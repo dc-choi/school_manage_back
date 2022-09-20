@@ -1,0 +1,219 @@
+<html>
+<head>
+	<title>출석부</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<link href="./css/common.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<h1>
+			<select id="year"></select>
+			중고등부 주일학교 출석부
+		</h1>
+		<p>
+			작성법<br>
+			출석=◎ 미사만 참여=○ 결석=미 표기
+		</p>
+		<p>
+			<select class="form-select" id="group"></select>
+		</p>
+		<div class="table-responsive" style="width: 1500px;">
+			<table class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
+		</div>
+		<p><button class="btn btn-success" type="button" id="save">저장</button></p>
+		<p><a class="btn btn-primary" href="index.html">뒤로 가기</a></p>
+	</div>
+</body>
+<script>
+	let table = $('.table');
+	let yearDate; // 한해의 일요일에 해당하는 날에 대한 변수
+	let students; // 그룹에 소속된 학생에 대한 변수
+
+	const initPage = () => {
+		$.ajax({
+			type: 'GET',
+			url: '/attendance/initPage',
+			data: {},
+			success: (data) => {
+				console.log(data);
+				const getArrYear = data.year - (data.year - 5);
+				let arrYear = [];
+				let html = '';
+				for (let i = 0; i < getArrYear; i++) {
+					arrYear.push(data.year - i);
+					html += `<option value="${arrYear[i]}">${arrYear[i]}</option>`;
+				}
+				$('#year').append(html);
+				let html2 = '';
+				data.groupList.forEach(e => {
+					html2 += `<option value="${e.gCode}">${e.gName}</option>`;
+				});
+				$('#group').append(html2);
+				getTable();
+			},
+			error: (error) => {
+				console.log(error);
+			}
+		});
+	};
+
+	const getTable = () => {
+		let year = $('#year').val();
+		let group = $('#group').val();
+
+		$.ajax({
+			type: 'GET',
+			url: '/attendance/table',
+			data: { year, group },
+			success: (data) => {
+				console.log(data);
+				students = data.groupStudents;
+				yearDate = data.day;
+				table.empty();
+				let html = `<thead class="table-primary">`;
+				html += `<tr scope="row">`;
+				html += `<th scope="col" rowspan="2" class="text-center align-middle">이름</th>`;
+				html += `<th scope="col" rowspan="2" class="text-center align-middle">세례명</th>`;
+				html += `<th scope="col" class="text-center">1월</th>`;
+				html += `<th scope="col" class="text-center">2월</th>`;
+				html += `<th scope="col" class="text-center">3월</th>`;
+				html += `<th scope="col" class="text-center">4월</th>`;
+				html += `<th scope="col" class="text-center">5월</th>`;
+				html += `<th scope="col" class="text-center">6월</th>`;
+				html += `<th scope="col" class="text-center">7월</th>`;
+				html += `<th scope="col" class="text-center">8월</th>`;
+				html += `<th scope="col" class="text-center">9월</th>`;
+				html += `<th scope="col" class="text-center">10월</th>`;
+				html += `<th scope="col" class="text-center">11월</th>`;
+				html += `<th scope="col" class="text-center">12월</th>`;
+				html += `</tr>`;
+				html += `<tr scope="row">`;
+				data.day.forEach(e => {
+					html += '<th scope="col" class="text-center">';
+					e.forEach(item => {
+						html += `${item} `;
+					})
+					html += '</th>';
+				});
+				html += '</tr>';
+				html += `</thead>`;
+				html += `<tbody>`;
+				data.groupStudents.forEach(e => {
+					html += '<tr scope="row">';
+					html += `<td scope="col" class="text-center table-info">${e.societyName}</td>`;
+					html += `<td scope="col" class="text-center table-info">${e.catholicName}</td>`;
+					for (let i = 0; i < 12; i++) {
+						html += '<td scope="col" class="text-center">';
+						for (let j = 0; j < data.day[i].length; j++) {
+							let month;
+							let day;
+							let inputContent;
+							let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
+
+							data.attendanceList.filter(list => {
+								month = list.aDate.substring(4, 6);
+								day = list.aDate.substring(6, 8);
+								inputContent = list.aContent;
+								Number(month);
+								Number(day);
+								if (e.sCode === list.studentCode && month - 1 == i && day == data.day[i][j]) {
+									html += `<input class="attendanceInput table-info" type="text" id="${e.sCode + '-' + (i + 1) + '.' + data.day[i][j]}" value="${inputContent}"" size=1> `;
+									inputCase = false;
+								}
+							});
+							if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e.sCode + '-' + (i + 1) + '.'+ data.day[i][j]}"" size=1> `;
+						}
+						html += '</td>';
+					}
+					html += '</tr>';
+				});
+				html += '</tbody>';
+				table.append(html);
+			},
+			error: (error) => {
+				console.log(error);
+			}
+		})
+	};
+
+	const save = () => {
+		if (confirm('정말 이대로 입력 하시겠습니까?')) {
+			let year = $('#year').val();
+			let loopData = {};
+			let emptyData = [];
+			let fullData = [];
+			
+			const month = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12 ];
+			let day = [];
+			
+			month.forEach(e => {
+				const lastDay = new Date(year, e, 0).getDate();
+				
+				for (let i = 1; i <= lastDay; i++) {
+					const date = new Date(year, e - 1, i);
+					if (date.getDay() === 0) {
+						day.push({ month: e, day: i });
+					}
+				}
+			});
+
+			students.forEach(e => {
+				day.forEach(item => {
+					let str = `${e.sCode + '-' + item.month + '.'+ item.day}`;
+					console.log(str);
+					let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
+					loopData.str = str;
+					loopData.data = data;
+					if (data === ''){
+						emptyData.push(loopData);
+					} else {
+						fullData.push(loopData);
+					}
+					loopData = {};
+				});
+			});
+
+			$.ajax({
+				type: 'POST',
+				url: '/attendance/fullSave',
+				data: { year, fullData },
+				success: (data) => {
+					if (data === "출석 입력 성공") alert("출석 입력중...");
+				},
+				error: (error) => {
+					alert(error);
+				}
+			});
+
+			$.ajax({
+				type: 'POST',
+				url: '/attendance/emptySave',
+				data: { year, emptyData },
+				success: (data) => {
+					if (data === "출석 입력 성공") alert(data);
+				},
+				error: (error) => {
+					alert(error);
+				}
+			});
+		}
+	};
+
+	initPage();
+
+	$('#year').on('change', () => {
+		getTable();
+	});
+
+	$('#group').on('change', () => {
+		getTable();
+	});
+
+	$('#save').on('click', () => {
+		save();
+	});
+</script>
+</html>
