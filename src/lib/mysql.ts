@@ -46,19 +46,7 @@ export function connect() {
 
         try {
             await sequelize.authenticate();
-            await sequelize.sync({
-                force: false, // 실제 배포시에는 false로 해야함.
-            });
             console.log('Connection has been established successfully.');
-
-            try {
-                await Rp.create({
-                    rp_id: env.webauthn.rpId,
-                    created_at: new Date()
-                });
-            } catch (e: any) {
-                logger.error(e);
-            }
             resolve(null);
         } catch (error) {
             console.error('Unable to connect to the database:', error);
