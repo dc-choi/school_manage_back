@@ -1,98 +1,106 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
-import type { Attendance, AttendanceId } from './attendance';
-import type { Group, GroupId } from './group';
 
 export interface StudentAttributes {
-    s_code: string;
-    s_society_name: string;
-    s_catholic_name: string;
-    s_age: number;
-    s_contact: string;
-    group_g_code: string;
+    _id: number;
+    student_society_name: string;
+    student_catholic_name?: string;
+    student_age?: number;
+    student_contact?: number;
+    student_description?: string;
+    create_at: Date;
+    update_at?: Date;
+    delete_at?: Date;
+    group__id: number;
 }
 
-export type StudentPk = "s_code";
+export type StudentPk = "_id";
 export type StudentId = Student[StudentPk];
-export type StudentCreationAttributes = StudentAttributes;
+export type StudentOptionalAttributes = "_id" | "student_catholic_name" | "student_age" | "student_contact" | "student_description" | "update_at" | "delete_at";
+export type StudentCreationAttributes = Optional<StudentAttributes, StudentOptionalAttributes>;
 
 export class Student extends Model<StudentAttributes, StudentCreationAttributes> implements StudentAttributes {
-    s_code!: string;
-    s_society_name!: string;
-    s_catholic_name!: string;
-    s_age!: number;
-    s_contact!: string;
-    group_g_code!: string;
-
-    // Student belongsTo Group via group_g_code
-    group_g_code_group!: Group;
-    getGroup_g_code_group!: Sequelize.BelongsToGetAssociationMixin<Group>;
-    setGroup_g_code_group!: Sequelize.BelongsToSetAssociationMixin<Group, GroupId>;
-    createGroup_g_code_group!: Sequelize.BelongsToCreateAssociationMixin<Group>;
-    // Student hasMany Attendance via student_s_code
-    attendances!: Attendance[];
-    getAttendances!: Sequelize.HasManyGetAssociationsMixin<Attendance>;
-    setAttendances!: Sequelize.HasManySetAssociationsMixin<Attendance, AttendanceId>;
-    addAttendance!: Sequelize.HasManyAddAssociationMixin<Attendance, AttendanceId>;
-    addAttendances!: Sequelize.HasManyAddAssociationsMixin<Attendance, AttendanceId>;
-    createAttendance!: Sequelize.HasManyCreateAssociationMixin<Attendance>;
-    removeAttendance!: Sequelize.HasManyRemoveAssociationMixin<Attendance, AttendanceId>;
-    removeAttendances!: Sequelize.HasManyRemoveAssociationsMixin<Attendance, AttendanceId>;
-    hasAttendance!: Sequelize.HasManyHasAssociationMixin<Attendance, AttendanceId>;
-    hasAttendances!: Sequelize.HasManyHasAssociationsMixin<Attendance, AttendanceId>;
-    countAttendances!: Sequelize.HasManyCountAssociationsMixin;
+    _id!: number;
+    student_society_name!: string;
+    student_catholic_name?: string;
+    student_age?: number;
+    student_contact?: number;
+    student_description?: string;
+    create_at!: Date;
+    update_at?: Date;
+    delete_at?: Date;
+    group__id!: number;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Student {
-        return sequelize.define('Student', {
-        s_code: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-            primaryKey: true
-        },
-        s_society_name: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        s_catholic_name: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        s_age: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        s_contact: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        group_g_code: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-            references: {
-                model: 'group',
-                key: 'g_code'
+        return Student.init({
+            _id: {
+                autoIncrement: true,
+                type: DataTypes.BIGINT,
+                allowNull: false,
+                primaryKey: true
+            },
+            student_society_name: {
+                type: DataTypes.STRING(50),
+                allowNull: false
+            },
+            student_catholic_name: {
+                type: DataTypes.STRING(50),
+                allowNull: true
+            },
+            student_age: {
+                type: DataTypes.BIGINT,
+                allowNull: true
+            },
+            student_contact: {
+                type: DataTypes.BIGINT,
+                allowNull: true
+            },
+            student_description: {
+                type: DataTypes.TEXT,
+                allowNull: true
+            },
+            create_at: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            },
+            update_at: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            delete_at: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            group__id: {
+                type: DataTypes.BIGINT,
+                allowNull: false,
+                references: {
+                    model: 'group',
+                    key: '_id'
+                }
             }
-        }
-    }, {
-        tableName: 'student',
-        timestamps: false,
-        indexes: [
-            {
-                name: "PRIMARY",
-                unique: true,
-                using: "BTREE",
-                fields: [
-                    { name: "s_code" },
-                ]
-            },
-            {
-                name: "fk_student_gruop1_idx",
-                using: "BTREE",
-                fields: [
-                    { name: "group_g_code" },
-                ]
-            },
-        ]
-    }) as typeof Student;
+        }, {
+            sequelize,
+            tableName: 'student',
+            timestamps: false,
+            indexes: [
+                {
+                    name: "PRIMARY",
+                    unique: true,
+                    using: "BTREE",
+                    fields: [
+                        { name: "_id" },
+                    ]
+                },
+                {
+                    name: "fk_student_group1_idx",
+                    using: "BTREE",
+                    fields: [
+                        { name: "group__id" },
+                    ]
+                },
+            ]
+        });
     }
 }
