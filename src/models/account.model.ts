@@ -1,6 +1,5 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
-import type { Group, GroupId } from './group';
 
 export interface AccountAttributes {
     _id: number;
@@ -23,19 +22,6 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     create_at!: Date;
     update_at?: Date;
     delete_at?: Date;
-
-    // Account hasMany Group via account__id
-    groups!: Group[];
-    getGroups!: Sequelize.HasManyGetAssociationsMixin<Group>;
-    setGroups!: Sequelize.HasManySetAssociationsMixin<Group, GroupId>;
-    addGroup!: Sequelize.HasManyAddAssociationMixin<Group, GroupId>;
-    addGroups!: Sequelize.HasManyAddAssociationsMixin<Group, GroupId>;
-    createGroup!: Sequelize.HasManyCreateAssociationMixin<Group>;
-    removeGroup!: Sequelize.HasManyRemoveAssociationMixin<Group, GroupId>;
-    removeGroups!: Sequelize.HasManyRemoveAssociationsMixin<Group, GroupId>;
-    hasGroup!: Sequelize.HasManyHasAssociationMixin<Group, GroupId>;
-    hasGroups!: Sequelize.HasManyHasAssociationsMixin<Group, GroupId>;
-    countGroups!: Sequelize.HasManyCountAssociationsMixin;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Account {
         return Account.init({
