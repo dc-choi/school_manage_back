@@ -27,6 +27,13 @@ export const env = {
     mongodb: {
         url: getOsEnv('MONGODB_URL')
     },
+    mysql: {
+        host: getOsEnv('MYSQL_HOST'),
+        port: getOsEnv('MYSQL_PORT'),
+        username: getOsEnv('MYSQL_USERNAME'),
+        password: getOsEnv('MYSQL_PASSWORD'),
+        schema: getOsEnv('MYSQL_SCHEMA'),
+    },
     app: {
         name: getOsEnv('APP_NAME'),
         version: (pkg as any).version,
@@ -35,7 +42,9 @@ export const env = {
     },
     jwt: {
 		secret: getOsEnv('JWT_SECRET'),
-        access: getOsEnv('JWT_ACCESS_EXPIRE'),
-        refresh: getOsEnv('JWT_REFRESH_EXPIRE')
+        expire: {
+            access: getOsEnv('JWT_EXPIRE_ACCESS'),
+            refresh: getOsEnv('JWT_EXPIRE_REFRESH')
+        },
 	},
 };

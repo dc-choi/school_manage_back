@@ -1,23 +1,26 @@
 import express from 'express';
+import path from 'path';
 import cookieParser from 'cookie-parser';
 // import cors from 'cors';
+import appRoot from 'app-root-path';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
-import bodyParser from 'body-parser';
 
 import { env } from './env';
 
 import * as Api from './app.router';
 
 import logger from './lib/logger';
-import * as mongodb from './lib/mongodb';
+// import * as mongodb from './lib/mongodb';
+import * as mysql from './lib/mysql';
 
 export const app = express();
 
+app.use(express.static(path.join(appRoot.path, 'public')));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(bodyParser.raw());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.raw());
 
 /** APP과 Server 통신간 CORS를 사용하지 않음.
  function getOrigins() {
@@ -62,7 +65,8 @@ app.listen(env.app.port, async function appMain() {
     const { build, version } = require('../package.json');
     logger.log(`[ v${version}, ${env.mode.value} ] =========================================`);
 
-    await mongodb.connect();
+    // await mongodb.connect();
+    await mysql.connect();
 
     logger.log(`----------------------------------------------`);
     logger.log(`🚀 App listening on the port ${env.app.port}`);
