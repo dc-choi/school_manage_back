@@ -8,4 +8,4 @@ export const router = Router();
 router.post('/login', new AuthController().login);
 // router.post('/logout', new AuthController().logout);
 
-router.post('/accessToken', new AuthController().accessToken);
+// router.post('/accessToken', new AuthController().accessToken);

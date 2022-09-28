@@ -8,26 +8,26 @@ import ApiCodes from '../../lib/api.codes';
 // import ApiMessages from '../../lib/api.messages';
 import ApiError from '../../lib/errors';
 
-import TokenRepository from './token.repository';
+// import TokenRepository from './token.repository';
 
 export default class TokenService {
-    public encodeAccessToken = async (companyIdentificationNumber) => {
+    public encodeAccessToken = async(account_ID) => {
         const payload = {
-            companyIdentificationNumber,
+            account_ID,
             timeStamp: Date.now()
         };
-        return jwt.sign(payload, env.jwt.secret, { expiresIn: env.jwt.access });
+        return jwt.sign(payload, env.jwt.secret, { expiresIn: env.jwt.expire.access });
     };
 
-    public encodeRefreshToken = async (companyIdentificationNumber) => {
-        const payload = {
-            companyIdentificationNumber,
-            timeStamp: Date.now()
-        };
-        const token = jwt.sign(payload, env.jwt.secret, { expiresIn: env.jwt.refresh });
-        await new TokenRepository().create(token);
-        return token;
-    };
+    // public encodeRefreshToken = async (companyIdentificationNumber) => {
+    //     const payload = {
+    //         companyIdentificationNumber,
+    //         timeStamp: Date.now()
+    //     };
+    //     const token = jwt.sign(payload, env.jwt.secret, { expiresIn: env.jwt.expire.refresh });
+    //     await new TokenRepository().create(token);
+    //     return token;
+    // };
 
     public decodeToken = async (token) => {
         try {
@@ -38,7 +38,7 @@ export default class TokenService {
         }
     };
 
-    public getRefreshToken = async (token) => {
-        return await new TokenRepository().getRefreshToken(token);
-    };
+    // public getRefreshToken = async (token) => {
+    //     return await new TokenRepository().getRefreshToken(token);
+    // };
 }

@@ -9,19 +9,23 @@ import ApiMessages from '../../lib/api.messages';
 import ApiError from '../../lib/errors';
 import { getErrorResponse } from '../../lib/utils';
 
+import AccountService from '../account/account.service';
 import TokenService from '../token/token.service';
-import CompantService from '../company/company.service';
 
 export default class AuthMiddleware {
-    public verifyAccessToken = async (req, res, next) => {
+    public authorization = async (req, res, next) => {
 		try {
 			if (req.headers.authorization?.startsWith('Bearer')) {
 				const token = req.headers.authorization.split(' ')[1];
 				const decodeToken = await new TokenService().decodeToken(token);
-                const { companyIdentificationNumber } = decodeToken;
-				const result = await new CompantService().getCompany(companyIdentificationNumber);
-                if (!result) throw new ApiError(ApiCodes.FORBIDDEN, 'FORBIDDEN: TOKEN is FORBIDDEN');
-                context.set('companyIdentificationNumber', companyIdentificationNumber);
+                const { account_ID } = decodeToken;
+                const dbData = await new AccountService().getAccount(account_ID);
+                const account = {
+                    id: dbData.getDataValue('_id'),
+                    name: account_ID
+                };
+                req.account = account;
+                context.set('account_ID', account_ID);
                 next();
 			} else {
 				throw new ApiError(ApiCodes.NOT_FOUND, 'UNAUTHORIZED: TOKEN NOT_FOUND');
