@@ -10,60 +10,37 @@
 </head>
 <body>
 	<div class="container">
-		<h1 id="title">주일학교 그룹 리스트</h1><br>
-		<div class="table-responsive">
-			<table class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
-		</div>
-		<p><a class="btn btn-success" href="groupAdd.html">그룹 추가</a></p>
-		<p><a class="btn btn-primary" href="main.html">뒤로 가기</a></p>
+		<h1 id="account"></h1><br>
+		<h3 id="teacher"></h3><br>
+		<p><a class="btn btn-primary" href="attendance.html">출석부 이동</a></p>
+		<p><a class="btn btn-primary" href="groupList.html">그룹 리스트 이동</a></p>
+		<p><a class="btn btn-primary" href="studentList.html">학생 명단 이동</a></p>
+		<p><a class="btn btn-primary" href="statistics.html">통계 이동</a></p>
 	</div>
 </body>
 <script>
-	let table = $('.table');
-
 	const initPage = () => {
 		$.ajax({
 			type: 'GET',
-			url: '/api/group',
+			url: '/api/account',
             headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
-			data: {},
+			data: { 'token': sessionStorage.getItem('token') },
 			success: (data) => {
 				console.log(data);
                 if (data.code !== 200) {
                     alert(data.message);
                     sessionStorage.clear();
                     location.href = `index.html`;
-                    return;
                 }
-                $('#title').html(`${data.account} 주일학교 그룹 리스트`);
-				table.empty();
-				let html = `<thead class="table-primary">`;
-				html += `<tr scope="row">`;
-				html += `<th scope="col" class="text-center">그룹 명</th>`;
-				html += `<th scope="col" class="text-center">비고</th>`;
-				html += `</tr>`;
-				html += `</thead>`;
-				html += `<tbody>`;
-				data.result.forEach(e => {
-					html += `<tr scope="row">
-					<td scope="col" class="text-center">${e.group_name}</td>
-					<td scope="col" class="text-center"><button class="btn btn-primary" type="button" onclick="modifyData('${e._id}')">수정</button></td>
-				</tr>`;
-				});
-				html += '</tbody>';
-				table.append(html);
+                $("#account").html(`장위동 ${data.result} 주일학교 관리 프로그램`);
+                $("#teacher").html(`환영합니다. ${data.result} 선생님.`);
 			},
 			error: (error) => {
-				console.log(error.message);
+				console.log(error.responseText);
 			}
-		})
-	};
-
-	const modifyData = (_id) => {
-		location.href = `groupModify.html?${_id}`;
+		});
 	};
 
 	initPage();
-
 </script>
 </html>

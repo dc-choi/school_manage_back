@@ -1,6 +1,7 @@
 <html>
 <head>
-	<title>출석부</title>
+	<title>주일학교 관리 프로그램</title>
+    <link href="./img/logo.jpeg" rel="shortcut icon" type="image/x-icon">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -11,7 +12,7 @@
 	<div class="container">
 		<h1>
 			<select id="year"></select>
-			중고등부 주일학교 출석부
+			<span id="title">주일학교 출석부</span>
 		</h1>
 		<p>
 			작성법<br>
@@ -24,32 +25,44 @@
 			<table class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
 		</div>
 		<p><button class="btn btn-success" type="button" id="save">저장</button></p>
-		<p><a class="btn btn-primary" href="index.html">뒤로 가기</a></p>
+		<p><a class="btn btn-primary" href="main.html">뒤로 가기</a></p>
 	</div>
 </body>
 <script>
 	let table = $('.table');
-	let yearDate; // 한해의 일요일에 해당하는 날에 대한 변수
-	let students; // 그룹에 소속된 학생에 대한 변수
+    let USER; // 저장시 날짜를 구분하기 위한 계정이름에 대한 전역변수
+    let STUDENT_OF_GROUP; // 저장시 학생이름에 대한 정보를 받아오기 위한 전역변수
+    let SATURDAY; // 저장시 계정에 따른 날짜가 다르기에 날짜 정보를 저장하기 위한 전역변수
+    let SUNDAY; // 저장시 계정에 따른 날짜가 다르기에 날짜 정보를 저장하기 위한 전역변수
 
 	const initPage = () => {
+        // https://solbel.tistory.com/1461
 		$.ajax({
 			type: 'GET',
-			url: '/attendance/initPage',
+			url: '/api/attendance',
+            headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
 			data: {},
 			success: (data) => {
 				console.log(data);
-				const getArrYear = data.year - (data.year - 5);
+                if (data.code !== 200) {
+                    alert(data.message);
+                    sessionStorage.clear();
+                    location.href = `index.html`;
+                    return;
+                }
+                USER = data.account;
+                $('#title').html(`${data.account} 주일학교 출석부`);
+				const getArrYear = data.result.year - (data.result.year - 5);
 				let arrYear = [];
 				let html = '';
 				for (let i = 0; i < getArrYear; i++) {
-					arrYear.push(data.year - i);
+					arrYear.push(data.result.year - i);
 					html += `<option value="${arrYear[i]}">${arrYear[i]}</option>`;
 				}
 				$('#year').append(html);
 				let html2 = '';
-				data.groupList.forEach(e => {
-					html2 += `<option value="${e.gCode}">${e.gName}</option>`;
+				data.result.groups.forEach(e => {
+					html2 += `<option value="${e._id}">${e.group_name}</option>`;
 				});
 				$('#group').append(html2);
 				getTable();
@@ -66,12 +79,20 @@
 
 		$.ajax({
 			type: 'GET',
-			url: '/attendance/table',
-			data: { year, group },
+			url: `/api/attendance/${group}`,
+            headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+			data: { year },
 			success: (data) => {
 				console.log(data);
-				students = data.groupStudents;
-				yearDate = data.day;
+                if (data.code !== 200) {
+                    alert(data.message);
+                    sessionStorage.clear();
+                    location.href = `index.html`;
+                    return;
+                }
+                STUDENT_OF_GROUP = data.result.students;
+                SATURDAY = data.result.saturday
+                SUNDAY = data.result.sunday;
 				table.empty();
 				let html = `<thead class="table-primary">`;
 				html += `<tr scope="row">`;
@@ -91,41 +112,73 @@
 				html += `<th scope="col" class="text-center">12월</th>`;
 				html += `</tr>`;
 				html += `<tr scope="row">`;
-				data.day.forEach(e => {
-					html += '<th scope="col" class="text-center">';
-					e.forEach(item => {
-						html += `${item} `;
-					})
-					html += '</th>';
-				});
+                if (data.account === '초등부') {
+                    data.result.saturday.forEach(e => {
+                        html += '<th scope="col" class="text-center">';
+                        e.forEach(item => {
+                            html += `${item} `;
+                        })
+                        html += '</th>';
+                    });
+                } else {
+                    data.result.sunday.forEach(e => {
+                        html += '<th scope="col" class="text-center">';
+                        e.forEach(item => {
+                            html += `${item} `;
+                        })
+                        html += '</th>';
+                    });
+                }
 				html += '</tr>';
 				html += `</thead>`;
 				html += `<tbody>`;
-				data.groupStudents.forEach(e => {
+                data.result.students.forEach(e => {
 					html += '<tr scope="row">';
-					html += `<td scope="col" class="text-center table-info">${e.societyName}</td>`;
-					html += `<td scope="col" class="text-center table-info">${e.catholicName}</td>`;
+					html += `<td scope="col" class="text-center table-info">${e.student_society_name}</td>`;
+					html += `<td scope="col" class="text-center table-info">${e.student_catholic_name}</td>`;
 					for (let i = 0; i < 12; i++) {
 						html += '<td scope="col" class="text-center">';
-						for (let j = 0; j < data.day[i].length; j++) {
-							let month;
-							let day;
-							let inputContent;
-							let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
+                        if (data.account === '초등부') {
+                            for (let j = 0; j < data.result.saturday[i].length; j++) {
+                                let month;
+                                let day;
+                                let inputContent;
+                                let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
-							data.attendanceList.filter(list => {
-								month = list.aDate.substring(4, 6);
-								day = list.aDate.substring(6, 8);
-								inputContent = list.aContent;
-								Number(month);
-								Number(day);
-								if (e.sCode === list.studentCode && month - 1 == i && day == data.day[i][j]) {
-									html += `<input class="attendanceInput table-info" type="text" id="${e.sCode + '-' + (i + 1) + '.' + data.day[i][j]}" value="${inputContent}"" size=1> `;
-									inputCase = false;
-								}
-							});
-							if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e.sCode + '-' + (i + 1) + '.'+ data.day[i][j]}"" size=1> `;
-						}
+                                data.result.attendances.filter(list => {
+                                    month = list.attendance_date.substring(4, 6);
+                                    day = list.attendance_date.substring(6, 8);
+                                    inputContent = list.attendance_content;
+                                    Number(month);
+                                    Number(day);
+                                    if (e._id === list.student__id && month - 1 == i && day == data.result.saturday[i][j]) {
+                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}"" size=1> `;
+                                        inputCase = false;
+                                    }
+                                });
+                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.saturday[i][j]}"" size=1> `;
+                            }
+                        } else {
+                            for (let j = 0; j < data.result.sunday[i].length; j++) {
+                                let month;
+                                let day;
+                                let inputContent;
+                                let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
+
+                                data.result.attendances.filter(list => {
+                                    month = list.attendance_date.substring(4, 6);
+                                    day = list.attendance_date.substring(6, 8);
+                                    inputContent = list.attendance_content;
+                                    Number(month);
+                                    Number(day);
+                                    if (e._id === list.student__id && month - 1 == i && day == data.result.sunday[i][j]) {
+                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1> `;
+                                        inputCase = false;
+                                    }
+                                });
+                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.sunday[i][j]}"" size=1> `;
+                            }
+                        }
 						html += '</td>';
 					}
 					html += '</tr>';
@@ -145,58 +198,76 @@
 			let loopData = {};
 			let emptyData = [];
 			let fullData = [];
-			
-			const month = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12 ];
-			let day = [];
-			
-			month.forEach(e => {
-				const lastDay = new Date(year, e, 0).getDate();
-				
-				for (let i = 1; i <= lastDay; i++) {
-					const date = new Date(year, e - 1, i);
-					if (date.getDay() === 0) {
-						day.push({ month: e, day: i });
-					}
-				}
-			});
 
-			students.forEach(e => {
-				day.forEach(item => {
-					let str = `${e.sCode + '-' + item.month + '.'+ item.day}`;
-					console.log(str);
-					let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
-					loopData.str = str;
-					loopData.data = data;
-					if (data === ''){
-						emptyData.push(loopData);
-					} else {
-						fullData.push(loopData);
-					}
-					loopData = {};
-				});
-			});
-
-			$.ajax({
-				type: 'POST',
-				url: '/attendance/fullSave',
-				data: { year, fullData },
-				success: (data) => {
-					if (data === "출석 입력 성공") alert("출석 입력중...");
-				},
-				error: (error) => {
-					alert(error);
-				}
+            STUDENT_OF_GROUP.forEach(e => {
+                if (USER === '초등부') {
+                    SATURDAY.forEach((item) => {
+                        let str = `${e._id + '-' + item.month + '.'+ item.day}`;
+                        console.log(str);
+                        let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
+                        loopData.str = str;
+                        loopData.data = data;
+                        if (data === ''){
+                            emptyData.push(loopData);
+                        } else {
+                            fullData.push(loopData);
+                        }
+                        loopData = {};
+                    });
+                } else {
+                    SUNDAY.forEach((item) => {
+                        let str = `${e._id + '-' + item.month + '.'+ item.day}`;
+                        console.log(str);
+                        let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
+                        loopData.str = str;
+                        loopData.data = data;
+                        if (data === ''){
+                            emptyData.push(loopData);
+                        } else {
+                            fullData.push(loopData);
+                        }
+                        loopData = {};
+                    });
+                }
 			});
 
 			$.ajax({
 				type: 'POST',
-				url: '/attendance/emptySave',
-				data: { year, emptyData },
+                headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+				url: '/api/attendance/fullData',
+				data: { year, attendance: fullData },
 				success: (data) => {
-					if (data === "출석 입력 성공") alert(data);
+                    console.log(data);
+                    if (data.code !== 200) {
+                        alert(data.message);
+                        sessionStorage.clear();
+                        location.href = `index.html`;
+                        return;
+                    }
+					alert(data.message);
 				},
 				error: (error) => {
-					alert(error);
+					alert(error.message);
+				}
+			});
+
+			$.ajax({
+				type: 'POST',
+                headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+				url: '/api/attendance/blankData',
+				data: { year, attendance: emptyData },
+				success: (data) => {
+                    console.log(data);
+                    if (data.code !== 200) {
+                        alert(data.message);
+                        sessionStorage.clear();
+                        location.href = `index.html`;
+                        return;
+                    }
+					alert(data.message);
+				},
+				error: (error) => {
+					alert(error.message);
 				}
 			});
 		}
@@ -215,5 +286,6 @@
 	$('#save').on('click', () => {
 		save();
 	});
+
 </script>
 </html>
