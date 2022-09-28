@@ -6,9 +6,9 @@ import appRoot from 'app-root-path';
 
 const rootFolder = `${appRoot.path}/logs`;
 const splitFormat = `yyyymmdd`;
-const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{company}}] {{message}}';
-const sqlFormat = '{{timestamp}} {{title}} {{tid}} [{{company}}] {{message}}';
-const mongoFormat = '{{timestamp}} {{title}} {{tid}} [{{company}}] {{message}}';
+const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{account}}] {{message}}';
+const sqlFormat = '{{timestamp}} {{title}} {{tid}} [{{account}}] {{message}}';
+const mongoFormat = '{{timestamp}} {{title}} {{tid}} [{{account}}] {{message}}';
 const jsonFormat = '{ timestamp:{{timestamp}}, tid:{{tid}}, payload:{{message}} }';
 const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
 
@@ -71,8 +71,8 @@ const preprocess = (data) => {
     data.title = convTitle(data.title)?.toUpperCase();
     data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
 
-    const company = context.get('companyIdentificationNumber');
-    data.company = company ? company : '';
+    const account = context.get('account_ID');
+    data.account = account ? account : '';
 
     const file = data.file?.length > 23 ? (data.file.substring(0, 20) + '...') : data.file;
     data.file = file?.padStart(23, ' ');
@@ -108,8 +108,8 @@ const sqlConfig = {
     stackIndex: 1,
     preprocess: (data: any) => {
         data.title = 'SQL';
-        const company = context.get('companyIdentificationNumber');
-        data.company = company ? company : '';
+        const account = context.get('account_ID');
+        data.account = account ? account : '';
         data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
     },
     transport: (data: any) => {
@@ -126,8 +126,8 @@ const mongoConfig = {
     stackIndex: 1,
     preprocess: (data: any) => {
         data.title = 'QUERY';
-        const company = context.get('companyIdentificationNumber');
-        data.company = company ? company : '';
+        const account = context.get('account_ID');
+        data.account = account ? account : '';
         data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
     },
     transport: (data: any) => {
@@ -143,8 +143,8 @@ const jsonConfig = {
     splitFormat: splitFormat,
     stackIndex: 1,
     preprocess: function(data: any) {
-        const company = context.get('companyIdentificationNumber');
-        data.company = company ? company : '';
+        const account = context.get('account_ID');
+        data.account = account ? account : '';
         data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
     },
     transport: function(data: any) {

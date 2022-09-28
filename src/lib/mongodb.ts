@@ -17,12 +17,10 @@ export function connect() {
                 };
                 logger.mongo(`${collectionName}.${methodName}` + `(${methodArgs.map(msgMapper).join(', ')})`);
             });
-            console.log('Connection has been established successfully.');
             logger.log('Connection has been established successfully.');
 
             resolve(null);
         } catch (error) {
-            console.error('Unable to connect to the database:', error);
             logger.error('Unable to connect to the database:', error);
             reject(error);
         }

@@ -10,6 +10,12 @@ import { getErrorResponse, getSuccessResponse } from '../../lib/utils';
 import AuthService from './auth.service';
 
 export default class AuthController {
+    /**
+     * 로그인을 하는 API
+     *
+     * @param req
+     * @param res
+     */
     public login = async(req, res) => {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
@@ -64,32 +70,32 @@ export default class AuthController {
     //     res.status(httpStatus.OK).json(response);
     // };
 
-    public accessToken = async (req, res) => {
-        logger.log('req.params:', JSON.stringify(req.params));
-        logger.log('req.query:', JSON.stringify(req.query));
-        logger.log('req.body:', JSON.stringify(req.body));
+    // public accessToken = async (req, res) => {
+    //     logger.log('req.params:', JSON.stringify(req.params));
+    //     logger.log('req.query:', JSON.stringify(req.query));
+    //     logger.log('req.body:', JSON.stringify(req.body));
 
-        const { refreshToken } = req.body
-        let response;
+    //     // const { refreshToken } = req.body
+    //     let response;
 
-        try {
-            const dbToken = await new AuthService().checkRefreshToken(refreshToken);
-            const result = await new AuthService().getAccessToken(dbToken);
+    //     try {
+    //         const dbToken = await new AuthService().checkRefreshToken(refreshToken);
+    //         const result = await new AuthService().getAccessToken(dbToken);
 
-            response = getSuccessResponse({
-                result
-            });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
-            logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
-        }
+    //         response = getSuccessResponse({
+    //             result
+    //         });
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     } catch (e: any) {
+    //         logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
+    //         logger.error(e);
+    //         response = getErrorResponse({
+    //             code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
+    //             message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
+    //         });
+    //     }
 
-        logger.res(httpStatus.OK, response, req);
-        res.status(httpStatus.OK).json(response);
-    };
+    //     logger.res(httpStatus.OK, response, req);
+    //     res.status(httpStatus.OK).json(response);
+    // };
 }
