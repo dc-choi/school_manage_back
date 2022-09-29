@@ -255,9 +255,11 @@
             if (emptyData.length > 0) {
                 $.ajax({
                     type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
                     headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
                     url: '/api/attendance/blankData',
-                    data: { year, attendance: emptyData },
+                    data: JSON.stringify({ year, attendance: emptyData }),
+                    dataType: 'JSON',
                     success: (data) => {
                         console.log(data);
                         if (data.code !== 200) {
@@ -277,9 +279,11 @@
             if (fullData.length > 0) {
                 $.ajax({
                     type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
                     headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
                     url: '/api/attendance/fullData',
-                    data: { year, attendance: fullData },
+                    data: JSON.stringify({ year, attendance: fullData }),
+                    dataType: 'JSON',
                     success: (data) => {
                         console.log(data);
                         if (data.code !== 200) {
