@@ -18,9 +18,10 @@ export const app = express();
 
 app.use(express.static(path.join(appRoot.path, 'public')));
 app.use(cookieParser());
-app.use(express.urlencoded({ limit: '100mb', extended: true }));
+// 서버를 시작할 때 사이즈를 지정해줘야 함.
+app.use(express.urlencoded({ limit: '100mb', parameterLimit: 2000, extended: true }));
 app.use(express.json({ limit: '100mb' }));
-app.use(express.raw());
+app.use(express.raw({ limit: '100mb' }));
 
 /** APP과 Server 통신간 CORS를 사용하지 않음.
  function getOrigins() {
