@@ -195,81 +195,107 @@
 	const save = () => {
 		if (confirm('정말 이대로 입력 하시겠습니까?')) {
 			let year = $('#year').val();
-			let loopData = {};
-			let emptyData = [];
-			let fullData = [];
+			let loopData = {}; // loop하기 위한 임시 데이터
+			let emptyData = []; // 빈 출석에 대한 데이터
+			let fullData = []; // 마크된 출석에 대한 데이터
 
-            STUDENT_OF_GROUP.forEach(e => {
+            // SATURDAY, SUNDAY에는 한 해의 토요일에 해당하는 날짜가 배정 됨.
+            // 그래서 따로 날짜를 생성해주는 로직을 작성해야 함.
+            let saturDay = [];
+            let sunDay = [];
+            SATURDAY.forEach((month, monthIndex) => {
+                const index = monthIndex + 1;
+				const lastDay = new Date(year, index, 0).getDate();
+				for (let i = 1; i <= lastDay; i++) {
+					const date = new Date(year, index - 1, i);
+					if (date.getDay() === 6) {
+						saturDay.push({ month: index, day: i });
+					}
+				}
+			});
+            SATURDAY.forEach((month, monthIndex) => {
+                const index = monthIndex + 1;
+				const lastDay = new Date(year, index, 0).getDate();
+				for (let i = 1; i <= lastDay; i++) {
+					const date = new Date(year, index - 1, i);
+					if (date.getDay() === 0) {
+						sunDay.push({ month: index, day: i });
+					}
+				}
+			});
+
+            STUDENT_OF_GROUP.forEach((student, studentIndex) => {
                 if (USER === '초등부') {
-                    SATURDAY.forEach((item) => {
-                        let str = `${e._id + '-' + item.month + '.'+ item.day}`;
-                        console.log(str);
+                    saturDay.forEach((item) => {
+                        let str = `${student._id + '-' + item.month + '.'+ item.day}`;
                         let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
                         loopData.str = str;
                         loopData.data = data;
-                        if (data === ''){
+                        if (data === '')
                             emptyData.push(loopData);
-                        } else {
+                        else
                             fullData.push(loopData);
-                        }
                         loopData = {};
                     });
                 } else {
-                    SUNDAY.forEach((item) => {
-                        let str = `${e._id + '-' + item.month + '.'+ item.day}`;
-                        console.log(str);
+                    sunDay.forEach((item) => {
+                        let str = `${student._id + '-' + item.month + '.'+ item.day}`;
                         let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
                         loopData.str = str;
                         loopData.data = data;
-                        if (data === ''){
+                        if (data === '')
                             emptyData.push(loopData);
-                        } else {
+                        else
                             fullData.push(loopData);
-                        }
                         loopData = {};
                     });
                 }
 			});
 
-			$.ajax({
-				type: 'POST',
-                headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
-				url: '/api/attendance/fullData',
-				data: { year, attendance: fullData },
-				success: (data) => {
-                    console.log(data);
-                    if (data.code !== 200) {
+            if (emptyData.length > 0) {
+                $.ajax({
+                    type: 'POST',
+                    headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+                    url: '/api/attendance/blankData',
+                    data: { year, attendance: emptyData },
+                    success: (data) => {
+                        console.log(data);
+                        if (data.code !== 200) {
+                            alert(data.message);
+                            sessionStorage.clear();
+                            location.href = `index.html`;
+                            return;
+                        }
                         alert(data.message);
-                        sessionStorage.clear();
-                        location.href = `index.html`;
-                        return;
+                    },
+                    error: (error) => {
+                        alert(error.message);
                     }
-					alert(data.message);
-				},
-				error: (error) => {
-					alert(error.message);
-				}
-			});
+                });
+            }
 
-			$.ajax({
-				type: 'POST',
-                headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
-				url: '/api/attendance/blankData',
-				data: { year, attendance: emptyData },
-				success: (data) => {
-                    console.log(data);
-                    if (data.code !== 200) {
+            if (fullData.length > 0) {
+                $.ajax({
+                    type: 'POST',
+                    headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+                    url: '/api/attendance/fullData',
+                    data: { year, attendance: fullData },
+                    success: (data) => {
+                        console.log(data);
+                        if (data.code !== 200) {
+                            alert(data.message);
+                            sessionStorage.clear();
+                            location.href = `index.html`;
+                            return;
+                        }
                         alert(data.message);
-                        sessionStorage.clear();
-                        location.href = `index.html`;
-                        return;
+                    },
+                    error: (error) => {
+                        alert(error.message);
                     }
-					alert(data.message);
-				},
-				error: (error) => {
-					alert(error.message);
-				}
-			});
+                });
+            }
+
 		}
 	};
 
