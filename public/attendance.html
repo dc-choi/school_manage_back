@@ -259,6 +259,7 @@
                     headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
                     url: '/api/attendance/blankData',
                     data: { year, attendance: emptyData },
+                    dataType: 'JSON',
                     success: (data) => {
                         console.log(data);
                         if (data.code !== 200) {
@@ -282,6 +283,7 @@
                     headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
                     url: '/api/attendance/fullData',
                     data: { year, attendance: fullData },
+                    dataType: 'JSON',
                     success: (data) => {
                         console.log(data);
                         if (data.code !== 200) {
