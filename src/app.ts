@@ -18,8 +18,8 @@ export const app = express();
 
 app.use(express.static(path.join(appRoot.path, 'public')));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+app.use(express.json({ limit: '100mb' }));
 app.use(express.raw());
 
 /** APP과 Server 통신간 CORS를 사용하지 않음.
