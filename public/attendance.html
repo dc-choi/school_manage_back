@@ -192,115 +192,137 @@
 		})
 	};
 
-	const save = () => {
+    const setDay = async(year) => {
+        let saturDay = [];
+        let sunDay = [];
+
+        SATURDAY.forEach((month, monthIndex) => {
+            const index = monthIndex + 1;
+            const lastDay = new Date(year, index, 0).getDate();
+            for (let i = 1; i <= lastDay; i++) {
+                const date = new Date(year, index - 1, i);
+                if (date.getDay() === 6) {
+                    saturDay.push({ month: index, day: i });
+                }
+            }
+        });
+        SATURDAY.forEach((month, monthIndex) => {
+            const index = monthIndex + 1;
+            const lastDay = new Date(year, index, 0).getDate();
+            for (let i = 1; i <= lastDay; i++) {
+                const date = new Date(year, index - 1, i);
+                if (date.getDay() === 0) {
+                    sunDay.push({ month: index, day: i });
+                }
+            }
+        });
+
+        return {
+            saturDay,
+            sunDay
+        };
+    };
+
+    const setAttendance = async(saturDay, sunDay) => {
+        let loopData = {}; // loop하기 위한 임시 데이터
+        let emptyData = []; // 빈 출석에 대한 데이터
+        let fullData = []; // 마크된 출석에 대한 데이터
+
+        STUDENT_OF_GROUP.forEach((student, studentIndex) => {
+            if (USER === '초등부') {
+                saturDay.forEach((item) => {
+                    let str = `${student._id + '-' + item.month + '.'+ item.day}`;
+                    let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
+                    loopData.str = str;
+                    loopData.data = data;
+                    if (data === '')
+                        emptyData.push(loopData);
+                    else
+                        fullData.push(loopData);
+                    loopData = {};
+                });
+            } else {
+                sunDay.forEach((item) => {
+                    let str = `${student._id + '-' + item.month + '.'+ item.day}`;
+                    let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
+                    loopData.str = str;
+                    loopData.data = data;
+                    if (data === '')
+                        emptyData.push(loopData);
+                    else
+                        fullData.push(loopData);
+                    loopData = {};
+                });
+            }
+        });
+
+        return {
+            emptyData,
+            fullData
+        };
+    };
+
+    const makeRequest = (url, year, attendance) => {
+        return new Promise(function (resolve, reject) {
+		    // do something async here..
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+                url,
+                data: JSON.stringify({ year, attendance }),
+                success: (data) => {
+                    resolve(data);
+                },
+                error: (error) => {
+                    reject(error);
+                }
+            });
+        });
+    };
+
+    const sendRequest = async(url, year, attendance) => {
+        const request = makeRequest(url, year, attendance);
+
+        let checkResponse = false;
+
+        await request
+            .then((data) => {
+                console.log(data);
+                if (data.code !== 200) {
+                    alert(data.message);
+                    sessionStorage.clear();
+                    location.href = `index.html`;
+                    return;
+                }
+                // alert(data.message);
+                if (data.message === 'OK') checkResponse = true;
+                else checkResponse = false;
+            })
+            .catch((error) => {
+                alert(error);
+            });
+
+        return checkResponse;
+    };
+
+	const save = async() => {
 		if (confirm('정말 이대로 입력 하시겠습니까?')) {
 			let year = $('#year').val();
-			let loopData = {}; // loop하기 위한 임시 데이터
-			let emptyData = []; // 빈 출석에 대한 데이터
-			let fullData = []; // 마크된 출석에 대한 데이터
-
+            let checkResponse = false;
             // SATURDAY, SUNDAY에는 한 해의 토요일에 해당하는 날짜가 배정 됨.
             // 그래서 따로 날짜를 생성해주는 로직을 작성해야 함.
-            let saturDay = [];
-            let sunDay = [];
-            SATURDAY.forEach((month, monthIndex) => {
-                const index = monthIndex + 1;
-				const lastDay = new Date(year, index, 0).getDate();
-				for (let i = 1; i <= lastDay; i++) {
-					const date = new Date(year, index - 1, i);
-					if (date.getDay() === 6) {
-						saturDay.push({ month: index, day: i });
-					}
-				}
-			});
-            SATURDAY.forEach((month, monthIndex) => {
-                const index = monthIndex + 1;
-				const lastDay = new Date(year, index, 0).getDate();
-				for (let i = 1; i <= lastDay; i++) {
-					const date = new Date(year, index - 1, i);
-					if (date.getDay() === 0) {
-						sunDay.push({ month: index, day: i });
-					}
-				}
-			});
+            const { saturDay, sunDay } = await setDay(year);
+            // 출석 데이터를 입력하는 로직을 작성해야 함.
+            const { emptyData, fullData } = await setAttendance(saturDay, sunDay);
 
-            STUDENT_OF_GROUP.forEach((student, studentIndex) => {
-                if (USER === '초등부') {
-                    saturDay.forEach((item) => {
-                        let str = `${student._id + '-' + item.month + '.'+ item.day}`;
-                        let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
-                        loopData.str = str;
-                        loopData.data = data;
-                        if (data === '')
-                            emptyData.push(loopData);
-                        else
-                            fullData.push(loopData);
-                        loopData = {};
-                    });
-                } else {
-                    sunDay.forEach((item) => {
-                        let str = `${student._id + '-' + item.month + '.'+ item.day}`;
-                        let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
-                        loopData.str = str;
-                        loopData.data = data;
-                        if (data === '')
-                            emptyData.push(loopData);
-                        else
-                            fullData.push(loopData);
-                        loopData = {};
-                    });
-                }
-			});
+            if (emptyData.length > 0) checkResponse = await sendRequest('/api/attendance/blankData', year, emptyData);
+            if (fullData.length > 0) checkResponse = await sendRequest('/api/attendance/fullData', year, fullData);
 
-            if (emptyData.length > 0) {
-                $.ajax({
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
-                    url: '/api/attendance/blankData',
-                    data: JSON.stringify({ year, attendance: emptyData }),
-                    dataType: 'JSON',
-                    success: (data) => {
-                        console.log(data);
-                        if (data.code !== 200) {
-                            alert(data.message);
-                            sessionStorage.clear();
-                            location.href = `index.html`;
-                            return;
-                        }
-                        alert(data.message);
-                    },
-                    error: (error) => {
-                        alert(error.message);
-                    }
-                });
-            }
-
-            if (fullData.length > 0) {
-                $.ajax({
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
-                    url: '/api/attendance/fullData',
-                    data: JSON.stringify({ year, attendance: fullData }),
-                    dataType: 'JSON',
-                    success: (data) => {
-                        console.log(data);
-                        if (data.code !== 200) {
-                            alert(data.message);
-                            sessionStorage.clear();
-                            location.href = `index.html`;
-                            return;
-                        }
-                        alert(data.message);
-                    },
-                    error: (error) => {
-                        alert(error.message);
-                    }
-                });
-            }
-
-		}
+            if (checkResponse) alert('OK');
+		} else {
+            alert('출석 저장을 취소하셨습니다.');
+        }
 	};
 
 	initPage();
