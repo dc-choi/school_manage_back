@@ -1,4 +1,3 @@
-import { join } from 'path';
 import logger from '../logger';
 
 export function getOsEnv(key: string): string {
