@@ -92,6 +92,7 @@ const logConfig = {
     splitFormat: splitFormat,
     stackIndex: 1,
     preprocess: (data: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         data = preprocess(data);
     },
     transport: (data: any) => {
