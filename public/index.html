@@ -48,7 +48,7 @@
 		return true;
 	};
 
-	$("#login").on("click", () => {
+    const login = () => {
         const id = $("#id").val();
         const password = $("#password").val();
 
@@ -69,7 +69,6 @@
                 // 브라우저를 종료하면 새로 로그인을 하도록, 세션 스토리지를 사용 함.
                 // 참고: https://ko.javascript.info/localstorage
                 sessionStorage.setItem('token', data.result.accessToken);
-                alert('로그인 성공!');
                 location.href = `main.html`;
                 // localStorage.clear();
 			},
@@ -77,6 +76,15 @@
 				console.log(error.responseText);
 			}
 		});
+    };
+
+	$("#login").on("click", () => {
+        login();
 	});
+
+    $("body").on("keyup", (event) => {
+        if (event.code === 'Enter') login();
+	});
+
 </script>
 </html>
