@@ -38,6 +38,8 @@
     let SATURDAY; // 저장시 계정에 따른 날짜가 다르기에 날짜 정보를 저장하기 위한 전역변수
     let SUNDAY; // 저장시 계정에 따른 날짜가 다르기에 날짜 정보를 저장하기 위한 전역변수
 
+    let IS_RUN = false; // save() 실행시 중복되게 하지 않기 위한 전역변수
+
 	const initPage = () => {
         // https://solbel.tistory.com/1461
 		$.ajax({
@@ -135,12 +137,14 @@
 				html += '</tr>';
 				html += `</thead>`;
 				html += `<tbody>`;
-                data.result.students.forEach(e => {
+                data.result.students.forEach((e, studentIdx) => {
 					html += `<tr scope="row">`;
 					html += `<td scope="col" class="text-center table-info">${e.student_society_name}</td>`;
 					html += `<td scope="col" class="text-center table-info">${e.student_catholic_name}</td>`;
+
+                    let tableIndex = 1;
 					for (let i = 0; i < 12; i++) {
-						html += `<td scope="col" class="text-center">`;
+                        html += `<td scope="col" class="text-center">`;
                         if (data.account === '초등부') {
                             for (let j = 0; j < data.result.saturday[i].length; j++) {
                                 let month;
@@ -149,17 +153,19 @@
                                 let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
                                 data.result.attendances.filter(list => {
+                                    console.log(attendanceIdx);
                                     month = list.attendance_date.substring(4, 6);
                                     day = list.attendance_date.substring(6, 8);
                                     inputContent = list.attendance_content;
                                     Number(month);
                                     Number(day);
                                     if (e._id === list.student__id && month - 1 == i && day == data.result.saturday[i][j]) {
-                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}"" size=1> `;
+                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}" size=1 tabindex=${tableIndex}> `;
                                         inputCase = false;
                                     }
                                 });
-                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.saturday[i][j]}"" size=1> `;
+                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.saturday[i][j]}" size=1 tabindex=${tableIndex}> `;
+                                tableIndex++;
                             }
                         } else {
                             for (let j = 0; j < data.result.sunday[i].length; j++) {
@@ -175,11 +181,12 @@
                                     Number(month);
                                     Number(day);
                                     if (e._id === list.student__id && month - 1 == i && day == data.result.sunday[i][j]) {
-                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1> `;
+                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1 tabindex=${tableIndex}> `;
                                         inputCase = false;
                                     }
                                 });
-                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.sunday[i][j]}"" size=1> `;
+                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.sunday[i][j]}"" size=1 tabindex=${tableIndex}> `;
+                                tableIndex++;
                             }
                         }
 						html += '</td>';
@@ -338,7 +345,10 @@
     };
 
 	const save = async() => {
+        if (IS_RUN) return;
+
         showLoading();
+        IS_RUN = true;
 
         let year = $('#year').val();
         let checkResponse = false;
@@ -353,6 +363,7 @@
 
         if (checkResponse) {
             hideLoading();
+            IS_RUN = false;
         }
 	};
 
@@ -370,14 +381,8 @@
 		save();
 	});
 
-    $("body").on("keyup", (event) => {
+    $('body').on('keyup', (event) => {
         if (event.code === 'Enter') save();
-	});
-
-    $(".table-responsive").on("click keyup", (event) => {
-        if (event.code === 'Tab') {
-
-        }
 	});
 
 </script>
