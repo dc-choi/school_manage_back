@@ -24,6 +24,9 @@
 		<div class="table-responsive" style="width: 1500px;">
 			<table class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
 		</div>
+        <div id="spin" class="d-none spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
 		<p><button class="btn btn-success" type="button" id="save">저장</button></p>
 		<p><a class="btn btn-primary" href="main.html">뒤로 가기</a></p>
 	</div>
@@ -52,7 +55,7 @@
                 }
                 USER = data.account;
                 $('#title').html(`${data.account} 주일학교 출석부`);
-				const getArrYear = data.result.year - (data.result.year - 5);
+				const getArrYear = data.result.year - (data.result.year - 1);
 				let arrYear = [];
 				let html = '';
 				for (let i = 0; i < getArrYear; i++) {
@@ -133,11 +136,11 @@
 				html += `</thead>`;
 				html += `<tbody>`;
                 data.result.students.forEach(e => {
-					html += '<tr scope="row">';
+					html += `<tr scope="row">`;
 					html += `<td scope="col" class="text-center table-info">${e.student_society_name}</td>`;
 					html += `<td scope="col" class="text-center table-info">${e.student_catholic_name}</td>`;
 					for (let i = 0; i < 12; i++) {
-						html += '<td scope="col" class="text-center">';
+						html += `<td scope="col" class="text-center">`;
                         if (data.account === '초등부') {
                             for (let j = 0; j < data.result.saturday[i].length; j++) {
                                 let month;
@@ -306,22 +309,50 @@
         return checkResponse;
     };
 
+    const showLoading = () => {
+        $('#spin').removeClass("d-none");
+        $('#save').addClass("d-none");
+
+        //화면의 높이와 너비를 구합니다.
+        let maskHeight = $(document).height();
+        let maskWidth  = window.document.body.clientWidth;
+
+        //화면에 출력할 마스크를 설정해줍니다.
+        let mask ="<div id='mask' style='position:absolute; z-index:1000; background-color:#000000; left:0; top:0;'></div>";
+
+        //화면에 레이어 추가
+        $('body').append(mask)
+
+        //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채웁니다.
+        $('#mask').css({
+            'width' : maskWidth
+            ,'height': maskHeight
+            ,'opacity' :'0.3'
+        });
+    };
+
+    const hideLoading = () => {
+        $('#save').removeClass("d-none");
+        $('#spin').addClass("d-none");
+        $("#mask").remove();
+    };
+
 	const save = async() => {
-		if (confirm('정말 이대로 입력 하시겠습니까?')) {
-			let year = $('#year').val();
-            let checkResponse = false;
-            // SATURDAY, SUNDAY에는 한 해의 토요일에 해당하는 날짜가 배정 됨.
-            // 그래서 따로 날짜를 생성해주는 로직을 작성해야 함.
-            const { saturDay, sunDay } = await setDay(year);
-            // 출석 데이터를 입력하는 로직을 작성해야 함.
-            const { emptyData, fullData } = await setAttendance(saturDay, sunDay);
+        showLoading();
 
-            if (emptyData.length > 0) checkResponse = await sendRequest('/api/attendance/blankData', year, emptyData);
-            if (fullData.length > 0) checkResponse = await sendRequest('/api/attendance/fullData', year, fullData);
+        let year = $('#year').val();
+        let checkResponse = false;
+        // SATURDAY, SUNDAY에는 한 해의 토, 일요일에 해당하는 날짜가 배정 됨.
+        // 그래서 따로 날짜를 생성해주는 로직을 작성해야 함.
+        const { saturDay, sunDay } = await setDay(year);
+        // 출석 데이터를 입력하는 로직을 작성해야 함.
+        const { emptyData, fullData } = await setAttendance(saturDay, sunDay);
 
-            if (checkResponse) alert('OK');
-		} else {
-            alert('출석 저장을 취소하셨습니다.');
+        if (emptyData.length > 0) checkResponse = await sendRequest('/api/attendance/blankData', year, emptyData);
+        if (fullData.length > 0) checkResponse = await sendRequest('/api/attendance/fullData', year, fullData);
+
+        if (checkResponse) {
+            hideLoading();
         }
 	};
 
@@ -337,6 +368,16 @@
 
 	$('#save').on('click', () => {
 		save();
+	});
+
+    $("body").on("keyup", (event) => {
+        if (event.code === 'Enter') save();
+	});
+
+    $(".table-responsive").on("click keyup", (event) => {
+        if (event.code === 'Tab') {
+
+        }
 	});
 
 </script>
