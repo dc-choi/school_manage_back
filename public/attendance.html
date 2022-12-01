@@ -21,8 +21,9 @@
 		<p>
 			<select class="form-select" id="group"></select>
 		</p>
-		<div class="table-responsive" style="width: 1500px;">
-			<table class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
+		<div class="table-responsive">
+            <table id="headTable" class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
+			<table id="dataTable" class="table table-sm table-bordered table-hover align-middle mw-auto" style="min-width: 1500px; overflow: scroll;"></table>
 		</div>
         <div id="spin" class="d-none spinner-border text-success" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -32,7 +33,7 @@
 	</div>
 </body>
 <script>
-	let table = $('.table');
+	let table = $('#dataTable');
     let USER; // 저장시 날짜를 구분하기 위한 계정이름에 대한 전역변수
     let STUDENT_OF_GROUP; // 저장시 학생이름에 대한 정보를 받아오기 위한 전역변수
     let SATURDAY; // 저장시 계정에 따른 날짜가 다르기에 날짜 정보를 저장하기 위한 전역변수
@@ -101,8 +102,8 @@
 				table.empty();
 				let html = `<thead class="table-primary">`;
 				html += `<tr scope="row">`;
-				html += `<th scope="col" rowspan="2" class="text-center align-middle">이름</th>`;
-				html += `<th scope="col" rowspan="2" class="text-center align-middle">세례명</th>`;
+				html += `<th scope="col" rowspan="2" class="text-center align-middle" style="position:sticky; left: 0;">이름</th>`;
+				html += `<th scope="col" rowspan="2" class="text-center align-middle" style="position:sticky; left: 80px;">세례명</th>`;
 				html += `<th scope="col" class="text-center">1월</th>`;
 				html += `<th scope="col" class="text-center">2월</th>`;
 				html += `<th scope="col" class="text-center">3월</th>`;
@@ -119,28 +120,32 @@
 				html += `<tr scope="row">`;
                 if (data.account === '초등부') {
                     data.result.saturday.forEach(e => {
-                        html += '<th scope="col" class="text-center">';
+                        html += '<th scope="col">';
+                        html += `<span style="word-spacing: -1px;">`;
                         e.forEach(item => {
                             html += `${item} `;
-                        })
+                        });
+                        html += `</span>`
                         html += '</th>';
                     });
                 } else {
                     data.result.sunday.forEach(e => {
-                        html += '<th scope="col" class="text-center">';
+                        html += '<th scope="col">';
+                        html += `<span style="word-spacing: -1px;">`;
                         e.forEach(item => {
                             html += `${item} `;
-                        })
+                        });
+                        html += `</span>`
                         html += '</th>';
                     });
                 }
 				html += '</tr>';
 				html += `</thead>`;
-				html += `<tbody>`;
+				html += `<tbody style="position:sticky; left: 2; z-index: 10;">`;
                 data.result.students.forEach((e, studentIdx) => {
 					html += `<tr scope="row">`;
-					html += `<td scope="col" class="text-center table-info">${e.student_society_name}</td>`;
-					html += `<td scope="col" class="text-center table-info">${e.student_catholic_name}</td>`;
+					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 0;">${e.student_society_name}</td>`;
+					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 80px;">${e.student_catholic_name}</td>`;
 
                     let tableIndex = 1;
 					for (let i = 0; i < 12; i++) {
@@ -160,11 +165,11 @@
                                     Number(month);
                                     Number(day);
                                     if (e._id === list.student__id && month - 1 == i && day == data.result.saturday[i][j]) {
-                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}" size=1 tabindex=${tableIndex}> `;
+                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}" size=1 tabindex=${tableIndex}>`;
                                         inputCase = false;
                                     }
                                 });
-                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.saturday[i][j]}" size=1 tabindex=${tableIndex}> `;
+                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.saturday[i][j]}" size=1 tabindex=${tableIndex}>`;
                                 tableIndex++;
                             }
                         } else {
@@ -181,11 +186,11 @@
                                     Number(month);
                                     Number(day);
                                     if (e._id === list.student__id && month - 1 == i && day == data.result.sunday[i][j]) {
-                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1 tabindex=${tableIndex}> `;
+                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1 tabindex=${tableIndex}>`;
                                         inputCase = false;
                                     }
                                 });
-                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.sunday[i][j]}"" size=1 tabindex=${tableIndex}> `;
+                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.sunday[i][j]}"" size=1 tabindex=${tableIndex}>`;
                                 tableIndex++;
                             }
                         }
