@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { env } from '../../env';
 
 // import logger from '../../lib/logger';
@@ -10,7 +11,7 @@ import StudentService from '../student/student.service';
 import AttendanceRepository from './attendance.repository';
 
 export default class AttendanceService {
-    public initAttendance = async(_id) => {
+    async initAttendance(_id: number) {
         const year = new Date().getFullYear();
         const { groups } = await new GroupService().getGroups(_id);
 
@@ -19,18 +20,18 @@ export default class AttendanceService {
             year,
             groups
         };
-    };
+    }
 
-    public getAttendanceByGroup = async ({ groupId, year }) => {
+    async getAttendanceByGroup(groupId: number, year: number) {
         const month = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12 ];
-		const sunday = [];
-        const saturday = [];
-        const studentsCode = [];
+		const sunday: Array<any> = [];
+        const saturday: Array<any> = [];
+        const studentsCode: Array<number> = [];
 
         // 토, 일요일에 해당하는 날을 구하는 로직
 		month.forEach(e => {
-			const tempSunday = [];
-			const tempSaturday = [];
+			const tempSunday: Array<number> = [];
+			const tempSaturday: Array<number> = [];
 			const lastDay = new Date(year, e, 0).getDate();
 
 			for (let i = 1; i <= lastDay; i++) {
@@ -60,57 +61,57 @@ export default class AttendanceService {
             students,
             attendances
         };
-    };
+    }
 
-    public createBlankAttendance = async ({ year, attendance }) => {
+    async createBlankAttendance(year: number, attendance: Array<any>) {
         for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-			const { code, time } = await this.separateAttendance({ idx, attendance });
-			const fullTime = await this.getFullTime({ year, time });
+			const { id, time } = await this.separateAttendance(idx, attendance);
+			const fullTime = await this.getFullTime(year, time);
 
-			const checkAttendance = await new AttendanceRepository().getAttendance({ code, fullTime });
+			const checkAttendance = await new AttendanceRepository().getAttendance(id, fullTime);
 			if (checkAttendance !== null) {
-                await new AttendanceRepository().deleteAttendance({ code, fullTime });
+                await new AttendanceRepository().deleteAttendance(id, fullTime);
 			}
 		}
 
         return {
             message: ApiMessages.OK,
         };
-    };
+    }
 
-    public createFullAttendance = async ({ year, attendance }) => {
+    async createFullAttendance(year: number, attendance: Array<any>) {
         for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-            const { code, time, data } = await this.separateAttendance({ idx, attendance });
-            const fullTime = await this.getFullTime({ year, time });
+            const { id, time, data } = await this.separateAttendance(idx, attendance);
+            const fullTime = await this.getFullTime(year, time);
 
-			const checkAttendance = await new AttendanceRepository().getAttendance({ code, fullTime });
+			const checkAttendance = await new AttendanceRepository().getAttendance(id, fullTime);
             if (checkAttendance === null) {
-                await new AttendanceRepository().createAttendance({ code, fullTime, data });
+                await new AttendanceRepository().createAttendance(id, fullTime, data);
 			} else {
-                await new AttendanceRepository().updateAttendance({ code, fullTime, data });
+                await new AttendanceRepository().updateAttendance(id, fullTime, data);
 			}
 		}
 
         return {
             message: ApiMessages.OK,
         };
-    };
+    }
 
-    private separateAttendance = async ({ idx, attendance }) => {
+    private async separateAttendance(idx: number, attendance: Array<any>) {
 		const str = attendance[idx].str.split('-');
-        const code = str[0];
+        const id = str[0];
 		const time = str[1].split('.');
         const data = attendance[idx].data;
 
         return {
-            code,
+            id,
             time,
             data
         }
-    };
+    }
 
-    private getFullTime = async ({ year, time }) => {
-        let fullTime;
+    private async getFullTime(year: number, time: Array<any>) {
+        let fullTime: string;
 
         if (time[0] < 10 && time[1] < 10)
             fullTime = `${year}${time[0].padStart(2, '0')}${time[1].padStart(2, '0')}`;
@@ -122,5 +123,5 @@ export default class AttendanceService {
             fullTime = `${year}${time[0]}${time[1]}`;
 
         return fullTime;
-    };
+    }
 }

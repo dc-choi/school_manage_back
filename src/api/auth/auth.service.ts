@@ -11,8 +11,8 @@ import TokenService from '../token/token.service';
 import AccountService from '../account/account.service';
 
 export default class AuthService {
-    public authentication = async ({ id, password }) => {
-        const dbData = await new AccountService().getAccount(id);
+    async authentication(id: string, password: string) {
+        const dbData = await new AccountService().getAccountByAccountId(id);
         if (!dbData) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: ID NOT_FOUND`);
 
         // bcrypt.hashSync(password, 12)로 만들어낸 패스워드끼리 비교.
@@ -28,7 +28,7 @@ export default class AuthService {
             accessToken,
             // refreshToken
         };
-    };
+    }
 
     // public checkRefreshToken = async (refreshToken) => {
     //     const dbToken = await new TokenService().getRefreshToken(refreshToken);

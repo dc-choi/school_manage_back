@@ -6,10 +6,11 @@
   "scripts": {
     "start": "npm run serve",
     "test": "cross-env NODE_ENV=test TS_NODE_FILES=true mocha -w -timeout 50000 -r tsconfig-paths/register -r ts-node/register ./test/**/*.test.ts",
-    "presetup": "yarn install",
-    "setup": "npm start config && npm start setup.script",
     "serve": "cross-env NODE_ENV=local nodemon --exec ts-node -r tsconfig-paths/register --files ./src/app.ts",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --check **/*.ts src/**/*.ts",
+    "prettier:fix": "prettier --write **/*.ts src/**/*.ts"
   },
   "author": "dc-choi",
   "dependencies": {

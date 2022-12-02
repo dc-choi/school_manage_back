@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 // import { env } from '../../env';
@@ -5,6 +6,7 @@ import httpStatus from 'http-status';
 import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
 import ApiMessages from '../../lib/api.messages';
+import ApiError from '../../lib/errors';
 import { getErrorResponse, getSuccessResponse } from '../../lib/utils';
 
 import AttendanceService from './attendance.service';
@@ -16,7 +18,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-    public initAttendance = async(req, res) => {
+     async initAttendance(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -43,7 +45,7 @@ export default class AttendanceController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
     /**
      * 출석 데이터를 가져오는 API
@@ -51,22 +53,29 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-    public getAttendanceByGroup = async(req, res) => {
+    async getAttendanceByGroup(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
 
         const { groupId } = req.params;
-        let { year } = req.query;
+        const { year } = req.query;
         let response;
 
         try {
-            year = Number(year);
-            if (isNaN(year) || year === 0) {
-                year = new Date().getFullYear();
+            // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
+            const parseGroupId = Number(groupId);
+            if (isNaN(parseGroupId) || parseGroupId === 0) {
+                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
-            const result = await new AttendanceService().getAttendanceByGroup({ groupId, year });
+            let parseYear = Number(year);
+            if (isNaN(parseYear) || parseYear === 0) {
+                // year의 경우는 올해의 값으로 처리하도록 함.
+                parseYear = new Date().getFullYear();
+            }
+
+            const result = await new AttendanceService().getAttendanceByGroup(parseGroupId, parseYear);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -85,7 +94,7 @@ export default class AttendanceController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
     /**
      * 공백 출석 데이터를 입력하는 API
@@ -93,7 +102,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-    public createBlankAttendance = async(req, res) => {
+     async createBlankAttendance(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -102,7 +111,7 @@ export default class AttendanceController {
         let response;
 
         try {
-            const result = await new AttendanceService().createBlankAttendance({ year, attendance });
+            const result = await new AttendanceService().createBlankAttendance(year, attendance);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -121,7 +130,7 @@ export default class AttendanceController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
     /**
      * 출석 데이터를 입력하는 API
@@ -129,7 +138,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-     public createFullAttendance = async(req, res) => {
+     async createFullAttendance(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -138,7 +147,7 @@ export default class AttendanceController {
         let response;
 
         try {
-            const result = await new AttendanceService().createFullAttendance({ year, attendance });
+            const result = await new AttendanceService().createFullAttendance(year, attendance);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -157,5 +166,5 @@ export default class AttendanceController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 }

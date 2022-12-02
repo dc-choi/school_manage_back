@@ -6,7 +6,7 @@ import { mysql } from '../../lib/mysql';
 import { Attendance } from '../../models/attendance.model';
 
 export default class AttendanceRepository {
-    public getAttendances = async(studentsCode) => {
+    public getAttendances = async(studentsCode: Array<number>) => {
         return await Attendance.findAll({
 			attributes: [
 				'_id',
@@ -21,23 +21,23 @@ export default class AttendanceRepository {
 		});
     };
 
-    public getAttendance = async({ code, fullTime }) => {
+    public getAttendance = async(id: number, fullTime: string) => {
         return await Attendance.findOne({
             where: {
-                student__id: code,
+                student__id: id,
                 attendance_date: fullTime,
             },
         });
     };
 
-    public createAttendance = async({ code, fullTime, data }) => {
+    public createAttendance = async(id: number, fullTime: string, data: string) => {
         const transaction = await mysql.transaction();
 
         try {
             await Attendance.create({
                 attendance_date: fullTime,
                 attendance_content: data,
-                student__id: code,
+                student__id: id,
             }, { transaction });
 
             await transaction.commit();
@@ -48,7 +48,7 @@ export default class AttendanceRepository {
         }
     };
 
-    public updateAttendance = async({ code, fullTime, data }) => {
+    public updateAttendance = async(id: number, fullTime: string, data: string) => {
         const transaction = await mysql.transaction();
 
         try {
@@ -59,7 +59,7 @@ export default class AttendanceRepository {
                 {
                     where: {
                         attendance_date: fullTime,
-                        student__id: code,
+                        student__id: id,
                     },
                     transaction
                 }
@@ -73,14 +73,14 @@ export default class AttendanceRepository {
         }
     };
 
-    public deleteAttendance = async({ code, fullTime }) => {
+    public deleteAttendance = async(id: number, fullTime: string) => {
         const transaction = await mysql.transaction();
 
         try {
             await Attendance.destroy({
                 where: {
                     attendance_date: fullTime,
-                    student__id: code,
+                    student__id: id,
                 },
                 transaction
             });
