@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 // import { env } from '../../env';
@@ -11,7 +12,7 @@ import TokenService from '../token/token.service';
 // import AccountService from './account.service';
 
 export default class AccountController {
-    public getAccount = async(req, res) => {
+    async getAccount(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -39,5 +40,5 @@ export default class AccountController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 }

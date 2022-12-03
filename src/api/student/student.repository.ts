@@ -7,16 +7,13 @@ import { Group } from '../../models/group.model';
 import { Student } from '../../models/student.model';
 
 export default class StudentRepository {
-    public getTotalRow = async({ searchOption, searchWord, groupsCode }) => {
-        let totalRow;
+    async getTotalRow(searchOption: string, searchWord: string, groupsCode: Array<number>): Promise<number> {
+        let totalRow: number;
 
         if (searchWord !== '') {
             switch (searchOption) {
                 case 'societyName':
-                    totalRow = await Student.findOne({
-                        attributes: [
-                            [Sequelize.fn('COUNT', Sequelize.col('_id')), 'count']
-                        ],
+                    totalRow = await Student.count({
                         where: {
                             student_society_name: searchWord,
                             group__id: { [Op.in]: groupsCode },
@@ -27,10 +24,7 @@ export default class StudentRepository {
                     });
                     break;
                 case 'catholicName':
-                    totalRow = await Student.findOne({
-                        attributes: [
-                            [Sequelize.fn('COUNT', Sequelize.col('_id')), 'count']
-                        ],
+                    totalRow = await Student.count({
                         where: {
                             student_catholic_name: searchWord,
                             group__id: { [Op.in]: groupsCode },
@@ -41,10 +35,7 @@ export default class StudentRepository {
                     });
                     break;
                 default:
-                    totalRow = await Student.findOne({
-                        attributes: [
-                            [Sequelize.fn('COUNT', Sequelize.col('_id')), 'count']
-                        ],
+                    totalRow = await Student.count({
                         where: {
                             group__id: { [Op.in]: groupsCode },
                             delete_at: {
@@ -55,10 +46,7 @@ export default class StudentRepository {
                     break;
             }
         } else {
-            totalRow = await Student.findOne({
-                attributes: [
-                    [Sequelize.fn('COUNT', Sequelize.col('_id')), 'count']
-                ],
+            totalRow = await Student.count({
                 where: {
                     group__id: { [Op.in]: groupsCode },
                     delete_at: {
@@ -69,10 +57,10 @@ export default class StudentRepository {
         }
 
         return totalRow;
-    };
+    }
 
-    public getStudents = async({ searchOption, searchWord, startRow, rowPerPage, groupsCode }) => {
-        let students;
+    async getStudents(searchOption: string, searchWord: string, startRow: number, rowPerPage: number, groupsCode: Array<number>): Promise<Student[]> {
+        let students: Student[];
 
         if (searchWord !== '') {
             switch (searchOption) {
@@ -177,9 +165,9 @@ export default class StudentRepository {
         }
 
         return students;
-    };
+    }
 
-    public getStudentsByGroup = async(groupId) => {
+    async getStudentsByGroup(groupId: number) {
         return await Student.findAll({
 			attributes: [
                 '_id',
@@ -194,9 +182,9 @@ export default class StudentRepository {
             },
 			order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
 		});
-    };
+    }
 
-    public getStudent = async(studentId) => {
+    async getStudent(studentId: number) {
         return await Student.findOne({
             where: {
                 _id: studentId,
@@ -205,9 +193,9 @@ export default class StudentRepository {
                 },
             }
         })
-    };
+    }
 
-    public createStudent = async({ societyName, catholicName, age, contact, description, group }) => {
+    async createStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<void> {
         const transaction = await mysql.transaction();
 
         try {
@@ -217,7 +205,7 @@ export default class StudentRepository {
                 student_age: age,
                 student_contact: contact,
                 student_description: description,
-                group__id: group,
+                group__id: groupId,
             }, { transaction });
 
             await transaction.commit();
@@ -226,9 +214,9 @@ export default class StudentRepository {
             logger.error(e);
             await transaction.rollback();
         }
-    };
+    }
 
-    public updateStudent = async({ societyName, catholicName, age, contact, description, group, studentId }) => {
+    async updateStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<void> {
         const transaction = await mysql.transaction();
 
         try {
@@ -239,7 +227,7 @@ export default class StudentRepository {
                     student_age: age,
                     student_contact: contact,
                     student_description: description,
-                    group__id: group
+                    group__id: groupId
                 },
                 {
                     where: {
@@ -255,9 +243,9 @@ export default class StudentRepository {
             logger.error(e);
             await transaction.rollback();
         }
-    };
+    }
 
-    public deleteStudent = async(studentId) => {
+    async deleteStudent(studentId: number): Promise<void> {
         const transaction = await mysql.transaction();
 
         try {
@@ -279,5 +267,5 @@ export default class StudentRepository {
             logger.error(e);
             await transaction.rollback();
         }
-    };
+    }
 }

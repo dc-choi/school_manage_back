@@ -8,7 +8,7 @@
 import AccountRepository from './account.repository';
 
 export default class AccountService {
-    public getAccount = async(id) => {
-        return await new AccountRepository().getAccount(id);
-    };
+    async getAccountByAccountId(id: string) {
+        return await new AccountRepository().getAccountByAccountId(id);
+    }
 }

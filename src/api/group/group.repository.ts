@@ -6,7 +6,7 @@ import { mysql } from '../../lib/mysql';
 import { Group } from '../../models/group.model';
 
 export default class GroupRepository {
-    public getGroups = async(_id) => {
+    async getGroups(_id: number): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
@@ -19,9 +19,9 @@ export default class GroupRepository {
                 },
 			},
         });
-    };
+    }
 
-    public getGroup = async(groupId) => {
+    async getGroup(groupId: number): Promise<Group> {
         return await Group.findOne({
             where: {
                 _id: groupId,
@@ -30,9 +30,9 @@ export default class GroupRepository {
                 },
             }
         })
-    };
+    }
 
-    public createGroup = async({ name, accountId }) => {
+    async createGroup(name: string, accountId: number): Promise<void> {
         const transaction = await mysql.transaction();
 
         try {
@@ -47,9 +47,9 @@ export default class GroupRepository {
             logger.error(e);
             await transaction.rollback();
         }
-    };
+    }
 
-    public updateGroup = async({ groupId, name, accountId }) => {
+    async updateGroup(groupId: number, name: string, accountId: number): Promise<void> {
         const transaction = await mysql.transaction();
 
         try {
@@ -72,9 +72,9 @@ export default class GroupRepository {
             logger.error(e);
             await transaction.rollback();
         }
-    };
+    }
 
-    public deleteGroup = async(groupId) => {
+    async deleteGroup(groupId: number): Promise<void> {
         const transaction = await mysql.transaction();
 
         try {
@@ -96,5 +96,5 @@ export default class GroupRepository {
             logger.error(e);
             await transaction.rollback();
         }
-    };
+    }
 }
