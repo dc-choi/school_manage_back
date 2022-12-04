@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import context from 'express-http-context';
 
@@ -22,41 +23,10 @@ import TokenService from '../token/token.service';
  * Node.js의 next() 를 사용해서 파이프라인으로 처리하였음.
  */
 export default class AuthMiddleware {
-    public authorization = async (req, res, next) => {
-		try {
-			if (req.headers.authorization?.startsWith('Bearer')) {
-				const token = req.headers.authorization.split(' ')[1];
-				const decodeToken = await new TokenService().decodeToken(token);
-                const { account_ID } = decodeToken;
-                const dbData = await new AccountService().getAccount(account_ID);
-                const account = {
-                    id: dbData.getDataValue('_id'),
-                    name: account_ID
-                };
-                req.account = account;
-                context.set('account_ID', account_ID);
-                next();
-			} else {
-				throw new ApiError(ApiCodes.NOT_FOUND, 'UNAUTHORIZED: TOKEN NOT_FOUND');
-			}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} catch (e: any) {
-			logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
-            logger.error(e);
-            const response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
-
-            logger.res(httpStatus.OK, response, req);
-            res.status(httpStatus.OK).json(response);
-		}
-	};
-
     /**
      * 토큰 파싱하는 부분
      */
-    async parseAuthToken(req, res, next) {
+    async parseAuthToken(req: Request, res: Response, next: NextFunction) {
         try {
 			if (req.headers.authorization?.startsWith('Bearer')) {
 				const token = req.headers.authorization.split(' ')[1];
@@ -83,13 +53,13 @@ export default class AuthMiddleware {
     /**
      * 파싱된 데이터로 검증
      */
-    async verifyAccount(req, res, next) {
+    async verifyAccount(req: Request, res: Response, next: NextFunction) {
         try {
             // 디코드된 토큰안의 변수를 가져옴
             const { account_ID, timeStamp } = req.decodeToken;
 
             // 시스템상 가입된 회원인지 확인
-            const dbData = await new AccountService().getAccount(account_ID);
+            const dbData = await new AccountService().getAccountByAccountId(account_ID);
             if (!dbData) throw new ApiError(ApiCodes.NOT_FOUND, 'NOT_FOUND: ACCOUNT_ID IS WRONG');
 
             // 토큰의 기한이 만료된 토큰인지 검사하는 로직
@@ -111,12 +81,11 @@ export default class AuthMiddleware {
                 throw new ApiError(ApiCodes.UNAUTHORIZED, 'TOKEN is EXPIRE');
             }
 
-            const account = {
+            req.account = {
                 id: dbData.getDataValue('_id'),
                 name: account_ID
             };
 
-            req.account = account;
             context.set('account_ID', account_ID);
             next();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -11,13 +11,13 @@ import ApiError from '../../lib/errors';
 // import TokenRepository from './token.repository';
 
 export default class TokenService {
-    public encodeAccessToken = async(account_ID) => {
+    async encodeAccessToken(account_ID: string) {
         const payload = {
             account_ID,
             timeStamp: Date.now()
         };
         return jwt.sign(payload, env.jwt.secret, { expiresIn: env.jwt.expire.access });
-    };
+    }
 
     // public encodeRefreshToken = async (companyIdentificationNumber) => {
     //     const payload = {
@@ -29,14 +29,14 @@ export default class TokenService {
     //     return token;
     // };
 
-    public decodeToken = async (token) => {
+    async decodeToken(token) {
         try {
             return jwt.verify(token, env.jwt.secret);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
 			throw new ApiError(ApiCodes.UNAUTHORIZED, error.name);
         }
-    };
+    }
 
     // public getRefreshToken = async (token) => {
     //     return await new TokenRepository().getRefreshToken(token);

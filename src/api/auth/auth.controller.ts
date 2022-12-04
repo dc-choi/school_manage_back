@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 // import { env } from '../../env';
@@ -16,7 +17,7 @@ export default class AuthController {
      * @param req
      * @param res
      */
-    public login = async(req, res) => {
+     async login(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -25,7 +26,7 @@ export default class AuthController {
         let response;
 
         try {
-            const result = await new AuthService().authentication({ id, password });
+            const result = await new AuthService().authentication(id, password);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -43,7 +44,7 @@ export default class AuthController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
     // 지금 당장 사용하는 함수 X
     // public logout = async(req, res) => {

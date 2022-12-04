@@ -120,8 +120,8 @@
 				html += `<tr scope="row">`;
                 if (data.account === '초등부') {
                     data.result.saturday.forEach(e => {
-                        html += '<th scope="col">';
-                        html += `<span style="word-spacing: -1px;">`;
+                        html += '<th scope="col" class="text-center">';
+                        html += `<span style="word-spacing: -1px;" >`;
                         e.forEach(item => {
                             html += `${item} `;
                         });
@@ -130,7 +130,7 @@
                     });
                 } else {
                     data.result.sunday.forEach(e => {
-                        html += '<th scope="col">';
+                        html += '<th scope="col" class="text-center">';
                         html += `<span style="word-spacing: -1px;">`;
                         e.forEach(item => {
                             html += `${item} `;
@@ -141,7 +141,7 @@
                 }
 				html += '</tr>';
 				html += `</thead>`;
-				html += `<tbody style="position:sticky; left: 2; z-index: 10;">`;
+				html += `<tbody>`;
                 data.result.students.forEach((e, studentIdx) => {
 					html += `<tr scope="row">`;
 					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 0;">${e.student_society_name}</td>`;

@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 // import { env } from '../../env';
@@ -5,12 +6,13 @@ import httpStatus from 'http-status';
 import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
 import ApiMessages from '../../lib/api.messages';
+import ApiError from '../../lib/errors';
 import { getErrorResponse, getSuccessResponse } from '../../lib/utils';
 
 import GroupService from './group.service';
 
 export default class GroupController {
-    public getGroups = async(req, res) => {
+    async getGroups(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -37,9 +39,9 @@ export default class GroupController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
-    public getGroup = async(req, res) => {
+    async getGroup(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -48,7 +50,13 @@ export default class GroupController {
         let response;
 
         try {
-            const { group } = await new GroupService().getGroup(groupId);
+            // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
+            const parseGroupId = Number(groupId);
+            if (isNaN(parseGroupId) || parseGroupId === 0) {
+                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+            }
+
+            const { group } = await new GroupService().getGroup(parseGroupId);
             logger.log('result:', JSON.stringify(group));
 
             response = getSuccessResponse({
@@ -67,9 +75,9 @@ export default class GroupController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
-    public createGroup = async(req, res) => {
+    async createGroup(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -78,7 +86,7 @@ export default class GroupController {
         let response;
 
         try {
-            const result = await new GroupService().createGroup({ name, accountId: req.account.id });
+            const result = await new GroupService().createGroup(name, req.account.id);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -97,9 +105,9 @@ export default class GroupController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
-    public updateGroup = async(req, res) => {
+    async updateGroup(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -109,7 +117,13 @@ export default class GroupController {
         let response;
 
         try {
-            const result = await new GroupService().updateGroup({ groupId, name, accountId: req.account.id });
+            // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
+            const parseGroupId = Number(groupId);
+            if (isNaN(parseGroupId) || parseGroupId === 0) {
+                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+            }
+
+            const result = await new GroupService().updateGroup(parseGroupId, name, req.account.id);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -128,9 +142,9 @@ export default class GroupController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 
-    public deleteGroup = async(req, res) => {
+    async deleteGroup(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -139,7 +153,13 @@ export default class GroupController {
         let response;
 
         try {
-            const result = await new GroupService().deleteGroup(groupId);
+            // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
+            const parseGroupId = Number(groupId);
+            if (isNaN(parseGroupId) || parseGroupId === 0) {
+                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+            }
+
+            const result = await new GroupService().deleteGroup(parseGroupId);
             logger.log('result:', JSON.stringify(result));
 
             response = getSuccessResponse({
@@ -158,5 +178,5 @@ export default class GroupController {
 
         logger.res(httpStatus.OK, response, req);
         res.status(httpStatus.OK).json(response);
-    };
+    }
 }
