@@ -10,6 +10,9 @@ import ApiError from '../../lib/errors';
 
 // import TokenRepository from './token.repository';
 
+/**
+ * 추후에 refresh token을 구현할 때 타입을 적용시켜야 함.
+ */
 export default class TokenService {
     async encodeAccessToken(account_ID: string) {
         const payload = {
@@ -29,7 +32,7 @@ export default class TokenService {
     //     return token;
     // };
 
-    async decodeToken(token) {
+    async decodeToken(token: string) {
         try {
             return jwt.verify(token, env.jwt.secret);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

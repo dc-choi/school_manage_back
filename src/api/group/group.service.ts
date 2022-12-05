@@ -1,52 +1,55 @@
-// import { env } from '../../env';
+import { Builder } from 'builder-pattern';
 
-// import logger from '../../lib/logger';
-// import ApiCodes from '../../lib/api.codes';
-import ApiMessages from '../../lib/api.messages';
-// import ApiError from '../../lib/errors';
+import { IGroup } from '../../@types/group';
+import { Group } from '../../models/group.model';
 
 import GroupRepository from './group.repository';
 
 export default class GroupService {
-    async getGroups(_id: number) {
-        const groups = await new GroupRepository().getGroups(_id);
+    async getGroupsByAccountId(_id: number): Promise<IGroup[]> {
+        const groups: Group[] = await new GroupRepository().getGroupsByAccountId(_id);
+        const groupsBuilder: IGroup[] = [];
+        groups.forEach(item => {
+            groupsBuilder.push(
+                Builder<IGroup>()
+                    ._id(item._id)
+                    .groupName(item.group_name)
+                    .build()
+            );
+        });
 
-        return {
-            message: ApiMessages.OK,
-            groups
-        };
+        return groupsBuilder;
     }
 
-    async getGroup(groupId: number) {
-        const group = await new GroupRepository().getGroup(groupId);
+    async getGroup(groupId: number): Promise<IGroup> {
+        const group: Group = await new GroupRepository().getGroup(groupId);
 
-        return {
-            message: ApiMessages.OK,
-            group
-        };
+        return Builder<IGroup>()
+            ._id(group._id)
+            .groupName(group.group_name)
+            .accountId(group.account__id)
+            .build();
     }
 
-    async createGroup(name: string, accountId: number) {
-        await new GroupRepository().createGroup(name, accountId);
+    async createGroup(name: string, accountId: number): Promise<IGroup> {
+        const group = await new GroupRepository().createGroup(name, accountId);
 
-        return {
-            message: ApiMessages.OK
-        };
+        return Builder<IGroup>()
+            ._id(group._id)
+            .groupName(group.group_name)
+            .accountId(group.account__id)
+            .build();
     }
 
-    async updateGroup(groupId: number, name: string, accountId: number) {
-        await new GroupRepository().updateGroup(groupId, name, accountId);
-
-        return {
-            message: ApiMessages.OK
-        };
+    async updateGroup(groupId: number, name: string, accountId: number): Promise<number> {
+        const [ affectedCount ] = await new GroupRepository().updateGroup(groupId, name, accountId);
+        const row = affectedCount;
+        return row;
     }
 
-    async deleteGroup(groupId: number) {
-        await new GroupRepository().deleteGroup(groupId);
-
-        return {
-            message: ApiMessages.OK
-        };
+    async deleteGroup(groupId: number): Promise<number> {
+        const [ affectedCount ] = await new GroupRepository().deleteGroup(groupId);
+        const row = affectedCount;
+        return row;
     }
 }

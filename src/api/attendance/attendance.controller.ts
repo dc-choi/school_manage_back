@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-// import { env } from '../../env';
-
 import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
-import ApiMessages from '../../lib/api.messages';
 import ApiError from '../../lib/errors';
-import { getErrorResponse, getSuccessResponse } from '../../lib/utils';
+
+import { AttendancesDTO } from '../../common/dto/attendance.dto';
+import { Result } from '../../common/result';
 
 import AttendanceService from './attendance.service';
 
@@ -18,7 +17,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-     async initAttendance(req: Request, res: Response) {
+     async setAttendance(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -26,21 +25,20 @@ export default class AttendanceController {
         let response;
 
         try {
-            const result = await new AttendanceService().initAttendance(req.account.id);
+            const setting: AttendancesDTO = await new AttendanceService().setAttendance(req.account.id);
+
+            const result = {
+                ...setting,
+                account: req.account.name
+            }
             logger.log('result:', JSON.stringify(result));
 
-            response = getSuccessResponse({
-                result,
-                account: req.account.name
-            });
+            response = Result.ok(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            response = Result.fail<ApiError>(e).toJson();
         }
 
         logger.res(httpStatus.OK, response, req);
@@ -75,57 +73,20 @@ export default class AttendanceController {
                 parseYear = new Date().getFullYear();
             }
 
-            const result = await new AttendanceService().getAttendanceByGroup(parseGroupId, parseYear);
+            const attendances: AttendancesDTO = await new AttendanceService().getAttendanceByGroup(parseGroupId, parseYear);
+
+            const result = {
+                ...attendances,
+                account: req.account.name
+            }
             logger.log('result:', JSON.stringify(result));
 
-            response = getSuccessResponse({
-                result,
-                account: req.account.name
-            });
+            response = Result.ok(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
-        }
-
-        logger.res(httpStatus.OK, response, req);
-        res.status(httpStatus.OK).json(response);
-    }
-
-    /**
-     * 공백 출석 데이터를 입력하는 API
-     *
-     * @param req
-     * @param res
-     */
-     async createBlankAttendance(req: Request, res: Response) {
-        logger.log('req.params:', JSON.stringify(req.params));
-        logger.log('req.query:', JSON.stringify(req.query));
-        logger.log('req.body:', JSON.stringify(req.body));
-
-        const { year, attendance } = req.body;
-        let response;
-
-        try {
-            const result = await new AttendanceService().createBlankAttendance(year, attendance);
-            logger.log('result:', JSON.stringify(result));
-
-            response = getSuccessResponse({
-                result,
-                account: req.account.name
-            });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
-            logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            response = Result.fail<ApiError>(e).toJson();
         }
 
         logger.res(httpStatus.OK, response, req);
@@ -138,30 +99,34 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-     async createFullAttendance(req: Request, res: Response) {
+     async createAttendance(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
 
-        const { year, attendance } = req.body;
+        const { year, attendance, isFull } = req.body;
         let response;
 
         try {
-            const result = await new AttendanceService().createFullAttendance(year, attendance);
+            let row: number;
+            if (isFull) {
+                row = await new AttendanceService().createFullAttendance(year, attendance);
+            } else {
+                row = await new AttendanceService().createBlankAttendance(year, attendance);
+            }
+
+            const result = {
+                row,
+                account: req.account.name
+            }
             logger.log('result:', JSON.stringify(result));
 
-            response = getSuccessResponse({
-                result,
-                account: req.account.name
-            });
+            response = Result.ok(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            response = Result.fail<ApiError>(e).toJson();
         }
 
         logger.res(httpStatus.OK, response, req);

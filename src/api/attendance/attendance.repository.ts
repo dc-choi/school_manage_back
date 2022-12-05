@@ -6,7 +6,7 @@ import { mysql } from '../../lib/mysql';
 import { Attendance } from '../../models/attendance.model';
 
 export default class AttendanceRepository {
-    public getAttendances = async(studentsCode: Array<number>) => {
+    async getAttendances(studentsCode: Array<number>): Promise<Attendance[]> {
         return await Attendance.findAll({
 			attributes: [
 				'_id',
@@ -19,22 +19,23 @@ export default class AttendanceRepository {
 			},
 			// order: [ ['a_date', 'ASC'] ],
 		});
-    };
+    }
 
-    public getAttendance = async(id: number, fullTime: string) => {
+    async getAttendance(id: number, fullTime: string): Promise<Attendance> {
         return await Attendance.findOne({
             where: {
                 student__id: id,
                 attendance_date: fullTime,
             },
         });
-    };
+    }
 
-    public createAttendance = async(id: number, fullTime: string, data: string) => {
+    async createAttendance(id: number, fullTime: string, data: string): Promise<Attendance> {
         const transaction = await mysql.transaction();
+        let attendance;
 
         try {
-            await Attendance.create({
+            attendance = await Attendance.create({
                 attendance_date: fullTime,
                 attendance_content: data,
                 student__id: id,
@@ -45,14 +46,18 @@ export default class AttendanceRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            attendance = null;
         }
-    };
 
-    public updateAttendance = async(id: number, fullTime: string, data: string) => {
+        return attendance;
+    }
+
+    async updateAttendance(id: number, fullTime: string, data: string): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
+        let attendance: [affectedCount: number];
 
         try {
-            await Attendance.update(
+            attendance = await Attendance.update(
                 {
                     attendance_content: data,
                 },
@@ -66,18 +71,23 @@ export default class AttendanceRepository {
             );
 
             await transaction.commit();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            attendance = [ 0 ];
         }
-    };
 
-    public deleteAttendance = async(id: number, fullTime: string) => {
+        return attendance;
+    }
+
+    async deleteAttendance(id: number, fullTime: string): Promise<number> {
         const transaction = await mysql.transaction();
+        let attendance: number;
 
         try {
-            await Attendance.destroy({
+            attendance = await Attendance.destroy({
                 where: {
                     attendance_date: fullTime,
                     student__id: id,
@@ -86,10 +96,13 @@ export default class AttendanceRepository {
             });
 
             await transaction.commit();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            attendance = 0;
         }
-    };
+
+        return attendance;
+    }
 }
