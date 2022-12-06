@@ -22,7 +22,6 @@
 			<select class="form-select" id="group"></select>
 		</p>
 		<div class="table-responsive">
-            <table id="headTable" class="table table-sm table-bordered table-hover align-middle mw-auto"></table>
 			<table id="dataTable" class="table table-sm table-bordered table-hover align-middle mw-auto" style="min-width: 1500px; overflow: scroll;"></table>
 		</div>
         <div id="spin" class="d-none spinner-border text-success" role="status">
@@ -56,8 +55,8 @@
                     location.href = `index.html`;
                     return;
                 }
-                USER = data.account;
-                $('#title').html(`${data.account} 주일학교 출석부`);
+                USER = data.result.account;
+                $('#title').html(`${data.result.account} 주일학교 출석부`);
 				const getArrYear = data.result.year - (data.result.year - 1);
 				let arrYear = [];
 				let html = '';
@@ -68,7 +67,7 @@
 				$('#year').append(html);
 				let html2 = '';
 				data.result.groups.forEach(e => {
-					html2 += `<option value="${e._id}">${e.group_name}</option>`;
+					html2 += `<option value="${e._id}">${e.groupName}</option>`;
 				});
 				$('#group').append(html2);
 				getTable();
@@ -103,7 +102,7 @@
 				let html = `<thead class="table-primary">`;
 				html += `<tr scope="row">`;
 				html += `<th scope="col" rowspan="2" class="text-center align-middle" style="position:sticky; left: 0;">이름</th>`;
-				html += `<th scope="col" rowspan="2" class="text-center align-middle" style="position:sticky; left: 80px;">세례명</th>`;
+				html += `<th scope="col" rowspan="2" class="text-center align-middle" style="position:sticky; left: 5.1%;">세례명</th>`;
 				html += `<th scope="col" class="text-center">1월</th>`;
 				html += `<th scope="col" class="text-center">2월</th>`;
 				html += `<th scope="col" class="text-center">3월</th>`;
@@ -118,7 +117,7 @@
 				html += `<th scope="col" class="text-center">12월</th>`;
 				html += `</tr>`;
 				html += `<tr scope="row">`;
-                if (data.account === '초등부') {
+                if (data.result.account === '초등부') {
                     data.result.saturday.forEach(e => {
                         html += '<th scope="col" class="text-center">';
                         html += `<span style="word-spacing: -1px;" >`;
@@ -144,13 +143,13 @@
 				html += `<tbody>`;
                 data.result.students.forEach((e, studentIdx) => {
 					html += `<tr scope="row">`;
-					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 0;">${e.student_society_name}</td>`;
-					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 80px;">${e.student_catholic_name}</td>`;
+					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 0;">${e.studentSocietyName}</td>`;
+					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 5.1%;">${e.studentCatholicName}</td>`;
 
                     let tableIndex = 1;
 					for (let i = 0; i < 12; i++) {
                         html += `<td scope="col" class="text-center">`;
-                        if (data.account === '초등부') {
+                        if (data.result.account === '초등부') {
                             for (let j = 0; j < data.result.saturday[i].length; j++) {
                                 let month;
                                 let day;
@@ -159,12 +158,12 @@
 
                                 data.result.attendances.filter(list => {
                                     console.log(attendanceIdx);
-                                    month = list.attendance_date.substring(4, 6);
-                                    day = list.attendance_date.substring(6, 8);
-                                    inputContent = list.attendance_content;
+                                    month = list.attendanceDate.substring(4, 6);
+                                    day = list.attendanceDate.substring(6, 8);
+                                    inputContent = list.attendanceContent;
                                     Number(month);
                                     Number(day);
-                                    if (e._id === list.student__id && month - 1 == i && day == data.result.saturday[i][j]) {
+                                    if (e._id === list.studentId && month - 1 == i && day == data.result.saturday[i][j]) {
                                         html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}" size=1 tabindex=${tableIndex}>`;
                                         inputCase = false;
                                     }
@@ -180,12 +179,12 @@
                                 let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
                                 data.result.attendances.filter(list => {
-                                    month = list.attendance_date.substring(4, 6);
-                                    day = list.attendance_date.substring(6, 8);
-                                    inputContent = list.attendance_content;
+                                    month = list.attendanceDate.substring(4, 6);
+                                    day = list.attendanceDate.substring(6, 8);
+                                    inputContent = list.attendanceContent;
                                     Number(month);
                                     Number(day);
-                                    if (e._id === list.student__id && month - 1 == i && day == data.result.sunday[i][j]) {
+                                    if (e._id === list.studentId && month - 1 == i && day == data.result.sunday[i][j]) {
                                         html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1 tabindex=${tableIndex}>`;
                                         inputCase = false;
                                     }
@@ -243,7 +242,7 @@
         let emptyData = []; // 빈 출석에 대한 데이터
         let fullData = []; // 마크된 출석에 대한 데이터
 
-        STUDENT_OF_GROUP.forEach((student, studentIndex) => {
+        STUDENT_OF_GROUP.forEach(student => {
             if (USER === '초등부') {
                 saturDay.forEach((item) => {
                     let str = `${student._id + '-' + item.month + '.'+ item.day}`;
@@ -277,7 +276,7 @@
         };
     };
 
-    const makeRequest = (url, year, attendance) => {
+    const makeRequest = (url, year, attendance, isFull) => {
         return new Promise(function (resolve, reject) {
 		    // do something async here..
             $.ajax({
@@ -285,7 +284,7 @@
                 contentType: 'application/json; charset=utf-8',
                 headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
                 url,
-                data: JSON.stringify({ year, attendance }),
+                data: JSON.stringify({ year, attendance, isFull }),
                 success: (data) => {
                     resolve(data);
                 },
@@ -296,8 +295,8 @@
         });
     };
 
-    const sendRequest = async(url, year, attendance) => {
-        const request = makeRequest(url, year, attendance);
+    const sendRequest = async(url, year, attendance, isFull) => {
+        const request = makeRequest(url, year, attendance, isFull);
 
         let checkResponse = false;
 
@@ -363,8 +362,8 @@
         // 출석 데이터를 입력하는 로직을 작성해야 함.
         const { emptyData, fullData } = await setAttendance(saturDay, sunDay);
 
-        if (emptyData.length > 0) checkResponse = await sendRequest('/api/attendance/blankData', year, emptyData);
-        if (fullData.length > 0) checkResponse = await sendRequest('/api/attendance/fullData', year, fullData);
+        if (emptyData.length > 0) checkResponse = await sendRequest('/api/attendance', year, emptyData, false);
+        if (fullData.length > 0) checkResponse = await sendRequest('/api/attendance', year, fullData, true);
 
         if (checkResponse) {
             hideLoading();

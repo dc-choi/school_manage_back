@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-// import { env } from '../../env';
-
 import logger from '../../lib/logger';
-import ApiCodes from '../../lib/api.codes';
-import ApiMessages from '../../lib/api.messages';
-import { getErrorResponse, getSuccessResponse } from '../../lib/utils';
+import ApiError from '../../lib/errors';
+
+import { IToken } from '../../@types/token';
+
+import { Result } from '../../common/result';
 
 import AuthService from './auth.service';
 
@@ -26,20 +26,15 @@ export default class AuthController {
         let response;
 
         try {
-            const result = await new AuthService().authentication(id, password);
+            const result: IToken = await new AuthService().authentication(id, password);
             logger.log('result:', JSON.stringify(result));
 
-            response = getSuccessResponse({
-                result
-            });
+            response = Result.ok<IToken>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            response = Result.fail<ApiError>(e).toJson();
         }
 
         logger.res(httpStatus.OK, response, req);

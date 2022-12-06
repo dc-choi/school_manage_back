@@ -6,9 +6,10 @@ import { env } from '../../env';
 
 import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
-import ApiMessages from '../../lib/api.messages';
 import ApiError from '../../lib/errors';
-import { getErrorResponse } from '../../lib/utils';
+
+import { IAccount } from '../../@types/account';
+import { Result } from '../../common/result';
 
 import AccountService from '../account/account.service';
 import TokenService from '../token/token.service';
@@ -40,10 +41,7 @@ export default class AuthMiddleware {
 		} catch (e: any) {
 			logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            const response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            const response = Result.fail<ApiError>(e).toJson();
 
             logger.res(httpStatus.OK, response, req);
             res.status(httpStatus.OK).json(response);
@@ -59,8 +57,8 @@ export default class AuthMiddleware {
             const { account_ID, timeStamp } = req.decodeToken;
 
             // 시스템상 가입된 회원인지 확인
-            const dbData = await new AccountService().getAccountByAccountId(account_ID);
-            if (!dbData) throw new ApiError(ApiCodes.NOT_FOUND, 'NOT_FOUND: ACCOUNT_ID IS WRONG');
+            const account: IAccount = await new AccountService().getAccountByAccountId(account_ID);
+            if (!account) throw new ApiError(ApiCodes.NOT_FOUND, 'NOT_FOUND: ACCOUNT_ID IS WRONG');
 
             // 토큰의 기한이 만료된 토큰인지 검사하는 로직
             const regex = /[^A-z]/g; // 문자열 A~z에 대한 정규식
@@ -82,7 +80,7 @@ export default class AuthMiddleware {
             }
 
             req.account = {
-                id: dbData.getDataValue('_id'),
+                id: account._id,
                 name: account_ID
             };
 
@@ -92,10 +90,7 @@ export default class AuthMiddleware {
 		} catch (e: any) {
 			logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            const response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            const response = Result.fail<ApiError>(e).toJson();
 
             logger.res(httpStatus.OK, response, req);
             res.status(httpStatus.OK).json(response);

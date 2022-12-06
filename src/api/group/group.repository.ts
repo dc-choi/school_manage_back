@@ -6,7 +6,7 @@ import { mysql } from '../../lib/mysql';
 import { Group } from '../../models/group.model';
 
 export default class GroupRepository {
-    async getGroups(_id: number): Promise<Group[]> {
+    async getGroupsByAccountId(_id: number): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
@@ -32,11 +32,12 @@ export default class GroupRepository {
         })
     }
 
-    async createGroup(name: string, accountId: number): Promise<void> {
+    async createGroup(name: string, accountId: number): Promise<Group> {
         const transaction = await mysql.transaction();
+        let group;
 
         try {
-            await Group.create({
+            group = await Group.create({
                 group_name: name,
                 account__id: accountId
             }, { transaction });
@@ -46,14 +47,18 @@ export default class GroupRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            group = null;
         }
+
+        return group;
     }
 
-    async updateGroup(groupId: number, name: string, accountId: number): Promise<void> {
+    async updateGroup(groupId: number, name: string, accountId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
+        let group;
 
         try {
-            await Group.update(
+            group = await Group.update(
                 {
                     group_name: name,
                     account__id: accountId
@@ -71,14 +76,18 @@ export default class GroupRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            group = 0;
         }
+
+        return group;
     }
 
-    async deleteGroup(groupId: number): Promise<void> {
+    async deleteGroup(groupId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
+        let group;
 
         try {
-            await Group.update(
+            group = await Group.update(
                 {
                     delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
                 },
@@ -95,6 +104,9 @@ export default class GroupRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            group = 0;
         }
+
+        return group;
     }
 }
