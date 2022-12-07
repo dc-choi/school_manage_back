@@ -59,15 +59,25 @@ export default class StudentRepository {
         return totalRow;
     }
 
-    async getStudents(searchOption: string, searchWord: string, startRow: number, rowPerPage: number, groupsCode: Array<number>): Promise<Student[]> {
-        let students: Student[];
+    /**
+     * TODO: typescript의 문제점때문에 막힘.
+     *
+     * sequelize에서 join을 하고 불러오게 되면 실제 객체상으로는 불러와지는데,
+     * Service단에서 호출시 여기서 Student[]으로 타입을 지정해주면 타입때문에 막힘.
+     *
+     * Student Entity에는 group_name이 없어서 타입상 무조건 막힘...
+     *
+     * 추후에 이 문제를 해결해야함...
+     */
+    async getStudents(searchOption: string, searchWord: string, startRow: number, rowPerPage: number, groupsCode: Array<number>) {
+        let students;
 
         if (searchWord !== '') {
             switch (searchOption) {
                 case 'societyName':
                     students = await Student.findAll({
                         include: [
-                            { model: Group, as: 'group', attributes: [] }
+                            { model: Group, as: 'group', required: true, attributes: [] }
                         ],
                         attributes: [
                             '_id',
@@ -84,6 +94,7 @@ export default class StudentRepository {
                                 [Op.eq]: null,
                             },
                         },
+                        raw: true,
                         offset: startRow,
                         limit: rowPerPage,
                         order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
@@ -92,7 +103,7 @@ export default class StudentRepository {
                 case 'catholicName':
                     students = await Student.findAll({
                         include: [
-                            { model: Group, as: 'group', attributes: [] }
+                            { model: Group, as: 'group', required: true, attributes: [] }
                         ],
                         attributes: [
                             '_id',
@@ -109,6 +120,7 @@ export default class StudentRepository {
                                 [Op.eq]: null,
                             },
                         },
+                        raw: true,
                         offset: startRow,
                         limit: rowPerPage,
                         order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
@@ -117,7 +129,7 @@ export default class StudentRepository {
                 default:
                     students = await Student.findAll({
                         include: [
-                            { model: Group, as: 'group', attributes: [] }
+                            { model: Group, as: 'group', required: true, attributes: [] }
                         ],
                         attributes: [
                             '_id',
@@ -133,6 +145,7 @@ export default class StudentRepository {
                                 [Op.eq]: null,
                             },
                         },
+                        raw: true,
                         offset: startRow,
                         limit: rowPerPage,
                         order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
@@ -142,7 +155,7 @@ export default class StudentRepository {
         } else {
             students = await Student.findAll({
                 include: [
-                    { model: Group, as: 'group', attributes: [] }
+                    { model: Group, as: 'group', required: true, attributes: [] }
                 ],
                 attributes: [
                     '_id',
@@ -158,6 +171,7 @@ export default class StudentRepository {
                         [Op.eq]: null,
                     },
                 },
+                raw: true,
                 offset: startRow,
                 limit: rowPerPage,
                 order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
@@ -167,7 +181,7 @@ export default class StudentRepository {
         return students;
     }
 
-    async getStudentsByGroup(groupId: number) {
+    async getStudentsByGroup(groupId: number): Promise<Student[]> {
         return await Student.findAll({
 			attributes: [
                 '_id',
@@ -184,7 +198,7 @@ export default class StudentRepository {
 		});
     }
 
-    async getStudent(studentId: number) {
+    async getStudent(studentId: number): Promise<Student> {
         return await Student.findOne({
             where: {
                 _id: studentId,
@@ -195,11 +209,12 @@ export default class StudentRepository {
         })
     }
 
-    async createStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<void> {
+    async createStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<Student> {
         const transaction = await mysql.transaction();
+        let student: Student;
 
         try {
-            await Student.create({
+            student = await Student.create({
                 student_society_name: societyName,
                 student_catholic_name: catholicName,
                 student_age: age,
@@ -213,14 +228,18 @@ export default class StudentRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            student = null;
         }
+
+        return student;
     }
 
-    async updateStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<void> {
+    async updateStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
+        let student: [affectedCount: number];
 
         try {
-            await Student.update(
+            student = await Student.update(
                 {
                     student_society_name: societyName,
                     student_catholic_name: catholicName,
@@ -242,14 +261,18 @@ export default class StudentRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            student = [ 0 ];
         }
+
+        return student;
     }
 
-    async deleteStudent(studentId: number): Promise<void> {
+    async deleteStudent(studentId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
+        let student: [affectedCount: number];
 
         try {
-            await Student.update(
+            student = await Student.update(
                 {
                     delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
                 },
@@ -266,6 +289,9 @@ export default class StudentRepository {
         } catch (e: any) {
             logger.error(e);
             await transaction.rollback();
+            student = [ 0 ];
         }
+
+        return student;
     }
 }

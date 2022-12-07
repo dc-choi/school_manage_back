@@ -75,9 +75,8 @@
 				group.empty();
 				let html = '';
 				html += `<option value="선택하세요.">선택하세요.</option>`;
-				data.result.forEach(element => {
-					console.log(element);
-					html += `<option value="${element._id}">${element.group_name}</option>`;
+				data.result.groups.forEach(item => {
+					html += `<option value="${item._id}">${item.groupName}</option>`;
 				});
 				group.append(html);
 			},
@@ -104,11 +103,11 @@
                     return;
                 }
 				$('#_id').val(data.result.student._id);
-				$('#societyName').val(data.result.student.student_society_name);
-				$('#catholicName').val(data.result.student.student_catholic_name);
-				$('#age').val(data.result.student.student_age);
-				$('#group').val(data.result.student.group__id);
-				$('#contact').val('0' + data.result.student.student_contact);
+				$('#societyName').val(data.result.student.studentSocietyName);
+				$('#catholicName').val(data.result.student.studentCatholicName);
+				$('#age').val(data.result.student.studentAge);
+				$('#group').val(data.result.student.groupId);
+				$('#contact').val('0' + data.result.student.studentContact);
 			},
 			error: (error) => {
 				alert(error.responseText);

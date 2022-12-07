@@ -4,9 +4,9 @@ import httpStatus from 'http-status';
 // import { env } from '../../env';
 
 import logger from '../../lib/logger';
-import ApiCodes from '../../lib/api.codes';
-import ApiMessages from '../../lib/api.messages';
-import { getErrorResponse, getSuccessResponse } from '../../lib/utils';
+import ApiError from '../../lib/errors';
+
+import { Result } from '../../common/result';
 
 import TokenService from '../token/token.service';
 // import AccountService from './account.service';
@@ -25,17 +25,12 @@ export default class AccountController {
             const { account_ID } = decodeToken;
             logger.log('result:', JSON.stringify(account_ID));
 
-            response = getSuccessResponse({
-                result: account_ID
-            });
+            response = Result.ok<string>(account_ID).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
             logger.error(e);
-            response = getErrorResponse({
-                code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-                message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
-            });
+            response = Result.fail<ApiError>(e).toJson();
         }
 
         logger.res(httpStatus.OK, response, req);

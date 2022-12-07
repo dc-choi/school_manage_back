@@ -54,8 +54,8 @@
                     location.href = `index.html`;
                     return;
                 }
-				$('#_id').val(data.result._id);
-				$('#name').val(data.result.group_name);
+				$('#_id').val(data.result.group._id);
+				$('#name').val(data.result.group.groupName);
 			},
 			error: (error) => {
 				alert(error.responseText);

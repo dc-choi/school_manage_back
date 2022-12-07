@@ -18,6 +18,7 @@
     "axios": "^0.26.1",
     "base64url": "^3.0.1",
     "bcrypt": "^5.0.1",
+    "builder-pattern": "^2.1.0",
     "cls-rtracer": "^2.6.0",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",

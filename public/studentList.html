@@ -64,7 +64,7 @@
                     location.href = `index.html`;
                     return;
                 }
-                $('#title').html(`${data.account} 주일학교 학생 명단`);
+                $('#title').html(`${data.result.account} 주일학교 학생 명단`);
 				$('#nowPage').val(data.result.nowPage);
 				table.empty();
 				pageNation.empty();
@@ -80,12 +80,12 @@
 				html += `</thead>`;
 				html += `<tbody>`;
 				data.result.students.forEach(e => {
-                    const phone = e.student_contact.toString();
+                    const phone = e.studentContact.toString();
 					html += `<tr scope="row">`;
-					html += `<td scope="col" class="text-center">${e.student_society_name}</td>`;
-					html += `<td scope="col" class="text-center">${e.student_catholic_name}</td>`;
-					html += `<td scope="col" class="text-center">${e.student_age}</td>`;
-					html += `<td scope="col" class="text-center">${e.group_name}</td>`;
+					html += `<td scope="col" class="text-center">${e.studentSocietyName}</td>`;
+					html += `<td scope="col" class="text-center">${e.studentCatholicName}</td>`;
+					html += `<td scope="col" class="text-center">${e.studentAge}</td>`;
+					html += `<td scope="col" class="text-center">${e.groupName}</td>`;
 					html += `<td scope="col" class="text-center">0${phone.substring(0, 2)}-${phone.substring(2, 6)}-${phone.substring(6, 10)}</td>`;
 					html += `<td scope="col" class="text-center"><button class="btn btn-primary" type="button" onclick="modifyData('${e._id}')">수정</button></td>`;
 					html += `</tr>`;
