@@ -58,7 +58,6 @@ export default class AuthMiddleware {
 
             // 시스템상 가입된 회원인지 확인
             const account: IAccount = await new AccountService().getAccountByAccountId(account_ID);
-            if (!account) throw new ApiError(ApiCodes.NOT_FOUND, 'NOT_FOUND: ACCOUNT_ID IS WRONG');
 
             // 토큰의 기한이 만료된 토큰인지 검사하는 로직
             const regex = /[^A-z]/g; // 문자열 A~z에 대한 정규식

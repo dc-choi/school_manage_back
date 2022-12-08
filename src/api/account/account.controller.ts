@@ -1,15 +1,10 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-// import { env } from '../../env';
-
 import logger from '../../lib/logger';
 import ApiError from '../../lib/errors';
 
 import { Result } from '../../common/result';
-
-import TokenService from '../token/token.service';
-// import AccountService from './account.service';
 
 export default class AccountController {
     async getAccount(req: Request, res: Response) {
@@ -17,15 +12,14 @@ export default class AccountController {
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
 
-        const { token } = req.query;
         let response;
 
         try {
-            const decodeToken = await new TokenService().decodeToken(token);
-            const { account_ID } = decodeToken;
-            logger.log('result:', JSON.stringify(account_ID));
+            // 파싱된 토큰에 데이터가 있으면 처리가 가능함.
+            const { name } = req.account;
+            logger.log('result:', JSON.stringify(name));
 
-            response = Result.ok<string>(account_ID).toJson();
+            response = Result.ok<string>(name).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

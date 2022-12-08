@@ -30,7 +30,7 @@ export default class StudentController {
             }
 
             // 계정에 소속된 그룹의 PK를 가져온다.
-            const groups = await new GroupService().getGroupsByAccountId(req.account.id);
+            const groups = await new GroupService().getGroupsByAccount(req.account.id);
             const groupsCode = [];
             groups.forEach((item) => {
                 groupsCode.push(item._id);
@@ -179,6 +179,8 @@ export default class StudentController {
                 account: req.account.name
             }
             logger.log('result:', JSON.stringify(result));
+
+            response = Result.ok(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

@@ -24,7 +24,6 @@
 			type: 'GET',
 			url: '/api/account',
             headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
-			data: { 'token': sessionStorage.getItem('token') },
 			success: (data) => {
 				console.log(data);
                 if (data.code !== 200) {
