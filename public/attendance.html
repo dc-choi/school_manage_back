@@ -57,7 +57,7 @@
                 }
                 USER = data.result.account;
                 $('#title').html(`${data.result.account} 주일학교 출석부`);
-				const getArrYear = data.result.year - (data.result.year - 1);
+				const getArrYear = data.result.year - (data.result.year - 3);
 				let arrYear = [];
 				let html = '';
 				for (let i = 0; i < getArrYear; i++) {
@@ -362,13 +362,33 @@
         // 출석 데이터를 입력하는 로직을 작성해야 함.
         const { emptyData, fullData } = await setAttendance(saturDay, sunDay);
 
-        if (emptyData.length > 0) checkResponse = await sendRequest('/api/attendance', year, emptyData, false);
-        if (fullData.length > 0) checkResponse = await sendRequest('/api/attendance', year, fullData, true);
-
-        if (checkResponse) {
-            hideLoading();
-            IS_RUN = false;
+        /**
+         * all(), allSettled() 둘중에서 고민했고, 둘중 하나만 입력이 되는 경우,
+         * 출석 데이터의 무결성이 깨진다고 판단하여 둘다 오류를 발생시키도록 함.
+         *
+         * 굳이 이렇게 할 이유가 없을때는 하나씩 요청을 보내도록함.
+         *
+         * 참고:
+         * https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+         * https://code-masterjung.tistory.com/91
+         */
+        if (emptyData.length > 0 && fullData.length > 0) {
+            let [ emptyRes, fullRes ] = await Promise.all([
+                sendRequest('/api/attendance', year, emptyData, false),
+                sendRequest('/api/attendance', year, fullData, true),
+            ]);
+            checkResponse = emptyRes;
+            checkResponse = fullRes;
         }
+        else if (emptyData.length > 0 && fullData.length <= 0)
+            checkResponse = await sendRequest('/api/attendance', year, emptyData, false);
+        else if (fullData.length > 0 && emptyData.length <= 0)
+            checkResponse = await sendRequest('/api/attendance', year, fullData, true);
+
+        if (!checkResponse) alert('출석 입력 과정에서 오류가 발생했습니다.');
+
+        hideLoading();
+        IS_RUN = false;
 	};
 
 	initPage();

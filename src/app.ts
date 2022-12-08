@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import appRoot from 'app-root-path';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
+// import schedule from 'node-schedule';
 
 import { env } from './env';
 
@@ -16,32 +17,37 @@ import * as mysql from './lib/mysql';
 
 export const app = express();
 
+// 초등부 졸업식과 중고등부의 졸업식 날짜가 정해진게 아니라서 스케줄러로 처리하기 힘듬.
+// 초(옵션), 분, 시, 일, 월, 요일
+// const time = '* * * * *';
+// schedule.scheduleJob(time, async() => {
+//     console.log('node-schedule!');
+//     logger.log('node-schedule!');
+// });
+
 app.use(express.static(path.join(appRoot.path, 'public')));
 app.use(cookieParser());
 
-/**
- * 각 요청의 최대 사이즈를 지정해 주는 부분이다.
- */
+// 각 요청의 최대 사이즈를 지정해 주는 부분이다.
 app.use(express.urlencoded({ extended: true })); // parameterLimit을 줘서 최대 파라미터 개수를 지정할 수도 있다.
 app.use(express.json({ limit: '10mb' }));
 app.use(express.raw({ limit: '10mb' }));
 
-/** APP과 Server 통신간 CORS를 사용하지 않음.
- function getOrigins() {
-     const origins = [env.app.web.url];
-     if (env.app.dev.web.url) {
-        origins.push(env.app.dev.web.url);
-    }
-    return origins;
-}
+// 지금은 Web과 Server 통신간 CORS가 걸릴일이 없음.
+// function getOrigins() {
+//     const origins = [env.app.web.url];
+//     if (env.app.dev.web.url) {
+//         origins.push(env.app.dev.web.url);
+//     }
+//     return origins;
+// }
 
-// https://1004lucifer.blogspot.com/2019/04/axios-response-headers-content.html
-app.use(cors( {
-    origin: getOrigins(),
-    exposedHeaders: ['Content-Disposition'],
-    credentials: true
-}));
-*/
+// // https://1004lucifer.blogspot.com/2019/04/axios-response-headers-content.html
+// app.use(cors( {
+//     origin: getOrigins(),
+//     exposedHeaders: ['Content-Disposition'],
+//     credentials: true
+// }));
 
 app.use(tracer.expressMiddleware());
 app.use(context.middleware);

@@ -1,5 +1,8 @@
 import { Builder } from 'builder-pattern';
 
+import ApiCodes from '../../lib/api.codes';
+import ApiError from '../../lib/errors';
+
 import { IStudent } from '../../@types/student';
 import { StudentsDTO, StudentsDTOBuilder } from '../../common/dto/student.dto';
 import { Student } from '../../models/student.model';
@@ -13,6 +16,7 @@ export default class StudentService {
         const totalPage = Math.ceil(totalRow / rowPerPage); // 학생 출력할 총 페이지
         const startRow = (nowPage - 1) * rowPerPage; // DB에서 가져올 데이터 위치
 
+        // TODO: any타입을 사용하지않고 타입 에러를 내지않도록 해야함...
         const students = await new StudentRepository().getStudents(searchOption, searchWord, startRow, rowPerPage, groupsCode);
         const studentsBuilder: IStudent[] = [];
         students.forEach(item => {
@@ -57,6 +61,7 @@ export default class StudentService {
 
     async getStudent(studentId: number): Promise<IStudent> {
         const student: Student = await new StudentRepository().getStudent(studentId);
+        if (!student) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: STUDENT NOT_FOUND`);
 
         return Builder<IStudent>()
             ._id(student._id)
