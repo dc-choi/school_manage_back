@@ -1,6 +1,6 @@
 {
   "name": "school-manage-server",
-  "version": "1.00.00",
+  "version": "2.00.00",
   "description": "school-manage-server",
   "main": "src/app.ts",
   "scripts": {
@@ -37,6 +37,7 @@
     "multer": "^1.4.4",
     "multer-s3": "^2.10.0",
     "mysql2": "^2.3.3",
+    "node-schedule": "^2.1.0",
     "nodemon": "^2.0.15",
     "path": "^0.12.7",
     "request-ip": "^2.2.0",
@@ -70,5 +71,5 @@
     "sequelize-auto": "^0.8.8",
     "tsconfig-paths": "^3.14.0"
   },
-  "build": "1.00.00.2209061959"
+  "build": "2.00.00.2209061959"
 }

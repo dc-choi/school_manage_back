@@ -15,8 +15,6 @@ import AccountService from '../account/account.service';
 export default class AuthService {
     async authentication(id: string, password: string): Promise<IToken> {
         const account = await new AccountService().getAccountByAccountId(id);
-        if (!account) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: ID NOT_FOUND`);
-
         // bcrypt.hashSync(password, 12)로 만들어낸 패스워드끼리 비교.
         const checkPw = bcrypt.compareSync(password, account.accountPw);
         if (!checkPw) throw new ApiError(ApiCodes.UNAUTHORIZED, `UNAUTHORIZED: PW is NOT_MATCHED`);

@@ -6,7 +6,7 @@ import { mysql } from '../../lib/mysql';
 import { Group } from '../../models/group.model';
 
 export default class GroupRepository {
-    async getGroupsByAccountId(_id: number): Promise<Group[]> {
+    async getGroupsByAccount(_id: number): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',

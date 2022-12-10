@@ -19,8 +19,7 @@ export default class AttendanceService {
      */
     async setAttendance(_id: number): Promise<AttendancesDTO> {
         const year = new Date().getFullYear();
-
-        const groups: IGroup[] = await new GroupService().getGroupsByAccountId(_id);
+        const groups: IGroup[] = await new GroupService().getGroupsByAccount(_id);
 
         return new AttendancesDTOBuilder()
             .setYear(year)
@@ -116,7 +115,7 @@ export default class AttendanceService {
      * 출석부 입력한 부분에 대한 처리
      *
      * @param year
-     * @param attendance
+     * @param attendance - [ { str: string, data: string }, ... ]
      * @returns
      */
     async createFullAttendance(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {

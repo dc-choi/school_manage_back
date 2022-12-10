@@ -19,7 +19,7 @@ export default class GroupController {
         let response;
 
         try {
-            const groups: IGroup[] = await new GroupService().getGroupsByAccountId(req.account.id);
+            const groups: IGroup[] = await new GroupService().getGroupsByAccount(req.account.id);
             logger.log('result:', JSON.stringify(groups));
 
             const result = {
