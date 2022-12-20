@@ -157,7 +157,6 @@
                                 let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
                                 data.result.attendances.filter(list => {
-                                    console.log(attendanceIdx);
                                     month = list.attendanceDate.substring(4, 6);
                                     day = list.attendanceDate.substring(6, 8);
                                     inputContent = list.attendanceContent;
