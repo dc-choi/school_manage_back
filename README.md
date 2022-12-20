@@ -1,5 +1,6 @@
 # school-manage program
 이 [프로젝트](https://jangwi-dev.duckdns.org)는 기존의 출석부 프로젝트를 보완하기 위해서 제작된 프로젝트입니다.
+
 ※실제 정보가 들어있는 사이트입니다. 기존 데이터의 수정/삭제는 금지해주세요.
 
 [v1의 프로젝트 내역...](https://github.com/dc-choi/Attendance)
@@ -101,7 +102,7 @@ public // 정적 파일을 담아두는 폴더
 src
  ├── @types // TS 타입 지정
  ├── api // api's (기능별 분류)
- ├── common // api에서의 공통 사용 모듈
+ ├── common // 공통 사용 모듈
  ├── lib // 프로젝트 구성 모듈
  ├── models // Database entity's
  ├── app.router.ts // api에 독립적인 router
