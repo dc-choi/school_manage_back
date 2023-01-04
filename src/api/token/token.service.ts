@@ -6,7 +6,7 @@ import { env } from '../../env';
 // import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
 // import ApiMessages from '../../lib/api.messages';
-import ApiError from '../../lib/errors';
+import ApiError from '../../lib/api.error';
 
 // import TokenRepository from './token.repository';
 

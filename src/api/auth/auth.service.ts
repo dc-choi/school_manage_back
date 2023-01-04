@@ -5,7 +5,7 @@ import { Builder } from 'builder-pattern';
 
 // import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
+import ApiError from '../../lib/api.error';
 
 import { IToken } from '../../@types/token';
 

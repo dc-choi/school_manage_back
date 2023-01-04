@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 
 import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
+import ApiError from '../../lib/api.error';
 
 import { AttendancesDTO } from '../../common/dto/attendance.dto';
 import { Result } from '../../common/result';
