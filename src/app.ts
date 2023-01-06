@@ -5,25 +5,26 @@ import cookieParser from 'cookie-parser';
 import appRoot from 'app-root-path';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
-// import schedule from 'node-schedule';
 
 import { env } from './env';
 
 import * as Api from './app.router';
 
 import logger from './lib/logger';
-// import * as mongodb from './lib/mongodb';
 import * as mysql from './lib/mysql';
+
+import scheduler from './scheduler';
 
 export const app = express();
 
-// 초등부 졸업식과 중고등부의 졸업식 날짜가 정해진게 아니라서 스케줄러로 처리하기 힘듬.
-// 초(옵션), 분, 시, 일, 월, 요일
-// const time = '* * * * *';
-// schedule.scheduleJob(time, async() => {
-//     console.log('node-schedule!');
-//     logger.log('node-schedule!');
-// });
+/**
+ * TODO: 아이들의 졸업 기능을 만들어야 함.
+ * 다만, 초등부 졸업식과 중고등부의 졸업식 날짜가 정해진게 아니라서 스케줄러로 처리하기 힘듬.
+ * 따라서 이 부분은 따로 관리자를 만들어서 설정이 필요함.
+ */
+(async function() {
+    await new scheduler().studentAge();
+}());
 
 app.use(express.static(path.join(appRoot.path, 'public')));
 app.use(cookieParser());

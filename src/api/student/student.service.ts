@@ -1,11 +1,12 @@
 import { Builder } from 'builder-pattern';
 
-import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
+import { IStudent } from '../../types/student';
 
-import { IStudent } from '../../@types/student';
-import { StudentsDTO, StudentsDTOBuilder } from '../../common/dto/student.dto';
+import ApiCodes from '../../common/api.codes';
+import ApiError from '../../common/api.error';
+
 import { Student } from '../../models/student.model';
+import { StudentsDTO, StudentsDTOBuilder } from '../../common/dto/student.dto';
 
 import StudentRepository from './student.repository';
 

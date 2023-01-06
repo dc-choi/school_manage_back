@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
+import { IToken } from '../../types/token';
+
 import logger from '../../lib/logger';
-import ApiError from '../../lib/errors';
 
-import { IToken } from '../../@types/token';
-
+import ApiError from '../../common/api.error';
 import { Result } from '../../common/result';
 
 import AuthService from './auth.service';

@@ -4,11 +4,12 @@ import context from 'express-http-context';
 
 import { env } from '../../env';
 
-import logger from '../../lib/logger';
-import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
+import { IAccount } from '../../types/account';
 
-import { IAccount } from '../../@types/account';
+import logger from '../../lib/logger';
+
+import ApiCodes from '../../common/api.codes';
+import ApiError from '../../common/api.error';
 import { Result } from '../../common/result';
 
 import AccountService from '../account/account.service';

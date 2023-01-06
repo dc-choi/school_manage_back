@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 import logger from '../../lib/logger';
-import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
 
-import { AttendancesDTO } from '../../common/dto/attendance.dto';
+import ApiCodes from '../../common/api.codes';
+import ApiError from '../../common/api.error';
 import { Result } from '../../common/result';
+import { AttendancesDTO } from '../../common/dto/attendance.dto';
 
 import AttendanceService from './attendance.service';
 
