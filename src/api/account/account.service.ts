@@ -1,9 +1,10 @@
 ﻿import { Builder } from 'builder-pattern';
 
-import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/api.error';
+import { IAccount } from '../../types/account';
 
-import { IAccount } from '../../@types/account';
+import ApiCodes from '../../common/api.codes';
+import ApiError from '../../common/api.error';
+
 import { Account } from '../../models/account.model';
 
 import AccountRepository from './account.repository';

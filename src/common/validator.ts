@@ -1,6 +1,6 @@
 import ApiError from './api.error';
-import ApiCodes from '../lib/api.codes';
-import ApiMessages from '../lib/api.messages';
+import ApiCodes from './api.codes';
+import ApiMessages from './api.messages';
 
 const validator = async(params = []) => {
     params.forEach((item) => {

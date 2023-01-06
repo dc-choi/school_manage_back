@@ -1,9 +1,11 @@
 import { Builder } from 'builder-pattern';
 
-import { IGroup } from '../../@types/group';
-import { IStudent } from '../../@types/student';
-import { IAttendance } from '../../@types/attendance';
+import { IGroup } from '../../types/group';
+import { IStudent } from '../../types/student';
+import { IAttendance } from '../../types/attendance';
+
 import { AttendancesDTO, AttendancesDTOBuilder } from '../../common/dto/attendance.dto';
+
 import { Attendance } from '../../models/attendance.model';
 
 import GroupService from '../group/group.service';
