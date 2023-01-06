@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 import logger from '../../lib/logger';
-import ApiError from '../../lib/errors';
+import ApiError from '../../lib/api.error';
 
 import { Result } from '../../common/result';
 

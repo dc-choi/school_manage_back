@@ -1,7 +1,7 @@
 ﻿import { Builder } from 'builder-pattern';
 
 import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
+import ApiError from '../../lib/api.error';
 
 import { IAccount } from '../../@types/account';
 import { Account } from '../../models/account.model';

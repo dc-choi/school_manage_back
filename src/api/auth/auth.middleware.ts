@@ -6,7 +6,7 @@ import { env } from '../../env';
 
 import logger from '../../lib/logger';
 import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/errors';
+import ApiError from '../../lib/api.error';
 
 import { IAccount } from '../../@types/account';
 import { Result } from '../../common/result';
