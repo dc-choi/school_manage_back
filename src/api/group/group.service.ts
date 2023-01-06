@@ -1,9 +1,10 @@
 import { Builder } from 'builder-pattern';
 
-import ApiCodes from '../../lib/api.codes';
-import ApiError from '../../lib/api.error';
+import { IGroup } from '../../types/group';
 
-import { IGroup } from '../../@types/group';
+import ApiCodes from '../../common/api.codes';
+import ApiError from '../../common/api.error';
+
 import { Group } from '../../models/group.model';
 
 import GroupRepository from './group.repository';

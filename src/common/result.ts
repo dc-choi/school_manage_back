@@ -1,14 +1,14 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
-import ApiCode from "../lib/api.codes";
-import ApiMessages from "../lib/api.messages";
+import ApiCode from "./api.codes";
+import ApiMessages from "./api.messages";
 
-// staic을 이용해서 외부에서 new를 사용하지않아도 새 객체를 만들어내도록 하는 Factory Patten을 사용함.
+// staic을 이용해서 외부에서 new를 사용하지않아도 새 객체를 만들어내도록 함.
 export class Result<T> {
     public isSuccess: boolean;
     public error: any;
     private readonly _value: T;
 
-    private constructor (isSuccess: boolean, error?: string, value?: T) {
+    private constructor(isSuccess: boolean, error?: string, value?: T) {
         if (isSuccess && error) {
             throw new Error(`InvalidOperation: A result cannot be successful and contain an error`);
         }
@@ -38,15 +38,15 @@ export class Result<T> {
         return this.json;
     }
 
-    public getValue () : T {
+    public getValue() : T {
         return this._value;
     }
 
-    public static ok<U> (value?: U) : Result<U> {
+    public static ok<U>(value?: U) : Result<U> {
         return new Result<U>(true, null, value);
     }
 
-    public static fail<U> (error: string): Result<U> {
+    public static fail<U>(error: string): Result<U> {
         return new Result<U>(false, error);
     }
 }
