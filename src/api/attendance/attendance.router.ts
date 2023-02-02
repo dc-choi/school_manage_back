@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import AttendanceController from './attendance.controller';
 
-import AuthMiddleware from '../auth/auth.middleware'
+import AuthMiddleware from '@/api/auth/auth.middleware'
 
 export const path = '/attendance';
 export const router = Router();

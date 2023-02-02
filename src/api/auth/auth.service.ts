@@ -1,17 +1,13 @@
 import bcrypt from 'bcrypt';
 import { Builder } from 'builder-pattern';
 
-// import { env } from '../../env';
+import { IToken } from '@/@types/token';
 
-import { IToken } from '../../types/token';
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
 
-// import logger from '../../lib/logger';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-
-import TokenService from '../token/token.service';
-import AccountService from '../account/account.service';
+import TokenService from '@/api/token/token.service';
+import AccountService from '@/api/account/account.service';
 
 export default class AuthService {
     async authentication(id: string, password: string): Promise<IToken> {

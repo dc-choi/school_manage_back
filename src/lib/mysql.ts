@@ -1,13 +1,13 @@
 import { Sequelize } from 'sequelize';
 
-import { env } from '../env';
+import { env } from '@/env';
 
-import logger from '../lib/logger';
+import logger from '@/lib/logger';
 
-import { Account } from '../models/account.model';
-import { Group } from '../models/group.model'
-import { Student } from '../models/student.model'
-import { Attendance } from '../models/attendance.model'
+import { Account } from '@/models/account.model';
+import { Group } from '@/models/group.model'
+import { Student } from '@/models/student.model'
+import { Attendance } from '@/models/attendance.model'
 
 /**
  * sequelize-auto -o "./src/models" -d school -h localhost -p 3306 -e mysql -u root -x -l ts --cm p --indentation 4

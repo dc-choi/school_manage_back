@@ -1,4 +1,4 @@
-﻿// import Token from '../../models/token.model';
+﻿// import Token from '@/models/token.model';
 
 export default class TokenRepository {
     // public getRefreshToken = async (refreshToken) => {

@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import StudentController from './student.controller';
 
-import AuthMiddleware from '../auth/auth.middleware'
+import AuthMiddleware from '@/api/auth/auth.middleware'
 
 export const path = '/student';
 export const router = Router();

@@ -6,14 +6,14 @@ import appRoot from 'app-root-path';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
 
-import { env } from './env';
+import { env } from '@/env';
 
-import * as Api from './app.router';
+import * as Api from '@/app.router';
 
-import logger from './lib/logger';
-import * as mysql from './lib/mysql';
+import logger from '@/lib/logger';
+import * as mysql from '@/lib/mysql';
 
-import scheduler from './scheduler';
+import scheduler from '@/scheduler';
 
 export const app = express();
 

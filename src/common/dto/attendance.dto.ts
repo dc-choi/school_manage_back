@@ -1,7 +1,7 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
-import { IGroup } from '../../types/group';
-import { IStudent } from '../../types/student';
-import { IAttendance } from '../../types/attendance';
+import { IGroup } from '@/@types/group';
+import { IStudent } from '@/@types/student';
+import { IAttendance } from '@/@types/attendance';
 
 export class AttendancesDTO {
     constructor(

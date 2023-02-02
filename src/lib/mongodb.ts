@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import util from 'util';
 
-import { env } from '../env';
 import logger from './logger';
+
+import { env } from '@/env';
 
 export function connect() {
     // eslint-disable-next-line no-async-promise-executor

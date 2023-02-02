@@ -7,11 +7,11 @@ import request from 'supertest';
 // import { faker } from '@faker-js/faker';
 import cache from 'memory-cache';
 
-import { app } from '../../src/app';
-import { env } from '../../src/env';
+import { app } from '@/app';
+import { env } from '@/env';
 
-import logger from '../../src/lib/logger';
-import ApiCodes from '../../src/common/api.codes';
+import logger from '@/lib/logger';
+import ApiCodes from '@/common/api.codes';
 
 chai.use(chaiSubset);
 chai.use(chaiLike);

@@ -1,9 +1,9 @@
 ﻿import { Sequelize, Op } from 'sequelize';
 
-import logger from '../../lib/logger'
-import { mysql } from '../../lib/mysql';
+import logger from '@/lib/logger'
+import { mysql } from '@/lib/mysql';
 
-import { Group } from '../../models/group.model';
+import { Group } from '@/models/group.model';
 
 export default class GroupRepository {
     async getGroupsByAccount(_id: number): Promise<Group[]> {

@@ -1,7 +1,7 @@
 import schedule from 'node-schedule';
 
-import logger from '../lib/logger';
-import { mysql } from '../lib/mysql';
+import logger from '@/lib/logger';
+import { mysql } from '@/lib/mysql';
 
 class Scheduler {
     async studentAge() {

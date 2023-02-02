@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-import { IGroup } from '../../types/group';
-
-import logger from '../../lib/logger';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-import { Result } from '../../common/result';
-
 import GroupService from './group.service';
+
+import { IGroup } from '@/@types/group';
+
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+import { Result } from '@/common/result';
+
+import logger from '@/lib/logger';
 
 export default class GroupController {
     async getGroups(req: Request, res: Response) {
