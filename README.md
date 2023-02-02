@@ -1,9 +1,5 @@
 # school-manage program
-<<<<<<< HEAD
-이 [프로젝트](https://jangwi-dev.duckdns.org)는 기존의 출석부 프로젝트를 보완하기 위해서 제작된 프로젝트입니다.
-=======
 이 [프로젝트](https://dev.school.jangwi.link)는 기존의 출석부 프로젝트를 보완하기 위해서 제작된 프로젝트입니다.
->>>>>>> 99fe68f6748a45d056ac67e523ab27bc2c9c9685
 
 [v1의 프로젝트 내역...](https://github.com/dc-choi/Attendance)
 <details>
