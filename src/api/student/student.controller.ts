@@ -1,17 +1,18 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-import { IStudent } from '../../types/student';
-
-import logger from '../../lib/logger';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-import { Result } from '../../common/result';
-import { StudentsDTO } from '../../common/dto/student.dto';
-
-import GroupService from '../group/group.service';
 import StudentService from './student.service';
+
+import { IStudent } from '@/@types/student';
+
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+import { Result } from '@/common/result';
+import { StudentsDTO } from '@/common/dto/student.dto';
+
+import logger from '@/lib/logger';
+
+import GroupService from '@/api/group/group.service';
 
 export default class StudentController {
     async getStudents(req: Request, res: Response) {

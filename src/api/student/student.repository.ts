@@ -1,10 +1,10 @@
 ﻿import { Sequelize, Op } from 'sequelize';
 
-import logger from '../../lib/logger'
-import { mysql } from '../../lib/mysql';
+import logger from '@/lib/logger'
+import { mysql } from '@/lib/mysql';
 
-import { Group } from '../../models/group.model';
-import { Student } from '../../models/student.model';
+import { Group } from '@/models/group.model';
+import { Student } from '@/models/student.model';
 
 export default class StudentRepository {
     async getTotalRow(searchOption: string, searchWord: string, groupsCode: Array<number>): Promise<number> {

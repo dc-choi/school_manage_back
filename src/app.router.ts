@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import httpStatus from 'http-status';
 
-import * as api from './api/api.router';
+import * as api from '@/api/api.router';
 
 export const router = Router();
 export const path = '';

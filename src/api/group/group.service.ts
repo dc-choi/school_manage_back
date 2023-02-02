@@ -1,13 +1,13 @@
 import { Builder } from 'builder-pattern';
 
-import { IGroup } from '../../types/group';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-
-import { Group } from '../../models/group.model';
-
 import GroupRepository from './group.repository';
+
+import { IGroup } from '@/@types/group';
+
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+
+import { Group } from '@/models/group.model';
 
 export default class GroupService {
     async getGroupsByAccount(_id: number): Promise<IGroup[]> {

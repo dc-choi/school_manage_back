@@ -1,6 +1,6 @@
 ﻿// import { mysql } from '../../lib/mysql';
 
-import { Account } from '../../models/account.model';
+import { Account } from '@/models/account.model';
 
 export default class AccountRepository {
     async getAccountByAccountId(id: string): Promise<Account> {

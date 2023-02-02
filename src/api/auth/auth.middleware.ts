@@ -2,18 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import context from 'express-http-context';
 
-import { env } from '../../env';
+import { env } from '@/env';
 
-import { IAccount } from '../../types/account';
+import { IAccount } from '@/@types/account';
 
-import logger from '../../lib/logger';
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+import { Result } from '@/common/result';
 
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-import { Result } from '../../common/result';
+import logger from '@/lib/logger';
 
-import AccountService from '../account/account.service';
-import TokenService from '../token/token.service';
+import AccountService from '@/api/account/account.service';
+import TokenService from '@/api/token/token.service';
 
 /**
  * authentication/authorization에 관련된 미들웨어
