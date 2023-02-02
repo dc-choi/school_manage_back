@@ -1,13 +1,13 @@
 ﻿import { Builder } from 'builder-pattern';
 
-import { IAccount } from '../../types/account';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-
-import { Account } from '../../models/account.model';
-
 import AccountRepository from './account.repository';
+
+import { IAccount } from '@/@types/account';
+
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+
+import { Account } from '@/models/account.model';
 
 export default class AccountService {
     async getAccountByAccountId(id: string): Promise<IAccount> {

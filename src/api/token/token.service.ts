@@ -1,15 +1,15 @@
 ﻿import jwt from 'jsonwebtoken';
 // import bcrypt from 'bcrypt';
 
-import { env } from '../../env';
-
-// import logger from '../../lib/logger';
-
-import ApiCodes from '../../common/api.codes';
-// import ApiMessages from '../../common/api.messages';
-import ApiError from '../../common/api.error';
-
 // import TokenRepository from './token.repository';
+
+import { env } from '@/env';
+
+import ApiCodes from '@/common/api.codes';
+// import ApiMessages from '@/common/api.messages';
+import ApiError from '@/common/api.error';
+
+// import logger from '@/lib/logger';
 
 /**
  * 추후에 refresh token을 구현할 때 타입을 적용시켜야 함.

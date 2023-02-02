@@ -1,16 +1,17 @@
 import { Builder } from 'builder-pattern';
 
-import { IGroup } from '../../types/group';
-import { IStudent } from '../../types/student';
-import { IAttendance } from '../../types/attendance';
-
-import { AttendancesDTO, AttendancesDTOBuilder } from '../../common/dto/attendance.dto';
-
-import { Attendance } from '../../models/attendance.model';
-
-import GroupService from '../group/group.service';
-import StudentService from '../student/student.service';
 import AttendanceRepository from './attendance.repository';
+
+import { IGroup } from '@/@types/group';
+import { IStudent } from '@/@types/student';
+import { IAttendance } from '@/@types/attendance';
+
+import { AttendancesDTO, AttendancesDTOBuilder } from '@/common/dto/attendance.dto';
+
+import { Attendance } from '@/models/attendance.model';
+
+import GroupService from '@/api/group/group.service';
+import StudentService from '@/api/student/student.service';
 
 export default class AttendanceService {
     /**

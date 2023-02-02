@@ -1,4 +1,4 @@
-import logger from '../logger';
+import logger from '@/lib/logger';
 
 export function getOsEnv(key: string): string {
     if (typeof process.env[key] === 'undefined') {

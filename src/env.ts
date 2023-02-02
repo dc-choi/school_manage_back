@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+
+// 이 부분만 상대경로
 import * as pkg from '../package.json';
+
 import {
     getOsEnv,
     normalizePort,
-} from './lib/env';
+} from '@/lib/env';
 
 /**
  * Load .env file or for tests the .env.test file.

@@ -1,9 +1,9 @@
 ﻿import { Op } from 'sequelize';
 
-import logger from '../../lib/logger'
-import { mysql } from '../../lib/mysql';
+import logger from '@/lib/logger'
+import { mysql } from '@/lib/mysql';
 
-import { Attendance } from '../../models/attendance.model';
+import { Attendance } from '@/models/attendance.model';
 
 export default class AttendanceRepository {
     async getAttendances(studentsCode: Array<number>): Promise<Attendance[]> {

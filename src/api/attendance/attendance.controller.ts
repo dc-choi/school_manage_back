@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
-import logger from '../../lib/logger';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-import { Result } from '../../common/result';
-import { AttendancesDTO } from '../../common/dto/attendance.dto';
-
 import AttendanceService from './attendance.service';
+
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+import { Result } from '@/common/result';
+import { AttendancesDTO } from '@/common/dto/attendance.dto';
+
+import logger from '@/lib/logger';
 
 export default class AttendanceController {
     /**

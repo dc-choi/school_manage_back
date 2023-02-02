@@ -1,4 +1,4 @@
-﻿import { IStudent } from '../../types/student';
+﻿import { IStudent } from '@/@types/student';
 
 export class StudentsDTO {
     constructor(

@@ -1,14 +1,14 @@
 import { Builder } from 'builder-pattern';
 
-import { IStudent } from '../../types/student';
-
-import ApiCodes from '../../common/api.codes';
-import ApiError from '../../common/api.error';
-
-import { Student } from '../../models/student.model';
-import { StudentsDTO, StudentsDTOBuilder } from '../../common/dto/student.dto';
-
 import StudentRepository from './student.repository';
+
+import { IStudent } from '@/@types/student';
+
+import ApiCodes from '@/common/api.codes';
+import ApiError from '@/common/api.error';
+import { StudentsDTO, StudentsDTOBuilder } from '@/common/dto/student.dto';
+
+import { Student } from '@/models/student.model';
 
 export default class StudentService {
     async getStudents(nowPage: number, searchOption: string, searchWord: string, groupsCode: Array<number>): Promise<StudentsDTO> {

@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import GroupController from './group.controller';
 
-import AuthMiddleware from '../auth/auth.middleware'
+import AuthMiddleware from '@/api/auth/auth.middleware'
 
 export const path = '/group';
 export const router = Router();
