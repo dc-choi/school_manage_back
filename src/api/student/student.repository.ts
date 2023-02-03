@@ -187,6 +187,10 @@ export default class StudentRepository {
                 '_id',
 				'student_society_name',
 				'student_catholic_name',
+                'student_age',
+                'student_contact',
+                'student_description',
+                'group__id',
 			],
 			where: {
                 group__id: groupId,
