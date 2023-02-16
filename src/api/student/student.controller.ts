@@ -202,9 +202,10 @@ export default class StudentController {
         let response;
 
         try {
-            await new StudentService().graduateStudent(req.account.id, req.account.name);
+            const row = await new StudentService().graduateStudent(req.account.id, req.account.name);
 
             const result = {
+                row,
                 account: req.account.name
             }
             logger.log('result:', JSON.stringify(result));
