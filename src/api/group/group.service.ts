@@ -60,13 +60,11 @@ export default class GroupService {
 
     async updateGroup(groupId: number, name: string, accountId: number): Promise<number> {
         const [ affectedCount ] = await new GroupRepository().updateGroup(groupId, name, accountId);
-        const row = affectedCount;
-        return row;
+        return affectedCount;
     }
 
     async deleteGroup(groupId: number): Promise<number> {
         const [ affectedCount ] = await new GroupRepository().deleteGroup(groupId);
-        const row = affectedCount;
-        return row;
+        return affectedCount;
     }
 }

@@ -18,22 +18,14 @@ export class StudentsDTOBuilder {
     private totalPage?: number;
     private students?: IStudent[];
 
-    setNowPage(nowPage: number) {
+    setNowPage(nowPage: number, rowPerPage: number) {
         this.nowPage = nowPage;
-        return this;
-    }
-
-    setRowPerPage(rowPerPage: number) {
         this.rowPerPage = rowPerPage;
         return this;
     }
 
-    setTotalRow(totalRow: number) {
+    setTotalPage(totalRow: number, totalPage: number) {
         this.totalRow = totalRow;
-        return this;
-    }
-
-    setTotalPage(totalPage: number) {
         this.totalPage = totalPage;
         return this;
     }

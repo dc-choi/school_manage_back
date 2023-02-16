@@ -23,17 +23,9 @@ export class AttendancesDTOBuilder {
     private students?: IStudent[];
     private attendances?: IAttendance[];
 
-    setYear(year: number) {
+    setDate(year: number, sunday?: Array<number[]>, saturday?: Array<number[]>) {
         this.year = year;
-        return this;
-    }
-
-    setSunday(sunday: Array<number[]>) {
         this.sunday = sunday;
-        return this;
-    }
-
-    setSaturday(saturday: Array<number[]>) {
         this.saturday = saturday;
         return this;
     }

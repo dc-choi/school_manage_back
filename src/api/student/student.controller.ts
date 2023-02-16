@@ -44,7 +44,7 @@ export default class StudentController {
             const result = {
                 ...students,
                 account: req.account.name
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok(result).toJson();
