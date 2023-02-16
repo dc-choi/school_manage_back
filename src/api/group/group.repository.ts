@@ -18,7 +18,24 @@ export default class GroupRepository {
 				delete_at: {
                     [Op.eq]: null,
                 },
+			}
+        });
+    }
+
+    async getGroupsByAccountForGraduation(accountId: number): Promise<Group[]> {
+        return await Group.findAll({
+            attributes: [
+                '_id',
+				'group_name',
+                'account__id',
+			],
+            where: {
+                account__id: accountId,
+				delete_at: {
+                    [Op.eq]: null,
+                },
 			},
+            order: [ ['group_name', 'DESC'] ]
         });
     }
 

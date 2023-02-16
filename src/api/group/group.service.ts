@@ -26,6 +26,22 @@ export default class GroupService {
         return groupsBuilder;
     }
 
+    async getGroupsByAccountForGraduation(accountId: number): Promise<IGroup[]> {
+        const groups: Group[] = await new GroupRepository().getGroupsByAccountForGraduation(accountId);
+        const groupsBuilder: IGroup[] = [];
+        groups.forEach(item => {
+            groupsBuilder.push(
+                Builder<IGroup>()
+                    ._id(item._id)
+                    .groupName(item.group_name)
+                    .accountId(item.account__id)
+                    .build()
+            );
+        });
+
+        return groupsBuilder;
+    }
+
     async getGroup(groupId: number): Promise<IGroup> {
         const group: Group = await new GroupRepository().getGroup(groupId);
         if (!group) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: GROUP NOT_FOUND, group_id: ${groupId}`);

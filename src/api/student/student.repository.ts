@@ -202,6 +202,27 @@ export default class StudentRepository {
 		});
     }
 
+    async getStudentsByAge(age: number): Promise<Student[]> {
+        return await Student.findAll({
+			attributes: [
+                '_id',
+				'student_society_name',
+				'student_catholic_name',
+                'student_age',
+                'student_contact',
+                'student_description',
+                'group__id',
+			],
+			where: {
+                student_age: age,
+                delete_at: {
+                    [Op.eq]: null,
+                },
+            },
+			order: [ ['student_society_name', 'ASC'] ],
+		});
+    }
+
     async getStudent(studentId: number): Promise<Student> {
         return await Student.findOne({
             where: {

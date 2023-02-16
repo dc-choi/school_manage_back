@@ -69,6 +69,26 @@ export default class StudentService {
         return studentsBuilder;
     }
 
+    async getStudentsByAge(age: number): Promise<IStudent[]> {
+        const students: Student[] = await new StudentRepository().getStudentsByAge(age);
+        const studentsBuilder: IStudent[] = [];
+        students.forEach(item => {
+            studentsBuilder.push(
+                Builder<IStudent>()
+                    ._id(item._id)
+                    .studentSocietyName(item.student_society_name)
+                    .studentCatholicName(item.student_catholic_name)
+                    .studentAge(item.student_age)
+                    .studentContact(item.student_contact)
+                    .studentDescription(item.student_description)
+                    .groupId(item.group__id)
+                    .build()
+            );
+		});
+
+        return studentsBuilder;
+    }
+
     async getStudent(studentId: number): Promise<IStudent> {
         const student: Student = await new StudentRepository().getStudent(studentId);
         if (!student) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: STUDENT NOT_FOUND`);
@@ -108,46 +128,183 @@ export default class StudentService {
         return affectedCount;
     }
 
-    async graduateStudent(accountId: number, accountName: string): Promise<void> {
+    async graduateStudent(accountId: number, accountName: string): Promise<number> {
+        let result = 0;
+
         switch (accountName) {
             case '초등부':
-                await this.elementaryGraduation(accountId);
+                result = await this.elementaryGraduation(accountId);
                 break;
             case '중고등부':
-                await this.middleHighGraduation();
+                result = await this.middleHighGraduation();
                 break;
             default:
                 throw new ApiError(ApiCodes.UNAUTHORIZED, `UNAUTHORIZED: Invalid accountName`);
         }
+
+        return result;
     }
 
-    private async elementaryGraduation(accountId: number) {
-        const groups: IGroup[] = await new GroupService().getGroupsByAccount(accountId);
+    /**
+     * TODO: 추후에 반드시 리팩터링이 필요함.
+     *
+     * @param accountId
+     * @returns
+     */
+    private async elementaryGraduation(accountId: number): Promise<number> {
+        const groups: IGroup[] = await new GroupService().getGroupsByAccountForGraduation(accountId);
+        logger.log('졸업, 종업하는 초등부 학생들', groups);
         const _14Group = await new GroupService().getGroupByName('예비 중1');
+        const _8Group = groups.filter(item => { return item.groupName === '1학년' });
+        const _9Group = groups.filter(item => { return item.groupName === '2학년' });
+        const _10Group = groups.filter(item => { return item.groupName === '3학년' });
+        const _11Group = groups.filter(item => { return item.groupName === '4학년' });
+        const _12Group = groups.filter(item => { return item.groupName === '5학년' });
+        const _13Group = groups.filter(item => { return item.groupName === '6학년' });
+        let result = 0;
 
         for (const group of groups) {
-            logger.log('elementaryGraduation group');
-            const result = await this.getStudentsByGroup(group._id);
+            const students = await this.getStudentsByGroup(group._id);
+            logger.log('졸업, 종업하는 초등부 학생들', students);
+            switch (group.groupName) {
+                case '유치부':
+                    for (const student of students) {
+                        if (student.studentAge >= 8) {
+                            result += await this.updateStudent(
+                                student.studentSocietyName,
+                                student.studentCatholicName,
+                                student.studentAge,
+                                student.studentContact,
+                                student.studentDescription,
+                                _8Group[0]._id,
+                                student._id
+                            )
+                        }
+                    }
+                    break;
+                case '1학년':
+                    for (const student of students) {
+                        result += await this.updateStudent(
+                            student.studentSocietyName,
+                            student.studentCatholicName,
+                            student.studentAge,
+                            student.studentContact,
+                            student.studentDescription,
+                            _9Group[0]._id,
+                            student._id
+                        )
+                    }
+                    break;
+                case '2학년':
+                    for (const student of students) {
+                        result += await this.updateStudent(
+                            student.studentSocietyName,
+                            student.studentCatholicName,
+                            student.studentAge,
+                            student.studentContact,
+                            student.studentDescription,
+                            _10Group[0]._id,
+                            student._id
+                        )
+                    }
+                    break;
+                case '3학년':
+                    for (const student of students) {
+                        result += await this.updateStudent(
+                            student.studentSocietyName,
+                            student.studentCatholicName,
+                            student.studentAge,
+                            student.studentContact,
+                            student.studentDescription,
+                            _11Group[0]._id,
+                            student._id
+                        )
+                    }
+                    break;
+                case '4학년':
+                    for (const student of students) {
+                        result += await this.updateStudent(
+                            student.studentSocietyName,
+                            student.studentCatholicName,
+                            student.studentAge,
+                            student.studentContact,
+                            student.studentDescription,
+                            _12Group[0]._id,
+                            student._id
+                        )
+                    }
+                    break;
+                case '5학년':
+                    for (const student of students) {
+                        result += await this.updateStudent(
+                            student.studentSocietyName,
+                            student.studentCatholicName,
+                            student.studentAge,
+                            student.studentContact,
+                            student.studentDescription,
+                            _13Group[0]._id,
+                            student._id
+                        )
+                    }
+                    break;
+                case '6학년':
+                    for (const student of students) {
+                        result += await this.updateStudent(
+                            student.studentSocietyName,
+                            student.studentCatholicName,
+                            student.studentAge,
+                            student.studentContact,
+                            student.studentDescription,
+                            _14Group._id,
+                            student._id
+                        )
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
+
+        return result;
     }
 
-    private async middleHighGraduation() {
+    private async middleHighGraduation(): Promise<number> {
         const adult = await new GroupService().getGroupByName('성인');
         const _19Group = await new GroupService().getGroupByName('고3');
+        let result = 0;
 
-        const students: IStudent[] = await this.getStudentsByGroup(_19Group._id);
-        if (students.length <= 0) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: group's student is null`);
-
-        for (const student of students) {
-            await this.updateStudent(
-                student.studentSocietyName,
-                student.studentCatholicName,
-                student.studentAge,
-                student.studentContact,
-                student.studentDescription,
-                adult._id,
-                student._id
-            );
+        let students: IStudent[];
+        students = await this.getStudentsByAge(20);
+        logger.log('졸업하는 학생들', students);
+        if (students.length > 0) {
+            for (const student of students) {
+                result += await this.updateStudent(
+                    student.studentSocietyName,
+                    student.studentCatholicName,
+                    student.studentAge,
+                    student.studentContact,
+                    student.studentDescription,
+                    adult._id,
+                    student._id
+                );
+            }
         }
+        students = await this.getStudentsByAge(19);
+        logger.log('고3인 학생들', students);
+        if (students.length > 0) {
+            for (const student of students) {
+                result += await this.updateStudent(
+                    student.studentSocietyName,
+                    student.studentCatholicName,
+                    student.studentAge,
+                    student.studentContact,
+                    student.studentDescription,
+                    _19Group._id,
+                    student._id
+                );
+            }
+        }
+
+        return result;
     }
 }
