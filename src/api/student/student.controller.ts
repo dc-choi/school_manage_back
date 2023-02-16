@@ -44,7 +44,7 @@ export default class StudentController {
             const result = {
                 ...students,
                 account: req.account.name
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok(result).toJson();
@@ -178,6 +178,33 @@ export default class StudentController {
 
             const result = {
                 row,
+                account: req.account.name
+            }
+            logger.log('result:', JSON.stringify(result));
+
+            response = Result.ok(result).toJson();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
+            logger.error(e);
+            response = Result.fail<ApiError>(e).toJson();
+        }
+
+        logger.res(httpStatus.OK, response, req);
+        res.status(httpStatus.OK).json(response);
+    }
+
+    async graduateStudent(req: Request, res: Response) {
+        logger.log('req.params:', JSON.stringify(req.params));
+        logger.log('req.query:', JSON.stringify(req.query));
+        logger.log('req.body:', JSON.stringify(req.body));
+
+        let response;
+
+        try {
+            await new StudentService().graduateStudent(req.account.id, req.account.name);
+
+            const result = {
                 account: req.account.name
             }
             logger.log('result:', JSON.stringify(result));

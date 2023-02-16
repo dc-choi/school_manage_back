@@ -13,3 +13,5 @@ router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verif
 router.get('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().getStudent);
 router.put('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().updateStudent);
 router.delete('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().deleteStudent);
+
+router.post('/graduation', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().graduateStudent);

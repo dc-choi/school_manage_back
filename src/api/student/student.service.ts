@@ -1,14 +1,20 @@
+/* eslint-disable no-case-declarations */
 import { Builder } from 'builder-pattern';
 
 import StudentRepository from './student.repository';
 
+import { IGroup } from '@/@types/group'
 import { IStudent } from '@/@types/student';
 
 import ApiCodes from '@/common/api.codes';
 import ApiError from '@/common/api.error';
 import { StudentsDTO, StudentsDTOBuilder } from '@/common/dto/student.dto';
 
+import logger from '@/lib/logger';
+
 import { Student } from '@/models/student.model';
+
+import GroupService from '@/api/group/group.service';
 
 export default class StudentService {
     async getStudents(nowPage: number, searchOption: string, searchWord: string, groupsCode: Array<number>): Promise<StudentsDTO> {
@@ -18,6 +24,7 @@ export default class StudentService {
         const startRow = (nowPage - 1) * rowPerPage; // DB에서 가져올 데이터 위치
 
         // TODO: any타입을 사용하지않고 타입 에러를 내지않도록 해야함...
+        // TODO: React로 변경하는 경우 searchOption, searchWord을 굳이 서버에서 처리하지않고 프론트에서 처리하기.
         const students = await new StudentRepository().getStudents(searchOption, searchWord, startRow, rowPerPage, groupsCode);
         const studentsBuilder: IStudent[] = [];
         students.forEach(item => {
@@ -36,10 +43,8 @@ export default class StudentService {
 		});
 
         return new StudentsDTOBuilder()
-            .setNowPage(nowPage)
-            .setRowPerPage(rowPerPage)
-            .setTotalRow(totalRow)
-            .setTotalPage(totalPage)
+            .setNowPage(nowPage, rowPerPage)
+            .setTotalPage(totalRow, totalPage)
             .setStudents(studentsBuilder)
             .build();
     }
@@ -53,6 +58,10 @@ export default class StudentService {
                     ._id(item._id)
                     .studentSocietyName(item.student_society_name)
                     .studentCatholicName(item.student_catholic_name)
+                    .studentAge(item.student_age)
+                    .studentContact(item.student_contact)
+                    .studentDescription(item.student_description)
+                    .groupId(item.group__id)
                     .build()
             );
 		});
@@ -91,15 +100,54 @@ export default class StudentService {
 
     async updateStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<number> {
         const [ affectedCount ] = await new StudentRepository().updateStudent(societyName, catholicName, age, contact, description, groupId, studentId);
-        const row = affectedCount;
-
-        return row;
+        return affectedCount;
     }
 
     async deleteStudent(studentId: number): Promise<number> {
         const [ affectedCount ] = await new StudentRepository().deleteStudent(studentId);
-        const row = affectedCount;
+        return affectedCount;
+    }
 
-        return row;
+    async graduateStudent(accountId: number, accountName: string): Promise<void> {
+        switch (accountName) {
+            case '초등부':
+                await this.elementaryGraduation(accountId);
+                break;
+            case '중고등부':
+                await this.middleHighGraduation();
+                break;
+            default:
+                throw new ApiError(ApiCodes.UNAUTHORIZED, `UNAUTHORIZED: Invalid accountName`);
+        }
+    }
+
+    private async elementaryGraduation(accountId: number) {
+        const groups: IGroup[] = await new GroupService().getGroupsByAccount(accountId);
+        const _14Group = await new GroupService().getGroupByName('예비 중1');
+
+        for (const group of groups) {
+            logger.log('elementaryGraduation group');
+            const result = await this.getStudentsByGroup(group._id);
+        }
+    }
+
+    private async middleHighGraduation() {
+        const adult = await new GroupService().getGroupByName('성인');
+        const _19Group = await new GroupService().getGroupByName('고3');
+
+        const students: IStudent[] = await this.getStudentsByGroup(_19Group._id);
+        if (students.length <= 0) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: group's student is null`);
+
+        for (const student of students) {
+            await this.updateStudent(
+                student.studentSocietyName,
+                student.studentCatholicName,
+                student.studentAge,
+                student.studentContact,
+                student.studentDescription,
+                adult._id,
+                student._id
+            );
+        }
     }
 }

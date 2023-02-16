@@ -25,7 +25,7 @@ export default class AttendanceService {
         const groups: IGroup[] = await new GroupService().getGroupsByAccount(_id);
 
         return new AttendancesDTOBuilder()
-            .setYear(year)
+            .setDate(year)
             .setGroups(groups)
             .build();
     }
@@ -83,9 +83,7 @@ export default class AttendanceService {
         });
 
         return new AttendancesDTOBuilder()
-            .setYear(year)
-            .setSunday(sunday)
-            .setSaturday(saturday)
+            .setDate(year, sunday, saturday)
             .setStudents(students)
             .setAttendances(attendancesBuilder)
             .build();

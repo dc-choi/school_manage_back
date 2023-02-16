@@ -6,14 +6,15 @@ import { mysql } from '@/lib/mysql';
 import { Group } from '@/models/group.model';
 
 export default class GroupRepository {
-    async getGroupsByAccount(_id: number): Promise<Group[]> {
+    async getGroupsByAccount(accountId: number): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
 				'group_name',
+                'account__id',
 			],
             where: {
-                account__id: _id,
+                account__id: accountId,
 				delete_at: {
                     [Op.eq]: null,
                 },
@@ -30,6 +31,17 @@ export default class GroupRepository {
                 },
             }
         })
+    }
+
+    async getGroupByName(groupName: string): Promise<Group> {
+        return await Group.findOne({
+            where: {
+                group_name: groupName,
+                delete_at: {
+                    [Op.eq]: null,
+                },
+            }
+        });
     }
 
     async createGroup(name: string, accountId: number): Promise<Group> {
