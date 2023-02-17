@@ -17,15 +17,6 @@ import scheduler from '@/scheduler';
 
 export const app = express();
 
-/**
- * TODO: 아이들의 졸업 기능을 만들어야 함.
- * 다만, 초등부 졸업식과 중고등부의 졸업식 날짜가 정해진게 아니라서 스케줄러로 처리하기 힘듬.
- * 따라서 이 부분은 따로 관리자를 만들어서 설정이 필요함.
- */
-(async function() {
-    await new scheduler().studentAge();
-}());
-
 app.use(express.static(path.join(appRoot.path, 'public')));
 app.use(cookieParser());
 
@@ -77,6 +68,7 @@ app.listen(env.app.port, async function appMain() {
     logger.log(`[ v${version}, ${env.mode.value} ] =========================================`);
 
     // await mongodb.connect();
+    await scheduler.studentAge();
     await mysql.connect();
 
     logger.log(`----------------------------------------------`);
