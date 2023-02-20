@@ -14,43 +14,24 @@
 <body>
 	<div class="container">
 		<h1>
-			<select id="year">
-				<option>2022</option>
-			</select>년
-			<select id="month">
-				<option>6</option>
-			</select>월
+			<select id="year"></select>년
 			통계
 		</h1>
 		<div class="chart">
-			<div>
-				<span>월별 총 학생 출석수</span>
-				<canvas id="studentCountForMonth"></canvas>
-			</div>
+            <div></div>
             <div>
                 <span>우수 출석 학생(연도 기준)</span>
-                <canvas id="excellentStudent"></canvas>
+                <canvas id="excellentStudent" width="500" height="500"></canvas>
             </div>
-			<div>
-				<span>주간별 총 학생 출석수</span>
-				<canvas id="studentCountForWeek"></canvas>
-			</div>
+            <div></div>
 		</div>
 		<br>
-		<div class="chart">
-			<div>
-				<span>그룹별 학생 출석수(월 기준)</span>
-				<canvas id="groupCountForMonth"></canvas>
-			</div>
-			<div>
-				<span>그룹별 학생 출석수(주간 기준)</span>
-				<canvas id="groupCountForWeek"></canvas>
-			</div>
-		</div>
 		<p><a class="btn btn-primary" href="main.html">뒤로 가기</a></p>
 	</div>
 </body>
 <script>
+    let chart = null; // 차트를 다시 그리기 위한 전역변수
+
     const backgroundColor = [
         'rgba(255, 99, 132, 0.2)',
         'rgba(255, 159, 64, 0.2)',
@@ -70,117 +51,74 @@
         'rgb(201, 203, 207)'
     ];
 
-	const yearLabels = [
-		'1월',
-		'2월',
-		'3월',
-		'4월',
-		'5월',
-		'6월',
-		'7월',
-		'8월',
-		'9월',
-		'10월',
-		'11월',
-		'12월',
-	];
+	const excellent = () => {
+        const year = $('#year').val()
 
-	const barData = {
-		labels: yearLabels,
-		datasets: [{
-			label: '1그룹',
-			data: [65, 59, 80, 81, 56, 55, 40, 40, 40, 40, 40, 40],
-			backgroundColor: [ 'rgba(255, 99, 132, 0.2)' ],
-			borderColor: [ 'rgb(255, 99, 132)' ],
-			borderWidth: 1
-		},
-		{
-            label: '2그룹',
-			data: [65, 59, 80, 81, 56, 55, 40, 40, 40, 40, 40, 40],
-			backgroundColor: [ 'rgba(153, 102, 255, 0.2)' ],
-            borderColor: [ 'rgb(153, 102, 255)' ],
-			borderWidth: 1
-		},
-		{
-            label: '3그룹',
-			data: [65, 59, 80, 81, 56, 55, 40, 40, 40, 40, 40, 40],
-            backgroundColor: [ 'rgba(75, 192, 192, 0.2)' ],
-            borderColor: [ 'rgb(75, 192, 192)' ],
-			borderWidth: 1
-		}]
-	};
+		$.ajax({
+			type: 'get',
+			url: '/api/statistics/student/excellent',
+            headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
+			data: { year },
+			success: (data) => {
+				console.log(data);
 
-	const barConfig = {
-		type: 'bar',
-		data: barData,
-		options: {
-			scales: {
-				y: {
-					beginAtZero: true
-				}
+                let labels = [];
+                let counts = [];
+
+                data.result.excellentStudents.forEach(item => {
+                    labels.push(item.student_society_name);
+                    counts.push(item.count);
+                });
+
+                if (chart != null){
+                    chart.destroy();
+                }
+
+                const doughnutData = {
+                    labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: borderColor,
+                        hoverOffset: 4
+                    }]
+                };
+
+                const doughnutConfig = {
+                    type: 'doughnut',
+                    data: doughnutData,
+                };
+
+                chart = new Chart(
+                    document.getElementById('excellentStudent'),
+                    doughnutConfig
+                );
+			},
+			error: (error) => {
+				console.log(error);
 			}
-		},
+		});
 	};
 
-	const doughnutData = {
-		labels: [
-			'Red',
-			'Blue',
-			'Yellow',
-			'gray',
-			'white',
-            'Red',
-			'Blue',
-			'Yellow',
-			'gray',
-			'white'
-		],
-		datasets: [{
-			data: [300, 50, 100, 150, 200, 300, 50, 100, 150, 200],
-			backgroundColor: borderColor,
-			hoverOffset: 4
-		}]
-	};
+    const initPage = () => {
+        const year = new Date().getFullYear();
+        const getArrYear = year - (year - 2);
 
-	const doughnutConfig = {
-		type: 'doughnut',
-		data: doughnutData,
-	};
+        let arrYear = [];
+        let html = '';
 
-	const studentCountForMonth = new Chart(
-		document.getElementById('studentCountForMonth'),
-		barConfig
-	);
-	const studentCountForWeek = new Chart(
-		document.getElementById('studentCountForWeek'),
-		barConfig
-	);
-	const excellentStudent = new Chart(
-		document.getElementById('excellentStudent'),
-		doughnutConfig
-	);
-	const groupCountForMonth = new Chart(
-		document.getElementById('groupCountForMonth'),
-		barConfig
-	);
-	const groupCountForWeek = new Chart(
-		document.getElementById('groupCountForWeek'),
-		barConfig
-	);
+        for (let i = 0; i < getArrYear; i++) {
+            arrYear.push(year - i);
+            html += `<option value="${arrYear[i]}">${arrYear[i]}</option>`;
+        }
+        $('#year').append(html);
 
-	// const initPage = () => {
-	// 	$.ajax({
-	// 		type: 'get',
-	// 		url: '/statistics',
-	// 		data: {},
-	// 		success: (data) => {
-	// 			console.log(data);
-	// 		},
-	// 		error: (error) => {
-	// 			console.log(error);
-	// 		}
-	// 	})
-	// }
-	// initPage();
+        excellent();
+    };
+
+	initPage();
+
+    $('#year').on('change', () => {
+		excellent();
+	});
 </script>
 </html>
