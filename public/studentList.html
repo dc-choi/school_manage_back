@@ -126,5 +126,9 @@
 		initPage();
 	});
 
+    $('body').on('keyup', (event) => {
+        if (event.code === 'Enter') initPage();
+	});
+
 </script>
 </html>
