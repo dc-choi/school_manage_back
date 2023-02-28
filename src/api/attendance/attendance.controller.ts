@@ -6,6 +6,7 @@ import AttendanceService from './attendance.service';
 import ApiCodes from '@/common/api.codes';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
+import { ResponseDTO } from '@/common/dto/response.dto';
 import { AttendancesDTO } from '@/common/dto/attendance.dto';
 
 import logger from '@/lib/logger';
@@ -27,13 +28,13 @@ export default class AttendanceController {
         try {
             const setting: AttendancesDTO = await new AttendanceService().setAttendance(req.account.id);
 
-            const result = {
-                ...setting,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                ...setting
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -75,13 +76,13 @@ export default class AttendanceController {
 
             const attendances: AttendancesDTO = await new AttendanceService().getAttendanceByGroup(parseGroupId, parseYear);
 
-            const result = {
-                ...attendances,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                ...attendances
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -126,14 +127,14 @@ export default class AttendanceController {
                 row = await new AttendanceService().createBlankAttendance(year, attendance);
             }
 
-            const result = {
+            const result: ResponseDTO = {
+                account: req.account.name,
                 row,
                 isFull,
-                account: req.account.name
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

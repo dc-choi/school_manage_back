@@ -9,6 +9,7 @@ import ApiCodes from '@/common/api.codes';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
 import { StudentsDTO } from '@/common/dto/student.dto';
+import { ResponseDTO } from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -41,13 +42,13 @@ export default class StudentController {
             // req.query에서 넘어오는 값은 any가 아닌, string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[]으로 설정되어서 string으로 형변환해서 보내줌
             const students: StudentsDTO = await new StudentService().getStudents(parseNowPage, String(searchOption), String(searchWord), groupsCode);
 
-            const result = {
-                ...students,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                ...students
             };
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -76,13 +77,13 @@ export default class StudentController {
 
             const student: IStudent = await new StudentService().getStudent(parseStudentId);
 
-            const result = {
-                student,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                student
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -105,13 +106,13 @@ export default class StudentController {
         try {
             const student: IStudent = await new StudentService().createStudent(societyName, catholicName, age, contact, description, groupId);
 
-            const result = {
-                student,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                student
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -141,13 +142,13 @@ export default class StudentController {
 
             const row = await new StudentService().updateStudent(societyName, catholicName, age, contact, description, groupId, parseStudentId);
 
-            const result = {
-                row,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                row
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -176,13 +177,13 @@ export default class StudentController {
 
             const row = await new StudentService().deleteStudent(parseStudentId);
 
-            const result = {
-                row,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                row
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -204,13 +205,13 @@ export default class StudentController {
         try {
             const row = await new StudentService().graduateStudent(req.account.id, req.account.name);
 
-            const result = {
-                row,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                row
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

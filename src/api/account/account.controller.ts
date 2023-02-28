@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
+import { ResponseDTO } from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -19,7 +20,7 @@ export default class AccountController {
             const { name } = req.account;
             logger.log('result:', JSON.stringify(name));
 
-            response = Result.ok<string>(name).toJson();
+            response = Result.ok<ResponseDTO>(name).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

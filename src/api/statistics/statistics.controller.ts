@@ -6,6 +6,7 @@ import StatisticsService from './statistics.service';
 
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
+import { ResponseDTO } from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -27,13 +28,13 @@ export default class StatisticsController {
             const excellentStudents = await new StatisticsService().excellentStudents(req.account.id, parseYear);
             logger.log('result:', JSON.stringify(excellentStudents));
 
-            const result = {
-                excellentStudents,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                excellentStudents
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
