@@ -8,6 +8,7 @@ import { IGroup } from '@/@types/group';
 import ApiCodes from '@/common/api.codes';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
+import { ResponseDTO } from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -23,13 +24,13 @@ export default class GroupController {
             const groups: IGroup[] = await new GroupService().getGroupsByAccount(req.account.id);
             logger.log('result:', JSON.stringify(groups));
 
-            const result = {
-                groups,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                groups
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -58,13 +59,13 @@ export default class GroupController {
 
             const group: IGroup = await new GroupService().getGroup(parseGroupId);
 
-            const result = {
-                group,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                group
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -87,13 +88,13 @@ export default class GroupController {
         try {
             const group: IGroup = await new GroupService().createGroup(name, req.account.id);
 
-            const result = {
-                group,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                group
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -123,13 +124,13 @@ export default class GroupController {
 
             const row = await new GroupService().updateGroup(parseGroupId, name, req.account.id);
 
-            const result = {
-                row,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                row
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -158,13 +159,13 @@ export default class GroupController {
 
             const row = await new GroupService().deleteGroup(parseGroupId);
 
-            const result = {
-                row,
-                account: req.account.name
+            const result: ResponseDTO = {
+                account: req.account.name,
+                row
             }
             logger.log('result:', JSON.stringify(result));
 
-            response = Result.ok(result).toJson();
+            response = Result.ok<ResponseDTO>(result).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
