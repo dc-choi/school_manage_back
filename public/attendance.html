@@ -84,7 +84,7 @@
 
 		$.ajax({
 			type: 'GET',
-			url: `/api/attendance/${group}`,
+			url: `/api/attendance/group/${group}`,
             headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
 			data: { year },
 			success: (data) => {

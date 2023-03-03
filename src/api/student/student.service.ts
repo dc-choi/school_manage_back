@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-case-declarations */
 import { Builder } from 'builder-pattern';
 
@@ -17,15 +18,14 @@ import { Student } from '@/models/student.model';
 import GroupService from '@/api/group/group.service';
 
 export default class StudentService {
-    async getStudents(nowPage: number, searchOption: string, searchWord: string, groupsCode: Array<number>): Promise<StudentsDTO> {
-        const rowPerPage = 10; // 페이지당 학생 출력 수
-        const totalRow: number = await new StudentRepository().getTotalRow(searchOption, searchWord, groupsCode); // 학생 총 인원 수
-        const totalPage = Math.ceil(totalRow / rowPerPage); // 학생 출력할 총 페이지
-        const startRow = (nowPage - 1) * rowPerPage; // DB에서 가져올 데이터 위치
+    async list(page: number, where: any): Promise<StudentsDTO> {
+        const size = 10; // 페이지당 학생 출력 수
+        const count: number = await new StudentRepository().count(where); // 학생 총 인원 수
+        const maxPage = Math.ceil(count / size); // 학생 출력할 총 페이지
 
         // TODO: any타입을 사용하지않고 타입 에러를 내지않도록 해야함...
         // TODO: React로 변경하는 경우 searchOption, searchWord을 굳이 서버에서 처리하지않고 프론트에서 처리하기.
-        const students = await new StudentRepository().getStudents(searchOption, searchWord, startRow, rowPerPage, groupsCode);
+        const students = await new StudentRepository().list(page, size, where);
         const studentsBuilder: IStudent[] = [];
         students.forEach(item => {
             studentsBuilder.push(
@@ -43,14 +43,14 @@ export default class StudentService {
 		});
 
         return new StudentsDTOBuilder()
-            .setNowPage(nowPage, rowPerPage)
-            .setTotalPage(totalRow, totalPage)
+            .setNowPage(page, size)
+            .setTotalPage(count, maxPage)
             .setStudents(studentsBuilder)
             .build();
     }
 
-    async getStudentsByGroup(groupId: number): Promise<IStudent[]> {
-        const students: Student[] = await new StudentRepository().getStudentsByGroup(groupId);
+    async listByGroup(groupId: number): Promise<IStudent[]> {
+        const students: Student[] = await new StudentRepository().listByGroup(groupId);
         const studentsBuilder: IStudent[] = [];
         students.forEach(item => {
             studentsBuilder.push(
@@ -69,8 +69,8 @@ export default class StudentService {
         return studentsBuilder;
     }
 
-    async getStudentsByAge(age: number): Promise<IStudent[]> {
-        const students: Student[] = await new StudentRepository().getStudentsByAge(age);
+    async listByAge(age: number): Promise<IStudent[]> {
+        const students: Student[] = await new StudentRepository().listByAge(age);
         const studentsBuilder: IStudent[] = [];
         students.forEach(item => {
             studentsBuilder.push(
@@ -89,8 +89,8 @@ export default class StudentService {
         return studentsBuilder;
     }
 
-    async getStudent(studentId: number): Promise<IStudent> {
-        const student: Student = await new StudentRepository().getStudent(studentId);
+    async get(studentId: number): Promise<IStudent> {
+        const student: Student = await new StudentRepository().get(studentId);
         if (!student) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: STUDENT NOT_FOUND`);
 
         return Builder<IStudent>()
@@ -104,8 +104,8 @@ export default class StudentService {
             .build();
     }
 
-    async createStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<IStudent> {
-        const student: Student = await new StudentRepository().createStudent(societyName, catholicName, age, contact, description, groupId);
+    async create(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<IStudent> {
+        const student: Student = await new StudentRepository().create(societyName, catholicName, age, contact, description, groupId);
 
         return Builder<IStudent>()
             ._id(student._id)
@@ -118,17 +118,17 @@ export default class StudentService {
             .build();
     }
 
-    async updateStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<number> {
-        const [ affectedCount ] = await new StudentRepository().updateStudent(societyName, catholicName, age, contact, description, groupId, studentId);
+    async update(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<number> {
+        const [ affectedCount ] = await new StudentRepository().update(societyName, catholicName, age, contact, description, groupId, studentId);
         return affectedCount;
     }
 
-    async deleteStudent(studentId: number): Promise<number> {
-        const [ affectedCount ] = await new StudentRepository().deleteStudent(studentId);
+    async delete(studentId: number): Promise<number> {
+        const [ affectedCount ] = await new StudentRepository().delete(studentId);
         return affectedCount;
     }
 
-    async graduateStudent(accountId: number, accountName: string): Promise<number> {
+    async graduate(accountId: number, accountName: string): Promise<number> {
         let result = 0;
 
         switch (accountName) {
@@ -152,9 +152,9 @@ export default class StudentService {
      * @returns
      */
     private async elementaryGraduation(accountId: number): Promise<number> {
-        const groups: IGroup[] = await new GroupService().getGroupsByAccountForGraduation(accountId);
+        const groups: IGroup[] = await new GroupService().listByAccount(accountId);
         logger.log('졸업, 종업하는 초등부 학생들', groups);
-        const _14Group = await new GroupService().getGroupByName('예비 중1');
+        const _14Group = await new GroupService().getByName('예비 중1');
         const _8Group = groups.filter(item => { return item.groupName === '1학년' });
         const _9Group = groups.filter(item => { return item.groupName === '2학년' });
         const _10Group = groups.filter(item => { return item.groupName === '3학년' });
@@ -164,13 +164,13 @@ export default class StudentService {
         let result = 0;
 
         for (const group of groups) {
-            const students = await this.getStudentsByGroup(group._id);
+            const students = await this.listByGroup(group._id);
             logger.log('졸업, 종업하는 초등부 학생들', students);
             switch (group.groupName) {
                 case '유치부':
                     for (const student of students) {
                         if (student.studentAge >= 8) {
-                            result += await this.updateStudent(
+                            result += await this.update(
                                 student.studentSocietyName,
                                 student.studentCatholicName,
                                 student.studentAge,
@@ -184,7 +184,7 @@ export default class StudentService {
                     break;
                 case '1학년':
                     for (const student of students) {
-                        result += await this.updateStudent(
+                        result += await this.update(
                             student.studentSocietyName,
                             student.studentCatholicName,
                             student.studentAge,
@@ -197,7 +197,7 @@ export default class StudentService {
                     break;
                 case '2학년':
                     for (const student of students) {
-                        result += await this.updateStudent(
+                        result += await this.update(
                             student.studentSocietyName,
                             student.studentCatholicName,
                             student.studentAge,
@@ -210,7 +210,7 @@ export default class StudentService {
                     break;
                 case '3학년':
                     for (const student of students) {
-                        result += await this.updateStudent(
+                        result += await this.update(
                             student.studentSocietyName,
                             student.studentCatholicName,
                             student.studentAge,
@@ -223,7 +223,7 @@ export default class StudentService {
                     break;
                 case '4학년':
                     for (const student of students) {
-                        result += await this.updateStudent(
+                        result += await this.update(
                             student.studentSocietyName,
                             student.studentCatholicName,
                             student.studentAge,
@@ -236,7 +236,7 @@ export default class StudentService {
                     break;
                 case '5학년':
                     for (const student of students) {
-                        result += await this.updateStudent(
+                        result += await this.update(
                             student.studentSocietyName,
                             student.studentCatholicName,
                             student.studentAge,
@@ -249,7 +249,7 @@ export default class StudentService {
                     break;
                 case '6학년':
                     for (const student of students) {
-                        result += await this.updateStudent(
+                        result += await this.update(
                             student.studentSocietyName,
                             student.studentCatholicName,
                             student.studentAge,
@@ -269,16 +269,16 @@ export default class StudentService {
     }
 
     private async middleHighGraduation(): Promise<number> {
-        const adult = await new GroupService().getGroupByName('성인');
-        const _19Group = await new GroupService().getGroupByName('고3');
+        const adult = await new GroupService().getByName('성인');
+        const _19Group = await new GroupService().getByName('고3');
         let result = 0;
 
         let students: IStudent[];
-        students = await this.getStudentsByAge(20);
+        students = await this.listByAge(20);
         logger.log('졸업하는 학생들', students);
         if (students.length > 0) {
             for (const student of students) {
-                result += await this.updateStudent(
+                result += await this.update(
                     student.studentSocietyName,
                     student.studentCatholicName,
                     student.studentAge,
@@ -289,11 +289,11 @@ export default class StudentService {
                 );
             }
         }
-        students = await this.getStudentsByAge(19);
+        students = await this.listByAge(19);
         logger.log('고3인 학생들', students);
         if (students.length > 0) {
             for (const student of students) {
-                result += await this.updateStudent(
+                result += await this.update(
                     student.studentSocietyName,
                     student.studentCatholicName,
                     student.studentAge,

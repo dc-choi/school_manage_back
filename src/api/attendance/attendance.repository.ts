@@ -6,7 +6,7 @@ import { mysql } from '@/lib/mysql';
 import { Attendance } from '@/models/attendance.model';
 
 export default class AttendanceRepository {
-    async getAttendances(studentsCode: Array<number>): Promise<Attendance[]> {
+    async list(studentsCode: Array<number>): Promise<Attendance[]> {
         return await Attendance.findAll({
 			attributes: [
 				'_id',
@@ -21,7 +21,7 @@ export default class AttendanceRepository {
 		});
     }
 
-    async getAttendance(id: number, fullTime: string): Promise<Attendance> {
+    async get(id: number, fullTime: string): Promise<Attendance> {
         return await Attendance.findOne({
             where: {
                 student__id: id,
@@ -30,7 +30,7 @@ export default class AttendanceRepository {
         });
     }
 
-    async createAttendance(id: number, fullTime: string, data: string): Promise<Attendance> {
+    async create(id: number, fullTime: string, data: string): Promise<Attendance> {
         const transaction = await mysql.transaction();
         let attendance;
 
@@ -52,7 +52,7 @@ export default class AttendanceRepository {
         return attendance;
     }
 
-    async updateAttendance(id: number, fullTime: string, data: string): Promise<[affectedCount: number]> {
+    async update(id: number, fullTime: string, data: string): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let attendance: [affectedCount: number];
 
@@ -82,7 +82,7 @@ export default class AttendanceRepository {
         return attendance;
     }
 
-    async deleteAttendance(id: number, fullTime: string): Promise<number> {
+    async delete(id: number, fullTime: string): Promise<number> {
         const transaction = await mysql.transaction();
         let attendance: number;
 

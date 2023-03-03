@@ -7,7 +7,7 @@ import AuthMiddleware from '@/api/auth/auth.middleware'
 export const path = '/attendance';
 export const router = Router();
 
-router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AttendanceController().setAttendance);
-router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AttendanceController().createAttendance);
+router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AttendanceController().list);
+router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AttendanceController().create);
 
-router.get('/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AttendanceController().getAttendanceByGroup);
+router.get('/group/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AttendanceController().listByGroup);

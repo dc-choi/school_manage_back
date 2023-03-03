@@ -20,9 +20,9 @@ export default class AttendanceService {
      * @param _id
      * @returns
      */
-    async setAttendance(_id: number): Promise<AttendancesDTO> {
+    async list(_id: number): Promise<AttendancesDTO> {
         const year = new Date().getFullYear();
-        const groups: IGroup[] = await new GroupService().getGroupsByAccount(_id);
+        const groups: IGroup[] = await new GroupService().list(_id);
 
         return new AttendancesDTOBuilder()
             .setDate(year)
@@ -37,7 +37,7 @@ export default class AttendanceService {
      * @param year
      * @returns
      */
-    async getAttendanceByGroup(groupId: number, year: number): Promise<AttendancesDTO> {
+    async listByGroup(groupId: number, year: number): Promise<AttendancesDTO> {
         const month = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12 ];
 		const sunday: Array<number[]> = []; // 1년중 일요일에 해당하는 날
         const saturday: Array<number[]> = []; // 1년중 토요일에 해당하는 날
@@ -63,13 +63,13 @@ export default class AttendanceService {
 		});
 
         // 그룹에 해당되는 학생들의 정보 가져오기
-        const students: IStudent[] = await new StudentService().getStudentsByGroup(groupId);
+        const students: IStudent[] = await new StudentService().listByGroup(groupId);
         students.forEach(item => {
 			studentsCode.push(item._id);
 		});
 
         // Entity를 DTO로 변환하는 과정, 학생들의 출석정보를 가져온다.
-        const attendances: Attendance[] = await new AttendanceRepository().getAttendances(studentsCode);
+        const attendances: Attendance[] = await new AttendanceRepository().list(studentsCode);
         const attendancesBuilder: IAttendance[] = [];
         attendances.forEach(item => {
             attendancesBuilder.push(
@@ -90,49 +90,26 @@ export default class AttendanceService {
     }
 
     /**
-     * 출석부의 공백에 대한 처리
-     *
-     * @param year
-     * @param attendance
-     * @returns deleteAttendance: 기존에 출석이 있다가 없어진 갯수
-     */
-    async createBlankAttendance(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {
-        let deleteRow = 0;
-
-        for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-			const { id, time } = await this.separateAttendance(attendance[idx]);
-			const fullTime = await this.getFullTime(year, time);
-
-			const checkAttendance = await new AttendanceRepository().getAttendance(id, fullTime);
-			if (checkAttendance !== null) {
-                deleteRow += await new AttendanceRepository().deleteAttendance(id, fullTime);
-			}
-		}
-
-        return deleteRow;
-    }
-
-    /**
      * 출석부 입력한 부분에 대한 처리
      *
      * @param year
      * @param attendance - [ { str: string, data: string }, ... ]
      * @returns
      */
-    async createFullAttendance(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {
+    async create(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {
         let createRow = 0;
         let checkNull = null;
 
         for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-            const { id, time, data } = await this.separateAttendance(attendance[idx]);
-            const fullTime = await this.getFullTime(year, time);
+            const { id, time, data } = await this.separate(attendance[idx]);
+            const fullTime = await this.getTime(year, time);
 
-			const checkAttendance = await new AttendanceRepository().getAttendance(id, fullTime);
+			const checkAttendance = await new AttendanceRepository().get(id, fullTime);
             if (checkAttendance === null) {
-                checkNull = await new AttendanceRepository().createAttendance(id, fullTime, data);
+                checkNull = await new AttendanceRepository().create(id, fullTime, data);
                 if (checkNull) createRow++;
 			} else {
-                const [ affectedCount ] = await new AttendanceRepository().updateAttendance(id, fullTime, data);
+                const [ affectedCount ] = await new AttendanceRepository().update(id, fullTime, data);
                 createRow += affectedCount
 			}
 		}
@@ -141,12 +118,35 @@ export default class AttendanceService {
     }
 
     /**
+     * 출석부의 공백에 대한 처리
+     *
+     * @param year
+     * @param attendance
+     * @returns deleteAttendance: 기존에 출석이 있다가 없어진 갯수
+     */
+    async delete(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {
+        let deleteRow = 0;
+
+        for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
+			const { id, time } = await this.separate(attendance[idx]);
+			const fullTime = await this.getTime(year, time);
+
+			const checkAttendance = await new AttendanceRepository().get(id, fullTime);
+			if (checkAttendance !== null) {
+                deleteRow += await new AttendanceRepository().delete(id, fullTime);
+			}
+		}
+
+        return deleteRow;
+    }
+
+    /**
      * 배열의 인덱스 부분에 접근해서 출석 데이터를 추출한다.
      *
      * @param object 배열의 몇번째 인덱스의 데이터
      * @returns
      */
-    private async separateAttendance({ str, data }): Promise<{id: number, time: string[], data: string}> {
+    private async separate({ str, data }): Promise<{id: number, time: string[], data: string}> {
 		const splitStr = str.split('-');
         const id = splitStr[0];
 		const time = splitStr[1].split('.');
@@ -165,7 +165,7 @@ export default class AttendanceService {
      * @param time
      * @returns
      */
-    private async getFullTime(year: number, time: string[]) {
+    private async getTime(year: number, time: string[]) {
         const month = Number(time[0]);
         const day = Number(time[1]);
         let fullTime: string;

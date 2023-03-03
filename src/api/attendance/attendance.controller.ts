@@ -18,7 +18,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-     async setAttendance(req: Request, res: Response) {
+     async list(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -26,7 +26,7 @@ export default class AttendanceController {
         let response;
 
         try {
-            const setting: AttendancesDTO = await new AttendanceService().setAttendance(req.account.id);
+            const setting: AttendancesDTO = await new AttendanceService().list(req.account.id);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -52,7 +52,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-    async getAttendanceByGroup(req: Request, res: Response) {
+    async listByGroup(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -74,7 +74,7 @@ export default class AttendanceController {
                 parseYear = new Date().getFullYear();
             }
 
-            const attendances: AttendancesDTO = await new AttendanceService().getAttendanceByGroup(parseGroupId, parseYear);
+            const attendances: AttendancesDTO = await new AttendanceService().listByGroup(parseGroupId, parseYear);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -100,7 +100,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-     async createAttendance(req: Request, res: Response) {
+     async create(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -122,9 +122,9 @@ export default class AttendanceController {
              */
             let row: number;
             if (isFull) {
-                row = await new AttendanceService().createFullAttendance(year, attendance);
+                row = await new AttendanceService().create(year, attendance);
             } else {
-                row = await new AttendanceService().createBlankAttendance(year, attendance);
+                row = await new AttendanceService().delete(year, attendance);
             }
 
             const result: ResponseDTO = {

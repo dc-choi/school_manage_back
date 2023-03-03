@@ -3,7 +3,7 @@
 import { Account } from '@/models/account.model';
 
 export default class AccountRepository {
-    async getAccountByAccountId(id: string): Promise<Account> {
+    async getByAccountId(id: string): Promise<Account> {
         return await Account.findOne({
             where: {
                 account_ID: id

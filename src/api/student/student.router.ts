@@ -7,11 +7,11 @@ import AuthMiddleware from '@/api/auth/auth.middleware'
 export const path = '/student';
 export const router = Router();
 
-router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().getStudents);
-router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().createStudent);
+router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().list);
+router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().create);
 
-router.get('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().getStudent);
-router.put('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().updateStudent);
-router.delete('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().deleteStudent);
+router.get('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().get);
+router.put('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().update);
+router.delete('/:studentId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().delete);
 
-router.post('/graduation', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().graduateStudent);
+router.post('/graduation', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new StudentController().graduate);

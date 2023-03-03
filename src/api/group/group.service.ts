@@ -10,8 +10,8 @@ import ApiError from '@/common/api.error';
 import { Group } from '@/models/group.model';
 
 export default class GroupService {
-    async getGroupsByAccount(accountId: number): Promise<IGroup[]> {
-        const groups: Group[] = await new GroupRepository().getGroupsByAccount(accountId);
+    async list(accountId: number): Promise<IGroup[]> {
+        const groups: Group[] = await new GroupRepository().list(accountId);
         const groupsBuilder: IGroup[] = [];
         groups.forEach(item => {
             groupsBuilder.push(
@@ -26,8 +26,8 @@ export default class GroupService {
         return groupsBuilder;
     }
 
-    async getGroupsByAccountForGraduation(accountId: number): Promise<IGroup[]> {
-        const groups: Group[] = await new GroupRepository().getGroupsByAccountForGraduation(accountId);
+    async listByAccount(accountId: number): Promise<IGroup[]> {
+        const groups: Group[] = await new GroupRepository().listByAccount(accountId);
         const groupsBuilder: IGroup[] = [];
         groups.forEach(item => {
             groupsBuilder.push(
@@ -42,8 +42,8 @@ export default class GroupService {
         return groupsBuilder;
     }
 
-    async getGroup(groupId: number): Promise<IGroup> {
-        const group: Group = await new GroupRepository().getGroup(groupId);
+    async get(groupId: number): Promise<IGroup> {
+        const group: Group = await new GroupRepository().get(groupId);
         if (!group) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: GROUP NOT_FOUND, group_id: ${groupId}`);
 
         return Builder<IGroup>()
@@ -53,8 +53,8 @@ export default class GroupService {
             .build();
     }
 
-    async getGroupByName(groupName: string): Promise<IGroup> {
-        const group: Group = await new GroupRepository().getGroupByName(groupName);
+    async getByName(groupName: string): Promise<IGroup> {
+        const group: Group = await new GroupRepository().getByName(groupName);
         if (!group) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: GROUP NOT_FOUND, group_name: ${groupName}`);
 
         return Builder<IGroup>()
@@ -64,8 +64,8 @@ export default class GroupService {
             .build();
     }
 
-    async createGroup(name: string, accountId: number): Promise<IGroup> {
-        const group: Group = await new GroupRepository().createGroup(name, accountId);
+    async create(name: string, accountId: number): Promise<IGroup> {
+        const group: Group = await new GroupRepository().create(name, accountId);
 
         return Builder<IGroup>()
             ._id(group._id)
@@ -74,13 +74,13 @@ export default class GroupService {
             .build();
     }
 
-    async updateGroup(groupId: number, name: string, accountId: number): Promise<number> {
-        const [ affectedCount ] = await new GroupRepository().updateGroup(groupId, name, accountId);
+    async update(groupId: number, name: string, accountId: number): Promise<number> {
+        const [ affectedCount ] = await new GroupRepository().update(groupId, name, accountId);
         return affectedCount;
     }
 
-    async deleteGroup(groupId: number): Promise<number> {
-        const [ affectedCount ] = await new GroupRepository().deleteGroup(groupId);
+    async delete(groupId: number): Promise<number> {
+        const [ affectedCount ] = await new GroupRepository().delete(groupId);
         return affectedCount;
     }
 }

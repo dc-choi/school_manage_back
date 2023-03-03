@@ -1,4 +1,5 @@
-﻿import { Sequelize, Op } from 'sequelize';
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Sequelize, Op } from 'sequelize';
 
 import logger from '@/lib/logger'
 import { mysql } from '@/lib/mysql';
@@ -7,56 +8,10 @@ import { Group } from '@/models/group.model';
 import { Student } from '@/models/student.model';
 
 export default class StudentRepository {
-    async getTotalRow(searchOption: string, searchWord: string, groupsCode: Array<number>): Promise<number> {
-        let totalRow: number;
-
-        if (searchWord !== '') {
-            switch (searchOption) {
-                case 'societyName':
-                    totalRow = await Student.count({
-                        where: {
-                            student_society_name: searchWord,
-                            group__id: { [Op.in]: groupsCode },
-                            delete_at: {
-                                [Op.eq]: null,
-                            },
-                        },
-                    });
-                    break;
-                case 'catholicName':
-                    totalRow = await Student.count({
-                        where: {
-                            student_catholic_name: searchWord,
-                            group__id: { [Op.in]: groupsCode },
-                            delete_at: {
-                                [Op.eq]: null,
-                            },
-                        },
-                    });
-                    break;
-                default:
-                    totalRow = await Student.count({
-                        where: {
-                            group__id: { [Op.in]: groupsCode },
-                            delete_at: {
-                                [Op.eq]: null,
-                            },
-                        },
-                    });
-                    break;
-            }
-        } else {
-            totalRow = await Student.count({
-                where: {
-                    group__id: { [Op.in]: groupsCode },
-                    delete_at: {
-                        [Op.eq]: null,
-                    },
-                },
-            });
-        }
-
-        return totalRow;
+    async count(where: any): Promise<number> {
+        return await Student.count({
+            where,
+        });
     }
 
     /**
@@ -69,119 +24,32 @@ export default class StudentRepository {
      *
      * 추후에 이 문제를 해결해야함...
      */
-    async getStudents(searchOption: string, searchWord: string, startRow: number, rowPerPage: number, groupsCode: Array<number>) {
-        let students;
-
-        if (searchWord !== '') {
-            switch (searchOption) {
-                case 'societyName':
-                    students = await Student.findAll({
-                        include: [
-                            { model: Group, as: 'group', required: true, attributes: [] }
-                        ],
-                        attributes: [
-                            '_id',
-                            'student_society_name',
-                            'student_catholic_name',
-                            'student_age',
-                            [ Sequelize.col('group.group_name'), 'group_name' ],
-                            'student_contact',
-                        ],
-                        where: {
-                            student_society_name: searchWord,
-                            group__id: { [Op.in]: groupsCode },
-                            delete_at: {
-                                [Op.eq]: null,
-                            },
-                        },
-                        raw: true,
-                        offset: startRow,
-                        limit: rowPerPage,
-                        order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
-                    });
-                    break;
-                case 'catholicName':
-                    students = await Student.findAll({
-                        include: [
-                            { model: Group, as: 'group', required: true, attributes: [] }
-                        ],
-                        attributes: [
-                            '_id',
-                            'student_society_name',
-                            'student_catholic_name',
-                            'student_age',
-                            [ Sequelize.col('group.group_name'), 'group_name' ],
-                            'student_contact',
-                        ],
-                        where: {
-                            student_catholic_name: searchWord,
-                            group__id: { [Op.in]: groupsCode },
-                            delete_at: {
-                                [Op.eq]: null,
-                            },
-                        },
-                        raw: true,
-                        offset: startRow,
-                        limit: rowPerPage,
-                        order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
-                    });
-                    break;
-                default:
-                    students = await Student.findAll({
-                        include: [
-                            { model: Group, as: 'group', required: true, attributes: [] }
-                        ],
-                        attributes: [
-                            '_id',
-                            'student_society_name',
-                            'student_catholic_name',
-                            'student_age',
-                            [ Sequelize.col('group.group_name'), 'group_name' ],
-                            'student_contact',
-                        ],
-                        where: {
-                            group__id: { [Op.in]: groupsCode },
-                            delete_at: {
-                                [Op.eq]: null,
-                            },
-                        },
-                        raw: true,
-                        offset: startRow,
-                        limit: rowPerPage,
-                        order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
-                    });
-                    break;
-            }
-        } else {
-            students = await Student.findAll({
-                include: [
-                    { model: Group, as: 'group', required: true, attributes: [] }
-                ],
-                attributes: [
-                    '_id',
-                    'student_society_name',
-                    'student_catholic_name',
-                    'student_age',
-                    [ Sequelize.col('group.group_name'), 'group_name' ],
-                    'student_contact',
-                ],
-                where: {
-                    group__id: { [Op.in]: groupsCode },
-                    delete_at: {
-                        [Op.eq]: null,
-                    },
-                },
-                raw: true,
-                offset: startRow,
-                limit: rowPerPage,
-                order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
-            });
-        }
-
-        return students;
+    async list(page: number, size: number, where: any): Promise<any> {
+        return await Student.findAll({
+            include: [
+                {
+                    model: Group,
+                    as: 'group',
+                    required: true,
+                }
+            ],
+            attributes: [
+                '_id',
+                'student_society_name',
+                'student_catholic_name',
+                'student_age',
+                [ Sequelize.col('group.group_name'), 'group_name' ],
+                'student_contact',
+            ],
+            where,
+            raw: true,
+            offset: (page - 1) * size,
+            limit: size,
+            order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
+        });
     }
 
-    async getStudentsByGroup(groupId: number): Promise<Student[]> {
+    async listByGroup(groupId: number): Promise<Student[]> {
         return await Student.findAll({
 			attributes: [
                 '_id',
@@ -202,7 +70,7 @@ export default class StudentRepository {
 		});
     }
 
-    async getStudentsByAge(age: number): Promise<Student[]> {
+    async listByAge(age: number): Promise<Student[]> {
         return await Student.findAll({
 			attributes: [
                 '_id',
@@ -223,7 +91,7 @@ export default class StudentRepository {
 		});
     }
 
-    async getStudent(studentId: number): Promise<Student> {
+    async get(studentId: number): Promise<Student> {
         return await Student.findOne({
             where: {
                 _id: studentId,
@@ -234,7 +102,7 @@ export default class StudentRepository {
         })
     }
 
-    async createStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<Student> {
+    async create(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<Student> {
         const transaction = await mysql.transaction();
         let student: Student;
 
@@ -259,7 +127,7 @@ export default class StudentRepository {
         return student;
     }
 
-    async updateStudent(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<[affectedCount: number]> {
+    async update(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let student: [affectedCount: number];
 
@@ -292,7 +160,7 @@ export default class StudentRepository {
         return student;
     }
 
-    async deleteStudent(studentId: number): Promise<[affectedCount: number]> {
+    async delete(studentId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let student: [affectedCount: number];
 
