@@ -7,4 +7,4 @@ import AuthMiddleware from '@/api/auth/auth.middleware'
 export const path = '/account';
 export const router = Router();
 
-router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AccountController().getAccount);
+router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new AccountController().get);

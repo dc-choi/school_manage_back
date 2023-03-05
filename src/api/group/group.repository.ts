@@ -6,7 +6,7 @@ import { mysql } from '@/lib/mysql';
 import { Group } from '@/models/group.model';
 
 export default class GroupRepository {
-    async getGroupsByAccount(accountId: number): Promise<Group[]> {
+    async list(accountId: number): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
@@ -22,7 +22,7 @@ export default class GroupRepository {
         });
     }
 
-    async getGroupsByAccountForGraduation(accountId: number): Promise<Group[]> {
+    async listByAccount(accountId: number): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
@@ -39,7 +39,7 @@ export default class GroupRepository {
         });
     }
 
-    async getGroup(groupId: number): Promise<Group> {
+    async get(groupId: number): Promise<Group> {
         return await Group.findOne({
             where: {
                 _id: groupId,
@@ -50,7 +50,7 @@ export default class GroupRepository {
         })
     }
 
-    async getGroupByName(groupName: string): Promise<Group> {
+    async getByName(groupName: string): Promise<Group> {
         return await Group.findOne({
             where: {
                 group_name: groupName,
@@ -61,7 +61,7 @@ export default class GroupRepository {
         });
     }
 
-    async createGroup(name: string, accountId: number): Promise<Group> {
+    async create(name: string, accountId: number): Promise<Group> {
         const transaction = await mysql.transaction();
         let group;
 
@@ -82,7 +82,7 @@ export default class GroupRepository {
         return group;
     }
 
-    async updateGroup(groupId: number, name: string, accountId: number): Promise<[affectedCount: number]> {
+    async update(groupId: number, name: string, accountId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let group;
 
@@ -111,7 +111,7 @@ export default class GroupRepository {
         return group;
     }
 
-    async deleteGroup(groupId: number): Promise<[affectedCount: number]> {
+    async delete(groupId: number): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let group;
 

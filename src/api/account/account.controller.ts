@@ -8,7 +8,7 @@ import { ResponseDTO } from '@/common/dto/response.dto';
 import logger from '@/lib/logger';
 
 export default class AccountController {
-    async getAccount(req: Request, res: Response) {
+    async get(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
