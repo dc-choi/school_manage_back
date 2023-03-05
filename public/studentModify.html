@@ -64,7 +64,7 @@
 			url: "/api/group",
             headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
 			data: {},
-			success: (data) => {
+			success: async(data) => {
 				console.log(data);
                 if (data.code !== 200) {
                     alert(data.message);
@@ -79,6 +79,8 @@
 					html += `<option value="${item._id}">${item.groupName}</option>`;
 				});
 				group.append(html);
+
+                await getStudentInfo();
 			},
 			error: (error) => {
 				alert(error.responseText);
@@ -86,10 +88,8 @@
 		});
 	};
 
-	const initPage = () => {
-		groupList();
-
-		$.ajax({
+    const getStudentInfo = async() => {
+        $.ajax({
 			type: 'GET',
 			url: `/api/student/${_id}`,
             headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
@@ -113,7 +113,9 @@
 				alert(error.responseText);
 			}
 		});
-	};
+    };
+
+	groupList();
 
 	const checkData = (formData) => {
 		const numberRegExp = new RegExp('[1-9]');
@@ -145,7 +147,9 @@
 		return true;
 	};
 
-	initPage();
+    (async() => {
+        initPage();
+    })();
 
 	$("#modify").on("click", () => {
 		if (confirm('정말 수정하시겠습니까?')) {
