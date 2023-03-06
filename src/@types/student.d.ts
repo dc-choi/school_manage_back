@@ -5,6 +5,7 @@
     studentAge: number,
     studentContact: number,
     studentDescription: string,
+    baptizedAt: string,
     groupId: number,
     groupName: string,
 }

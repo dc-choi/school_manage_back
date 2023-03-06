@@ -125,7 +125,7 @@ export default class StudentController {
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
 
-        const { societyName, catholicName, age, contact, description, groupId } = req.body;
+        const { societyName, catholicName, age, contact, description, groupId, baptizedAt } = req.body;
         let response;
 
         try {
@@ -136,6 +136,7 @@ export default class StudentController {
                 .studentAge(age)
                 .studentContact(contact)
                 .studentDescription(description)
+                .baptizedAt(baptizedAt)
                 .build();
 
             const student: IStudent = await new StudentService().create(param);
@@ -164,7 +165,7 @@ export default class StudentController {
         logger.log('req.body:', JSON.stringify(req.body));
 
         const { studentId } = req.params;
-        const { societyName, catholicName, age, contact, description, groupId } = req.body;
+        const { societyName, catholicName, age, contact, description, groupId, baptizedAt } = req.body;
         let response;
 
         try {
@@ -182,6 +183,7 @@ export default class StudentController {
                 .studentAge(age)
                 .studentContact(contact)
                 .studentDescription(description)
+                .baptizedAt(baptizedAt)
                 .build();
 
             const row = await new StudentService().update(param);

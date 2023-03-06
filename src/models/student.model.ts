@@ -8,6 +8,7 @@ export interface StudentAttributes {
     student_age?: number;
     student_contact?: number;
     student_description?: string;
+    baptized_at?: string;
     create_at: Date;
     update_at?: Date;
     delete_at?: Date;
@@ -16,7 +17,7 @@ export interface StudentAttributes {
 
 export type StudentPk = "_id";
 export type StudentId = Student[StudentPk];
-export type StudentOptionalAttributes = "_id" | "student_catholic_name" | "student_age" | "student_contact" | "student_description" | "update_at" | "delete_at";
+export type StudentOptionalAttributes = "_id" | "student_catholic_name" | "student_age" | "student_contact" | "student_description" | "baptized_at" | "update_at" | "delete_at";
 export type StudentCreationAttributes = Optional<StudentAttributes, StudentOptionalAttributes>;
 
 export class Student extends Model<StudentAttributes, StudentCreationAttributes> implements StudentAttributes {
@@ -26,6 +27,7 @@ export class Student extends Model<StudentAttributes, StudentCreationAttributes>
     student_age?: number;
     student_contact?: number;
     student_description?: string;
+    baptized_at?: string;
     create_at!: Date;
     update_at?: Date;
     delete_at?: Date;
@@ -63,6 +65,10 @@ export class Student extends Model<StudentAttributes, StudentCreationAttributes>
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            },
+            baptized_at: {
+                type: DataTypes.STRING(10),
+                allowNull: true
             },
             update_at: {
                 type: DataTypes.DATE,

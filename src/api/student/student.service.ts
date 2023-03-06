@@ -38,6 +38,7 @@ export default class StudentService {
                     .groupId(item.group__id)
                     // any가 아니면 이곳에서 에러가 무조건 발생...
                     .groupName(item.group_name)
+                    .baptizedAt(item.baptized_at)
                     .build()
             );
 		});
@@ -62,6 +63,7 @@ export default class StudentService {
                     .studentContact(item.student_contact)
                     .studentDescription(item.student_description)
                     .groupId(item.group__id)
+                    .baptizedAt(item.baptized_at)
                     .build()
             );
 		});
@@ -82,6 +84,7 @@ export default class StudentService {
                     .studentContact(item.student_contact)
                     .studentDescription(item.student_description)
                     .groupId(item.group__id)
+                    .baptizedAt(item.baptized_at)
                     .build()
             );
 		});
@@ -100,6 +103,7 @@ export default class StudentService {
             .studentAge(student.student_age)
             .studentContact(student.student_contact)
             .studentDescription(student.student_description)
+            .baptizedAt(student.baptized_at)
             .groupId(student.group__id)
             .build();
     }
@@ -115,6 +119,7 @@ export default class StudentService {
             .studentContact(student.student_contact)
             .studentDescription(student.student_description)
             .groupId(student.group__id)
+            .baptizedAt(student.baptized_at)
             .build();
     }
 

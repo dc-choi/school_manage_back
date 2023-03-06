@@ -72,6 +72,7 @@
 				html += `<tr scope="row">`;
 				html += `<td scope="col" class="text-center">이름</td>`;
 				html += `<td scope="col" class="text-center">세례명</td>`;
+                html += `<td scope="col" class="text-center">축일</td>`;
 				html += `<td scope="col" class="text-center">나이</td>`;
 				html += `<td scope="col" class="text-center">그룹</td>`;
 				html += `<td scope="col" class="text-center">연락처</td>`;
@@ -84,6 +85,8 @@
 					html += `<tr scope="row">`;
 					html += `<td scope="col" class="text-center">${e.studentSocietyName}</td>`;
 					html += `<td scope="col" class="text-center">${e.studentCatholicName}</td>`;
+                    if (e.baptizedAt) html += `<td scope="col" class="text-center">${e.baptizedAt}</td>`;
+                    else html += `<td scope="col" class="text-center"></td>`;
 					html += `<td scope="col" class="text-center">${e.studentAge}</td>`;
 					html += `<td scope="col" class="text-center">${e.groupName}</td>`;
 					html += `<td scope="col" class="text-center">0${phone.substring(0, 2)}-${phone.substring(2, 6)}-${phone.substring(6, 10)}</td>`;

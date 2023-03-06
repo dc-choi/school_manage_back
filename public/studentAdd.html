@@ -18,6 +18,7 @@
 					<tr scope="row">
 						<th scope="col" class="text-center">이름</th>
 						<th scope="col" class="text-center">세례명</th>
+						<th scope="col" class="text-center">축일 (MM/DD)</th>
 						<th scope="col" class="text-center">나이</th>
 						<th scope="col" class="text-center">학년</th>
 						<th scope="col" class="text-center">연락처 (- 빼고 입력)</th>
@@ -30,6 +31,9 @@
 						</td>
 						<td scope="col" class="text-center">
 							<input class="form-control" type="text" name="catholicName" id="catholicName">
+						</td>
+                        <td scope="col" class="text-center">
+							<input class="form-control" type="text" name="baptism" id="baptism">
 						</td>
 						<td scope="col" class="text-center">
 							<input class="form-control" type="text" name="age" id="age">
@@ -123,6 +127,7 @@
 			const catholicName = $("#catholicName").val();
 			const age = $("#age").val();
 			const groupId = $("#group").val();
+            const baptizedAt = $("#baptism").val();
 			let contact = $('#contact').val();
             // 전화번호는 순수한 데이터를 넣는게 사용자 요구사항 변경시 도움 됨.
             if (contact[0] === '0') {
@@ -137,6 +142,7 @@
 				age,
 				groupId,
 				contact,
+                baptizedAt,
 			};
 
 			if (!checkData(formData)) return;

@@ -42,6 +42,7 @@ export default class StudentRepository {
                 'student_age',
                 [ Sequelize.col('group.group_name'), 'group_name' ],
                 'student_contact',
+                'baptized_at',
             ],
             where,
             raw: true,
@@ -61,6 +62,7 @@ export default class StudentRepository {
                 'student_contact',
                 'student_description',
                 'group__id',
+                'baptized_at',
 			],
 			where: {
                 group__id: groupId,
@@ -82,6 +84,7 @@ export default class StudentRepository {
                 'student_contact',
                 'student_description',
                 'group__id',
+                'baptized_at',
 			],
 			where: {
                 student_age: age,
@@ -116,6 +119,7 @@ export default class StudentRepository {
                 student_contact: param.studentContact,
                 student_description: param.studentDescription,
                 group__id: param.groupId,
+                baptized_at: param.baptizedAt,
             }, { transaction });
 
             await transaction.commit();
@@ -141,7 +145,8 @@ export default class StudentRepository {
                     student_age: param.studentAge,
                     student_contact: param.studentContact,
                     student_description: param.studentDescription,
-                    group__id: param.groupId
+                    group__id: param.groupId,
+                    baptized_at: param.baptizedAt,
                 },
                 {
                     where: {
