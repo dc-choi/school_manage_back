@@ -104,8 +104,8 @@ export default class StudentService {
             .build();
     }
 
-    async create(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<IStudent> {
-        const student: Student = await new StudentRepository().create(societyName, catholicName, age, contact, description, groupId);
+    async create(param: IStudent): Promise<IStudent> {
+        const student: Student = await new StudentRepository().create(param);
 
         return Builder<IStudent>()
             ._id(student._id)
@@ -118,8 +118,8 @@ export default class StudentService {
             .build();
     }
 
-    async update(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<number> {
-        const [ affectedCount ] = await new StudentRepository().update(societyName, catholicName, age, contact, description, groupId, studentId);
+    async update(param: IStudent): Promise<number> {
+        const [ affectedCount ] = await new StudentRepository().update(param);
         return affectedCount;
     }
 
@@ -170,94 +170,45 @@ export default class StudentService {
                 case '유치부':
                     for (const student of students) {
                         if (student.studentAge >= 8) {
-                            result += await this.update(
-                                student.studentSocietyName,
-                                student.studentCatholicName,
-                                student.studentAge,
-                                student.studentContact,
-                                student.studentDescription,
-                                _8Group[0]._id,
-                                student._id
-                            )
+                            student.groupId = _8Group[0]._id
+                            result += await this.update(student);
                         }
                     }
                     break;
                 case '1학년':
                     for (const student of students) {
-                        result += await this.update(
-                            student.studentSocietyName,
-                            student.studentCatholicName,
-                            student.studentAge,
-                            student.studentContact,
-                            student.studentDescription,
-                            _9Group[0]._id,
-                            student._id
-                        )
+                        student.groupId = _9Group[0]._id
+                        result += await this.update(student);
                     }
                     break;
                 case '2학년':
                     for (const student of students) {
-                        result += await this.update(
-                            student.studentSocietyName,
-                            student.studentCatholicName,
-                            student.studentAge,
-                            student.studentContact,
-                            student.studentDescription,
-                            _10Group[0]._id,
-                            student._id
-                        )
+                        student.groupId = _10Group[0]._id;
+                        result += await this.update(student);
                     }
                     break;
                 case '3학년':
                     for (const student of students) {
-                        result += await this.update(
-                            student.studentSocietyName,
-                            student.studentCatholicName,
-                            student.studentAge,
-                            student.studentContact,
-                            student.studentDescription,
-                            _11Group[0]._id,
-                            student._id
-                        )
+                        student.groupId = _11Group[0]._id;
+                        result += await this.update(student);
                     }
                     break;
                 case '4학년':
                     for (const student of students) {
-                        result += await this.update(
-                            student.studentSocietyName,
-                            student.studentCatholicName,
-                            student.studentAge,
-                            student.studentContact,
-                            student.studentDescription,
-                            _12Group[0]._id,
-                            student._id
-                        )
+                        student.groupId = _12Group[0]._id;
+                        result += await this.update(student);
                     }
                     break;
                 case '5학년':
                     for (const student of students) {
-                        result += await this.update(
-                            student.studentSocietyName,
-                            student.studentCatholicName,
-                            student.studentAge,
-                            student.studentContact,
-                            student.studentDescription,
-                            _13Group[0]._id,
-                            student._id
-                        )
+                        student.groupId = _13Group[0]._id;
+                        result += await this.update(student);
                     }
                     break;
                 case '6학년':
                     for (const student of students) {
-                        result += await this.update(
-                            student.studentSocietyName,
-                            student.studentCatholicName,
-                            student.studentAge,
-                            student.studentContact,
-                            student.studentDescription,
-                            _14Group._id,
-                            student._id
-                        )
+                        student.groupId = _14Group[0]._id;
+                        result += await this.update(student);
                     }
                     break;
                 default:
@@ -278,30 +229,16 @@ export default class StudentService {
         logger.log('졸업하는 학생들', students);
         if (students.length > 0) {
             for (const student of students) {
-                result += await this.update(
-                    student.studentSocietyName,
-                    student.studentCatholicName,
-                    student.studentAge,
-                    student.studentContact,
-                    student.studentDescription,
-                    adult._id,
-                    student._id
-                );
+                student.groupId = adult._id;
+                result += await this.update(student);
             }
         }
         students = await this.listByAge(19);
         logger.log('고3인 학생들', students);
         if (students.length > 0) {
             for (const student of students) {
-                result += await this.update(
-                    student.studentSocietyName,
-                    student.studentCatholicName,
-                    student.studentAge,
-                    student.studentContact,
-                    student.studentDescription,
-                    _19Group._id,
-                    student._id
-                );
+                student.groupId = _19Group._id;
+                result += await this.update(student);
             }
         }
 

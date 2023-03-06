@@ -1,6 +1,8 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Sequelize, Op } from 'sequelize';
 
+import { IStudent } from '@/@types/student';
+
 import logger from '@/lib/logger'
 import { mysql } from '@/lib/mysql';
 
@@ -102,18 +104,18 @@ export default class StudentRepository {
         })
     }
 
-    async create(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number): Promise<Student> {
+    async create(param: IStudent): Promise<Student> {
         const transaction = await mysql.transaction();
         let student: Student;
 
         try {
             student = await Student.create({
-                student_society_name: societyName,
-                student_catholic_name: catholicName,
-                student_age: age,
-                student_contact: contact,
-                student_description: description,
-                group__id: groupId,
+                student_society_name: param.studentSocietyName,
+                student_catholic_name: param.studentCatholicName,
+                student_age: param.studentAge,
+                student_contact: param.studentContact,
+                student_description: param.studentDescription,
+                group__id: param.groupId,
             }, { transaction });
 
             await transaction.commit();
@@ -127,23 +129,23 @@ export default class StudentRepository {
         return student;
     }
 
-    async update(societyName: string, catholicName: string, age: number, contact: number, description: string, groupId: number, studentId: number): Promise<[affectedCount: number]> {
+    async update(param: IStudent): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let student: [affectedCount: number];
 
         try {
             student = await Student.update(
                 {
-                    student_society_name: societyName,
-                    student_catholic_name: catholicName,
-                    student_age: age,
-                    student_contact: contact,
-                    student_description: description,
-                    group__id: groupId
+                    student_society_name: param.studentSocietyName,
+                    student_catholic_name: param.studentCatholicName,
+                    student_age: param.studentAge,
+                    student_contact: param.studentContact,
+                    student_description: param.studentDescription,
+                    group__id: param.groupId
                 },
                 {
                     where: {
-                        _id: studentId
+                        _id: param._id
                     },
                     transaction
                 },

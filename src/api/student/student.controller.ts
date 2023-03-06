@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { Op } from 'sequelize';
+import { Builder } from 'builder-pattern';
 
 import StudentService from './student.service';
 
@@ -62,8 +63,8 @@ export default class StudentController {
                     delete where.student_catholic_name
                     break;
             }
-
             logger.log('where:', where);
+
             const students: StudentsDTO = await new StudentService().list(parseNowPage, where);
 
             const result: ResponseDTO = {
@@ -104,7 +105,7 @@ export default class StudentController {
             const result: ResponseDTO = {
                 account: req.account.name,
                 student
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -128,12 +129,21 @@ export default class StudentController {
         let response;
 
         try {
-            const student: IStudent = await new StudentService().create(societyName, catholicName, age, contact, description, groupId);
+            const param = Builder<IStudent>()
+                .groupId(groupId)
+                .studentSocietyName(societyName)
+                .studentCatholicName(catholicName)
+                .studentAge(age)
+                .studentContact(contact)
+                .studentDescription(description)
+                .build();
+
+            const student: IStudent = await new StudentService().create(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
                 student
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -164,12 +174,22 @@ export default class StudentController {
                 throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
-            const row = await new StudentService().update(societyName, catholicName, age, contact, description, groupId, parseStudentId);
+            const param = Builder<IStudent>()
+                ._id(parseStudentId)
+                .groupId(groupId)
+                .studentSocietyName(societyName)
+                .studentCatholicName(catholicName)
+                .studentAge(age)
+                .studentContact(contact)
+                .studentDescription(description)
+                .build();
+
+            const row = await new StudentService().update(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
                 row
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -204,7 +224,7 @@ export default class StudentController {
             const result: ResponseDTO = {
                 account: req.account.name,
                 row
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -232,7 +252,7 @@ export default class StudentController {
             const result: ResponseDTO = {
                 account: req.account.name,
                 row
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();

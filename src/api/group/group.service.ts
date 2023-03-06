@@ -64,8 +64,8 @@ export default class GroupService {
             .build();
     }
 
-    async create(name: string, accountId: number): Promise<IGroup> {
-        const group: Group = await new GroupRepository().create(name, accountId);
+    async create(param: IGroup): Promise<IGroup> {
+        const group: Group = await new GroupRepository().create(param);
 
         return Builder<IGroup>()
             ._id(group._id)
@@ -74,8 +74,8 @@ export default class GroupService {
             .build();
     }
 
-    async update(groupId: number, name: string, accountId: number): Promise<number> {
-        const [ affectedCount ] = await new GroupRepository().update(groupId, name, accountId);
+    async update(param: IGroup): Promise<number> {
+        const [ affectedCount ] = await new GroupRepository().update(param);
         return affectedCount;
     }
 
