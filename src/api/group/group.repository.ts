@@ -1,5 +1,7 @@
 ﻿import { Sequelize, Op } from 'sequelize';
 
+import { IGroup } from '@/@types/group';
+
 import logger from '@/lib/logger'
 import { mysql } from '@/lib/mysql';
 
@@ -61,14 +63,14 @@ export default class GroupRepository {
         });
     }
 
-    async create(name: string, accountId: number): Promise<Group> {
+    async create(param: IGroup): Promise<Group> {
         const transaction = await mysql.transaction();
         let group;
 
         try {
             group = await Group.create({
-                group_name: name,
-                account__id: accountId
+                group_name: param.groupName,
+                account__id: param.accountId
             }, { transaction });
 
             await transaction.commit();
@@ -82,19 +84,19 @@ export default class GroupRepository {
         return group;
     }
 
-    async update(groupId: number, name: string, accountId: number): Promise<[affectedCount: number]> {
+    async update(param: IGroup): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let group;
 
         try {
             group = await Group.update(
                 {
-                    group_name: name,
-                    account__id: accountId
+                    group_name: param.groupName,
+                    account__id: param.accountId
                 },
                 {
                     where: {
-                        _id: groupId
+                        _id: param._id
                     },
                     transaction
                 }

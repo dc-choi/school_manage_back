@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
+import { Builder } from 'builder-pattern';
 
 import GroupService from './group.service';
 
@@ -27,7 +28,7 @@ export default class GroupController {
             const result: ResponseDTO = {
                 account: req.account.name,
                 groups
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -62,7 +63,7 @@ export default class GroupController {
             const result: ResponseDTO = {
                 account: req.account.name,
                 group
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -86,12 +87,17 @@ export default class GroupController {
         let response;
 
         try {
-            const group: IGroup = await new GroupService().create(name, req.account.id);
+            const param: IGroup = Builder<IGroup>()
+                .groupName(name)
+                .accountId(req.account.id)
+                .build();
+
+            const group: IGroup = await new GroupService().create(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
                 group
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -122,12 +128,18 @@ export default class GroupController {
                 throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
-            const row = await new GroupService().update(parseGroupId, name, req.account.id);
+            const param = Builder<IGroup>()
+                ._id(parseGroupId)
+                .groupName(name)
+                .accountId(req.account.id)
+                .build();
+
+            const row = await new GroupService().update(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
                 row
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
@@ -162,7 +174,7 @@ export default class GroupController {
             const result: ResponseDTO = {
                 account: req.account.name,
                 row
-            }
+            };
             logger.log('result:', JSON.stringify(result));
 
             response = Result.ok<ResponseDTO>(result).toJson();
