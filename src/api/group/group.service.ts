@@ -6,12 +6,13 @@ import { IGroup } from '@/@types/group';
 
 import ApiCodes from '@/common/api.codes';
 import ApiError from '@/common/api.error';
+import BaseService from '@/common/base/base.service';
 
 import { Group } from '@/models/group.model';
 
-export default class GroupService {
-    async list(accountId: number): Promise<IGroup[]> {
-        const groups: Group[] = await new GroupRepository().list(accountId);
+export default class GroupService extends BaseService<IGroup> {
+    async list(): Promise<IGroup[]> {
+        const groups: Group[] = await new GroupRepository().setId(this._id).findAll();
         const groupsBuilder: IGroup[] = [];
         groups.forEach(item => {
             groupsBuilder.push(
@@ -26,8 +27,8 @@ export default class GroupService {
         return groupsBuilder;
     }
 
-    async listByAccount(accountId: number): Promise<IGroup[]> {
-        const groups: Group[] = await new GroupRepository().listByAccount(accountId);
+    async listByAccount(): Promise<IGroup[]> {
+        const groups: Group[] = await new GroupRepository().setId(this._id).findAllByAccount();
         const groupsBuilder: IGroup[] = [];
         groups.forEach(item => {
             groupsBuilder.push(
@@ -42,9 +43,9 @@ export default class GroupService {
         return groupsBuilder;
     }
 
-    async get(groupId: number): Promise<IGroup> {
-        const group: Group = await new GroupRepository().get(groupId);
-        if (!group) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: GROUP NOT_FOUND, group_id: ${groupId}`);
+    async get(): Promise<IGroup> {
+        const group: Group = await new GroupRepository().setId(this._id).findOne();
+        if (!group) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: GROUP NOT_FOUND, group_id: ${this._id}`);
 
         return Builder<IGroup>()
             ._id(group._id)
@@ -54,7 +55,7 @@ export default class GroupService {
     }
 
     async getByName(groupName: string): Promise<IGroup> {
-        const group: Group = await new GroupRepository().getByName(groupName);
+        const group: Group = await new GroupRepository().findOneByName(groupName);
         if (!group) throw new ApiError(ApiCodes.NOT_FOUND, `NOT_FOUND: GROUP NOT_FOUND, group_name: ${groupName}`);
 
         return Builder<IGroup>()
@@ -64,8 +65,9 @@ export default class GroupService {
             .build();
     }
 
-    async create(param: IGroup): Promise<IGroup> {
-        const group: Group = await new GroupRepository().create(param);
+    async add(param: IGroup): Promise<IGroup> {
+        const transaction = await new GroupRepository().setTransaction();
+        const group: Group = await transaction.create(param);
 
         return Builder<IGroup>()
             ._id(group._id)
@@ -74,13 +76,13 @@ export default class GroupService {
             .build();
     }
 
-    async update(param: IGroup): Promise<number> {
-        const [ affectedCount ] = await new GroupRepository().update(param);
-        return affectedCount;
+    async modify(param: IGroup): Promise<number> {
+        const transaction = await new GroupRepository().setTransaction();
+        return await transaction.update(param);
     }
 
-    async delete(groupId: number): Promise<number> {
-        const [ affectedCount ] = await new GroupRepository().delete(groupId);
-        return affectedCount;
+    async remove(): Promise<number> {
+        const transaction = await new GroupRepository().setId(this._id).setTransaction();
+        return await transaction.delete();
     }
 }

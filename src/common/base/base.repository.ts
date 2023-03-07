@@ -11,30 +11,28 @@ export default abstract class BaseRepository<T> {
 
     setId(id: number) {
         this._id = id;
+        return this;
     }
 
     setPage(page: number) {
         this.page = page;
+        return this;
     }
 
     setSize(size: number) {
         this.size = size;
+        return this;
     }
 
     async setTransaction() {
         this.transaction = await mysql.transaction();
+        return this;
     }
 
     abstract findAll(): Promise<T[]>;
-    abstract findAll<U>(where: any): Promise<{rows: U[]; count: number}>; // pagenation
-
+    abstract findAndCountAll(where: any): Promise<{rows: any; count: number}>; // pagenation
     abstract findOne(): Promise<T>;
-    abstract findOne<U>(param: U): Promise<T>;
-
-    abstract create<U>(param: U): Promise<T>;
-
-    abstract update<U>(param: U): Promise<number>;
-
+    abstract create(param): Promise<T>;
+    abstract update(param): Promise<number>;
     abstract delete(): Promise<number>;
-    abstract delete<U>(param: U): Promise<number>;
 }

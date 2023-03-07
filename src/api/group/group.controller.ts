@@ -22,7 +22,7 @@ export default class GroupController {
         let response;
 
         try {
-            const groups: IGroup[] = await new GroupService().list(req.account.id);
+            const groups: IGroup[] = await new GroupService().setId(req.account.id).list();
             logger.log('result:', JSON.stringify(groups));
 
             const result: ResponseDTO = {
@@ -58,7 +58,7 @@ export default class GroupController {
                 throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
-            const group: IGroup = await new GroupService().get(parseGroupId);
+            const group: IGroup = await new GroupService().setId(parseGroupId).get();
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -78,7 +78,7 @@ export default class GroupController {
         res.status(httpStatus.OK).json(response);
     }
 
-    async create(req: Request, res: Response) {
+    async add(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -92,7 +92,7 @@ export default class GroupController {
                 .accountId(req.account.id)
                 .build();
 
-            const group: IGroup = await new GroupService().create(param);
+            const group: IGroup = await new GroupService().add(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -112,7 +112,7 @@ export default class GroupController {
         res.status(httpStatus.OK).json(response);
     }
 
-    async update(req: Request, res: Response) {
+    async modify(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -134,7 +134,7 @@ export default class GroupController {
                 .accountId(req.account.id)
                 .build();
 
-            const row = await new GroupService().update(param);
+            const row = await new GroupService().modify(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -154,7 +154,7 @@ export default class GroupController {
         res.status(httpStatus.OK).json(response);
     }
 
-    async delete(req: Request, res: Response) {
+    async remove(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -169,7 +169,7 @@ export default class GroupController {
                 throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
-            const row = await new GroupService().delete(parseGroupId);
+            const row = await new GroupService().setId(parseGroupId).remove();
 
             const result: ResponseDTO = {
                 account: req.account.name,

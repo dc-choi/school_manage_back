@@ -3,19 +3,14 @@ import { Sequelize, Op } from 'sequelize';
 
 import { IStudent } from '@/@types/student';
 
+import BaseRepository from '@/common/base/base.repository';
+
 import logger from '@/lib/logger'
-import { mysql } from '@/lib/mysql';
 
 import { Group } from '@/models/group.model';
 import { Student } from '@/models/student.model';
 
-export default class StudentRepository {
-    async count(where: any): Promise<number> {
-        return await Student.count({
-            where,
-        });
-    }
-
+export default class StudentRepository extends BaseRepository<Student> {
     /**
      * TODO: typescript의 문제점때문에 막힘.
      *
@@ -26,8 +21,11 @@ export default class StudentRepository {
      *
      * 추후에 이 문제를 해결해야함...
      */
-    async list(page: number, size: number, where: any): Promise<any> {
-        return await Student.findAll({
+    async findAndCountAll(where: any): Promise<{
+        rows: any;
+        count: number;
+    }> {
+        return await Student.findAndCountAll({
             include: [
                 {
                     model: Group,
@@ -46,13 +44,13 @@ export default class StudentRepository {
             ],
             where,
             raw: true,
-            offset: (page - 1) * size,
-            limit: size,
+            offset: (this.page - 1) * this.size,
+            limit: this.size,
             order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
         });
     }
 
-    async listByGroup(groupId: number): Promise<Student[]> {
+    async findAll(): Promise<Student[]> {
         return await Student.findAll({
 			attributes: [
                 '_id',
@@ -65,7 +63,7 @@ export default class StudentRepository {
                 'baptized_at',
 			],
 			where: {
-                group__id: groupId,
+                group__id: this._id,
                 delete_at: {
                     [Op.eq]: null,
                 },
@@ -74,7 +72,7 @@ export default class StudentRepository {
 		});
     }
 
-    async listByAge(age: number): Promise<Student[]> {
+    async findAllByAge(age: number): Promise<Student[]> {
         return await Student.findAll({
 			attributes: [
                 '_id',
@@ -96,10 +94,10 @@ export default class StudentRepository {
 		});
     }
 
-    async get(studentId: number): Promise<Student> {
+    async findOne(): Promise<Student> {
         return await Student.findOne({
             where: {
-                _id: studentId,
+                _id: this._id,
                 delete_at: {
                     [Op.eq]: null,
                 },
@@ -108,7 +106,6 @@ export default class StudentRepository {
     }
 
     async create(param: IStudent): Promise<Student> {
-        const transaction = await mysql.transaction();
         let student: Student;
 
         try {
@@ -120,25 +117,24 @@ export default class StudentRepository {
                 student_description: param.studentDescription,
                 group__id: param.groupId,
                 baptized_at: param.baptizedAt,
-            }, { transaction });
+            }, { transaction: this.transaction });
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
+            await this.transaction.rollback();
             student = null;
         }
 
         return student;
     }
 
-    async update(param: IStudent): Promise<[affectedCount: number]> {
-        const transaction = await mysql.transaction();
-        let student: [affectedCount: number];
+    async update(param: IStudent): Promise<number> {
+        let student: number;
 
         try {
-            student = await Student.update(
+            [ student ] = await Student.update(
                 {
                     student_society_name: param.studentSocietyName,
                     student_catholic_name: param.studentCatholicName,
@@ -152,44 +148,43 @@ export default class StudentRepository {
                     where: {
                         _id: param._id
                     },
-                    transaction
+                    transaction: this.transaction
                 },
             );
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
-            student = [ 0 ];
+            await this.transaction.rollback();
+            student = 0;
         }
 
         return student;
     }
 
-    async delete(studentId: number): Promise<[affectedCount: number]> {
-        const transaction = await mysql.transaction();
-        let student: [affectedCount: number];
+    async delete(): Promise<number> {
+        let student: number;
 
         try {
-            student = await Student.update(
+            [ student ] = await Student.update(
                 {
                     delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
                 },
                 {
                     where: {
-                        _id: studentId
+                        _id: this._id
                     },
-                    transaction
+                    transaction: this.transaction
                 }
             );
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
-            student = [ 0 ];
+            await this.transaction.rollback();
+            student = 0;
         }
 
         return student;

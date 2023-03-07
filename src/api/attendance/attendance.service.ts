@@ -22,7 +22,7 @@ export default class AttendanceService {
      */
     async list(_id: number): Promise<AttendancesDTO> {
         const year = new Date().getFullYear();
-        const groups: IGroup[] = await new GroupService().list(_id);
+        const groups: IGroup[] = await new GroupService().setId(_id).list();
 
         return new AttendancesDTOBuilder()
             .setDate(year)
@@ -63,7 +63,7 @@ export default class AttendanceService {
 		});
 
         // 그룹에 해당되는 학생들의 정보 가져오기
-        const students: IStudent[] = await new StudentService().listByGroup(groupId);
+        const students: IStudent[] = await new StudentService().setId(groupId).list();
         students.forEach(item => {
 			studentsCode.push(item._id);
 		});
@@ -96,7 +96,7 @@ export default class AttendanceService {
      * @param attendance - [ { str: string, data: string }, ... ]
      * @returns
      */
-    async create(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {
+    async modify(year: number, attendance: Array<{ str: string, data: string }>): Promise<number> {
         let createRow = 0;
         let checkNull = null;
 

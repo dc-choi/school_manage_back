@@ -8,8 +8,8 @@ export const path = '/group';
 export const router = Router();
 
 router.get('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().list);
-router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().create);
+router.post('/', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().add);
 
 router.get('/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().get);
-router.put('/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().update);
-router.delete('/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().delete);
+router.put('/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().modify);
+router.delete('/:groupId', new AuthMiddleware().parseAuthToken, new AuthMiddleware().verifyAccount, new GroupController().remove);
