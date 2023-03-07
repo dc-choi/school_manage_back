@@ -1,7 +1,6 @@
 /* eslint-disable no-extra-boolean-cast */
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { Op } from 'sequelize';
 import { Builder } from 'builder-pattern';
 
 import StudentService from './student.service';
@@ -15,8 +14,6 @@ import { StudentsDTO } from '@/common/dto/student.dto';
 import { ResponseDTO } from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
-
-import GroupService from '@/api/group/group.service';
 
 export default class StudentController {
     async list(req: Request, res: Response) {
@@ -35,37 +32,8 @@ export default class StudentController {
                 parseNowPage = 1;
             }
 
-            // 계정에 소속된 그룹의 PK를 가져온다.
-            const groups = await new GroupService().list(req.account.id);
-            const where = {
-                student_society_name: null,
-                student_catholic_name: null,
-                group__id: {
-                    [Op.in]: groups.map(item => { return item._id })
-                },
-                delete_at: {
-                    [Op.eq]: null,
-                },
-            };
-
-            // searchWord가 비어있으면 삭제
-            switch (searchOption) {
-                case 'societyName':
-                    !!!searchWord ? delete where.student_society_name : where.student_society_name = searchWord;
-                    delete where.student_catholic_name
-                    break;
-                case 'catholicName':
-                    !!!searchWord ? delete where.student_catholic_name : where.student_catholic_name = searchWord;
-                    delete where.student_society_name
-                    break;
-                default:
-                    delete where.student_society_name
-                    delete where.student_catholic_name
-                    break;
-            }
-            logger.log('where:', where);
-
-            const students: StudentsDTO = await new StudentService().list(parseNowPage, where);
+            const where = await new StudentService().setId(req.account.id).setWhere(String(searchOption), String(searchWord))
+            const students: StudentsDTO = await new StudentService().setPage(parseNowPage).findAll(where);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -100,7 +68,7 @@ export default class StudentController {
                 throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
-            const student: IStudent = await new StudentService().get(parseStudentId);
+            const student: IStudent = await new StudentService().setId(parseStudentId).get();
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -120,7 +88,7 @@ export default class StudentController {
         res.status(httpStatus.OK).json(response);
     }
 
-    async create(req: Request, res: Response) {
+    async add(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -139,7 +107,7 @@ export default class StudentController {
                 .baptizedAt(baptizedAt)
                 .build();
 
-            const student: IStudent = await new StudentService().create(param);
+            const student: IStudent = await new StudentService().add(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -159,7 +127,7 @@ export default class StudentController {
         res.status(httpStatus.OK).json(response);
     }
 
-    async update(req: Request, res: Response) {
+    async modify(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -186,7 +154,7 @@ export default class StudentController {
                 .baptizedAt(baptizedAt)
                 .build();
 
-            const row = await new StudentService().update(param);
+            const row = await new StudentService().modify(param);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -206,7 +174,7 @@ export default class StudentController {
         res.status(httpStatus.OK).json(response);
     }
 
-    async delete(req: Request, res: Response) {
+    async remove(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -221,7 +189,7 @@ export default class StudentController {
                 throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
-            const row = await new StudentService().delete(parseStudentId);
+            const row = await new StudentService().setId(parseStudentId).remove();
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -249,7 +217,7 @@ export default class StudentController {
         let response;
 
         try {
-            const row = await new StudentService().graduate(req.account.id, req.account.name);
+            const row = await new StudentService().setId(req.account.id).graduate(req.account.name);
 
             const result: ResponseDTO = {
                 account: req.account.name,

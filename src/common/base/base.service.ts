@@ -7,26 +7,22 @@ export default abstract class BaseService<T> {
 
     setId(id: number) {
         this._id = id;
+        return this;
     }
 
     setPage(page: number) {
         this.page = page;
+        return this;
     }
 
     setYear(year = new Date().getFullYear()) {
         this.year = year;
+        return this;
     }
 
     abstract list(): Promise<T[]>;
-    abstract list<U>(where: any): Promise<U>; // pagenation
-
     abstract get(): Promise<T>;
-    abstract get<U>(param: U): Promise<T>;
-
-    abstract add<U>(param: U): Promise<T>;
-
-    abstract modify<U>(param: U): Promise<number>;
-
+    abstract add(param): Promise<T>;
+    abstract modify(param): Promise<number>;
     abstract remove(): Promise<number>;
-    abstract remove<U>(param: U): Promise<number>;
 }

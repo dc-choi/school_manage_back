@@ -1,14 +1,21 @@
-﻿import { Sequelize, Op } from 'sequelize';
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Sequelize, Op } from 'sequelize';
 
 import { IGroup } from '@/@types/group';
 
+import BaseRepository from '@/common/base/base.repository';
+
 import logger from '@/lib/logger'
-import { mysql } from '@/lib/mysql';
 
 import { Group } from '@/models/group.model';
 
-export default class GroupRepository {
-    async list(accountId: number): Promise<Group[]> {
+export default class GroupRepository extends BaseRepository<Group> {
+    findAndCountAll(where: any): Promise<{ rows: any; count: number; }> {
+        throw new Error('Method not implemented.');
+    }
+
+    async findAll(): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
@@ -16,7 +23,7 @@ export default class GroupRepository {
                 'account__id',
 			],
             where: {
-                account__id: accountId,
+                account__id: this._id,
 				delete_at: {
                     [Op.eq]: null,
                 },
@@ -24,7 +31,7 @@ export default class GroupRepository {
         });
     }
 
-    async listByAccount(accountId: number): Promise<Group[]> {
+    async findAllByAccount(): Promise<Group[]> {
         return await Group.findAll({
             attributes: [
                 '_id',
@@ -32,7 +39,7 @@ export default class GroupRepository {
                 'account__id',
 			],
             where: {
-                account__id: accountId,
+                account__id: this._id,
 				delete_at: {
                     [Op.eq]: null,
                 },
@@ -41,10 +48,10 @@ export default class GroupRepository {
         });
     }
 
-    async get(groupId: number): Promise<Group> {
+    async findOne(): Promise<Group> {
         return await Group.findOne({
             where: {
-                _id: groupId,
+                _id: this._id,
                 delete_at: {
                     [Op.eq]: null,
                 },
@@ -52,7 +59,7 @@ export default class GroupRepository {
         })
     }
 
-    async getByName(groupName: string): Promise<Group> {
+    async findOneByName(groupName: string): Promise<Group> {
         return await Group.findOne({
             where: {
                 group_name: groupName,
@@ -64,32 +71,30 @@ export default class GroupRepository {
     }
 
     async create(param: IGroup): Promise<Group> {
-        const transaction = await mysql.transaction();
-        let group;
+        let group: Group;
 
         try {
             group = await Group.create({
                 group_name: param.groupName,
                 account__id: param.accountId
-            }, { transaction });
+            }, { transaction: this.transaction });
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
+            await this.transaction.rollback();
             group = null;
         }
 
         return group;
     }
 
-    async update(param: IGroup): Promise<[affectedCount: number]> {
-        const transaction = await mysql.transaction();
-        let group;
+    async update(param: IGroup): Promise<number> {
+        let group: number;
 
         try {
-            group = await Group.update(
+            [ group ] = await Group.update(
                 {
                     group_name: param.groupName,
                     account__id: param.accountId
@@ -98,43 +103,42 @@ export default class GroupRepository {
                     where: {
                         _id: param._id
                     },
-                    transaction
+                    transaction: this.transaction
                 }
             );
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
+            await this.transaction.rollback();
             group = 0;
         }
 
         return group;
     }
 
-    async delete(groupId: number): Promise<[affectedCount: number]> {
-        const transaction = await mysql.transaction();
-        let group;
+    async delete(): Promise<number> {
+        let group: number;
 
         try {
-            group = await Group.update(
+            [ group ] = await Group.update(
                 {
                     delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
                 },
                 {
                     where: {
-                        _id: groupId
+                        _id: this._id
                     },
-                    transaction
+                    transaction: this.transaction
                 }
             );
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
+            await this.transaction.rollback();
             group = 0;
         }
 

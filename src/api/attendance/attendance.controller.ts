@@ -100,7 +100,7 @@ export default class AttendanceController {
      * @param req
      * @param res
      */
-     async create(req: Request, res: Response) {
+     async modify(req: Request, res: Response) {
         logger.log('req.params:', JSON.stringify(req.params));
         logger.log('req.query:', JSON.stringify(req.query));
         logger.log('req.body:', JSON.stringify(req.body));
@@ -122,7 +122,7 @@ export default class AttendanceController {
              */
             let row: number;
             if (isFull) {
-                row = await new AttendanceService().create(year, attendance);
+                row = await new AttendanceService().modify(year, attendance);
             } else {
                 row = await new AttendanceService().delete(year, attendance);
             }
