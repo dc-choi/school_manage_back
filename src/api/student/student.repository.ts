@@ -21,10 +21,7 @@ export default class StudentRepository extends BaseRepository<Student> {
      *
      * 추후에 이 문제를 해결해야함...
      */
-    async findAndCountAll(where: any): Promise<{
-        rows: any;
-        count: number;
-    }> {
+    async findAndCountAll(where: any): Promise<{ rows: any; count: number; }> {
         return await Student.findAndCountAll({
             include: [
                 {
