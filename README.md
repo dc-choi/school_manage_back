@@ -1,15 +1,10 @@
 # school-manage program
-이 [프로젝트](https://dev.school.jangwi.link)는 기존의 출석부 프로젝트를 보완하기 위해서 제작된 프로젝트입니다.
+이 프로젝트는 [기존의 출석부 프로젝트](https://github.com/dc-choi/Attendance)를 보완하기 위해서 제작된 프로젝트입니다.
 
-[기존 프로젝트 내역...](https://github.com/dc-choi/Attendance)
+![데모](https://github.com/dc-choi/school_manage_back/blob/main/img/demo.gif)
 
 ## 시스템 구성도
 ![시스템 구성도](https://github.com/dc-choi/school_manage_back/blob/main/img/v2.0.0%20work%20flow.png)
-
-## 개발기간
-22.02.19 ~ 현재 (첫 배포는 기획한지 2주만에 진행)
-
-지금도 계속 유지보수중입니다.
 
 ## 프로젝트 구조
 ```
@@ -39,7 +34,55 @@ src // 백엔드 소스코드 작성
 ## ERD
 ![ERD](https://github.com/dc-choi/school_manage_back/blob/main/img/v2.0.0%20ERD.JPG)
 
-논리적 설계만 이렇게 하였고, 물리적 설계는 관계를 끊어놓았습니다. 사용자의 요구사항이 계속 바뀌므로 유연한 구조를 가져야겠다고 생각했습니다.
+물리적 설계시에는 관계를 끊어놓았습니다. 사용자의 요구사항이 계속 바뀌므로 유연한 구조를 가져야겠다고 생각했습니다.
+
+```sql
+CREATE TABLE `account` (
+  `_id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `name` varchar(50) NOT NULL COMMENT '사용자가 입력하는 ID',
+  `password` varchar(200) NOT NULL COMMENT '사용자가 입력하는 password',
+  `create_at` datetime NOT NULL COMMENT '생성일자',
+  `update_at` datetime NULL COMMENT '수정일자',
+  `delete_at` datetime NULL COMMENT '삭제일자',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `group` (
+  `_id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `name` varchar(50) NOT NULL COMMENT '그룹명',
+  `create_at` datetime NOT NULL COMMENT '생성일자',
+  `update_at` datetime NULL COMMENT '수정일자',
+  `delete_at` datetime NULL COMMENT '삭제일자',
+  `account_id` bigint NOT NULL COMMENT '계정의 PK',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `student` (
+  `_id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `society_name` varchar(50) NOT NULL COMMENT '이름',
+  `catholic_name` varchar(50) NULL COMMENT '세례명',
+  `age` bigint NULL COMMENT '나이',
+  `contact` bigint NULL COMMENT '연락처',
+  `description` mediumtext COMMENT '상세 설명',
+  `baptized_at` varchar(10) NULL COMMENT '축일',
+  `create_at` datetime NOT NULL COMMENT '생성일자',
+  `update_at` datetime NULL COMMENT '수정일자',
+  `delete_at` datetime NULL COMMENT '삭제일자',
+  `group_id` bigint NOT NULL COMMENT '그룹의 PK',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `attendance` (
+  `_id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `date` varchar(50) NULL COMMENT '출석일',
+  `content` varchar(50) NULL COMMENT '출석내용',
+  `create_at` datetime NOT NULL COMMENT '생성일자',
+  `update_at` datetime NULL COMMENT '수정일자',
+  `delete_at` datetime NULL COMMENT '삭제일자',
+  `student_id` bigint NOT NULL COMMENT '학생의 PK',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
 
 ## 주요 기능
 - 로그인: 각 계정별로 로그인하여 계정에 속한 그룹을 관리할 수 있습니다.
@@ -48,8 +91,15 @@ src // 백엔드 소스코드 작성
 - 출석부: 주일학교 학생들의 출석을 보고, 추가하고, 수정하고, 삭제할 수 있습니다.
 - 통계: 각 계정별 우수한 학생들의 출석 현황을 간단하게 확인 할 수 있습니다.
 
-<!-- ## 출석부 프로그램 초기 화면 구성
+<!--
+## 출석부 프로그램 초기 화면 구성
 [오븐을 이용한 프로토타입](https://ovenapp.io/view/uUt1nneSOrTuih71pV814CGUcr6lRVKP/I6IRP) 
+-->
+
+## 개발기간
+22.02.19 ~ 현재 (첫 배포는 기획한지 2주만에 진행)
+
+지금도 계속 유지보수중입니다.
 
 ## 만들게 된 계기
 주일학교 시스템상 매년 아이들의 출석을 기록해야 했고, 그에 따라 기존 엑셀로 된 출석부로는 매년 올해의 토요일, 일요일에 해당되는 부분을 일일히 알아보고 적어야하는 점이 너무 불편했습니다.
@@ -76,6 +126,7 @@ src // 백엔드 소스코드 작성
 3. 회의록을 통해 확인해야하는 출석현황과 다르게 직관적으로 확인이 가능합니다.
 4. 출석 상에 대한 통계를 낼때, 간편하게 산출할 수 있습니다.
 
+<!--
 ## 느낀점
 <details>
 <summary> 22년 1분기 느낀점 </summary>
