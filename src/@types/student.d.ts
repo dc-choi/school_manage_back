@@ -1,11 +1,11 @@
 ﻿export interface IStudent {
-    _id: number,
-    studentSocietyName: string,
-    studentCatholicName: string,
-    studentAge: number,
-    studentContact: number,
-    studentDescription: string,
-    baptizedAt: string,
-    groupId: number,
-    groupName: string,
+    _id?: number;
+    societyName: string;
+    catholicName?: string;
+    age?: number;
+    contact?: number;
+    description?: string;
+    baptizedAt?: string;
+    groupId: number;
+    groupName: string;
 }

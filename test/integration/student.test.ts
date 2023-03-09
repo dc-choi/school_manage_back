@@ -11,7 +11,7 @@ import { app } from '@/app';
 import { env } from '@/env';
 
 import logger from '@/lib/logger';
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 
 chai.use(chaiSubset);
 chai.use(chaiLike);
@@ -64,7 +64,7 @@ describe(`/api/student API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.id).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
             cache.put('id', res.body.result.id);
@@ -82,7 +82,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result).to.have.keys(studentDTOKeys);
             expect(res.body.result.students).to.be.a('array');
             expect(res.body.result.account).to.be.a('string');
@@ -99,7 +99,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
     });
 
@@ -114,7 +114,7 @@ describe(`/api/student API Test`, async () => {
             .send({ name });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.group).to.be.a('object');
             expect(res.body.result.group).to.have.keys(groupDTOKeys);
             cache.put('groupId', res.body.result.group._id);
@@ -131,7 +131,7 @@ describe(`/api/student API Test`, async () => {
             .send(studentJSON);
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.student).to.have.keys(studentKeys);
             expect(res.body.result.student._id).to.be.a('number');
             expect(res.body.result.student.studentSocietyName).to.be.a('string');
@@ -149,7 +149,7 @@ describe(`/api/student API Test`, async () => {
             .send(studentJSON);
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`매개변수가 없을 경우`, async () => {
@@ -161,7 +161,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.INTERNAL_SERVER_ERROR);
+            expect(res.body.code).to.equal(ApiCode.INTERNAL_SERVER_ERROR);
         });
     });
 
@@ -176,7 +176,7 @@ describe(`/api/student API Test`, async () => {
             .send(studentJSON);
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.student).to.have.keys(detailStudentKeys);
             expect(res.body.result.student._id).to.be.a('number');
             expect(res.body.result.student.studentSocietyName).to.be.a('string');
@@ -195,7 +195,7 @@ describe(`/api/student API Test`, async () => {
             .send(studentJSON);
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 학생번호일 경우`, async () => {
@@ -208,7 +208,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 
@@ -223,7 +223,7 @@ describe(`/api/student API Test`, async () => {
             .send(studentJSON);
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.row).to.be.a('number');
             expect(res.body.result.account).to.be.a('string');
 
@@ -234,7 +234,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res2.body).to.have.keys(responseSuccessKeys);
-            expect(res2.body.code).to.equal(ApiCodes.OK);
+            expect(res2.body.code).to.equal(ApiCode.OK);
             expect(res2.body.result.student).to.have.keys(detailStudentKeys);
             expect(res2.body.result.student._id).to.be.a('number');
             expect(res2.body.result.student.studentSocietyName).to.be.a('string');
@@ -253,7 +253,7 @@ describe(`/api/student API Test`, async () => {
             .send(studentJSON);
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 학생번호일 경우`, async () => {
@@ -266,7 +266,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 
@@ -281,7 +281,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.row).to.be.a('number');
             expect(res.body.result.account).to.be.a('string');
 
@@ -293,7 +293,7 @@ describe(`/api/student API Test`, async () => {
 
             // 학생이 이미 삭제되어서 404 에러
             expect(res2.body).to.have.keys(responseFailKeys);
-            expect(res2.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res2.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`토큰이 없을 경우`, async () => {
@@ -304,7 +304,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 학생번호일 경우`, async () => {
@@ -317,7 +317,7 @@ describe(`/api/student API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 });

@@ -11,7 +11,7 @@ import { app } from '@/app';
 import { env } from '@/env';
 
 import logger from '@/lib/logger';
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 
 chai.use(chaiSubset);
 chai.use(chaiLike);
@@ -53,7 +53,7 @@ describe(`/api/group API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.id).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
             cache.put('id', res.body.result.id);
@@ -71,7 +71,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.groups).to.be.a('array');
             expect(res.body.result.account).to.be.a('string');
         });
@@ -83,7 +83,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
     });
 
@@ -98,7 +98,7 @@ describe(`/api/group API Test`, async () => {
             .send({ name });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.group).to.be.a('object');
             expect(res.body.result.group).to.have.keys(groupDTOKeys);
             cache.put('groupId', res.body.result.group._id);
@@ -112,7 +112,7 @@ describe(`/api/group API Test`, async () => {
             .send({ name });
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`매개변수가 없을 경우`, async () => {
@@ -124,7 +124,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.INTERNAL_SERVER_ERROR);
+            expect(res.body.code).to.equal(ApiCode.INTERNAL_SERVER_ERROR);
         });
     });
 
@@ -139,7 +139,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.group).to.be.a('object');
             expect(res.body.result.group).to.have.keys(groupDTOKeys);
             cache.put('groupId', res.body.result.group._id);
@@ -153,7 +153,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 그룹번호일 경우`, async () => {
@@ -166,7 +166,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 
@@ -182,7 +182,7 @@ describe(`/api/group API Test`, async () => {
             .send({ name });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.row).to.be.a('number');
             expect(res.body.result.account).to.be.a('string');
 
@@ -193,7 +193,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res2.body).to.have.keys(responseSuccessKeys);
-            expect(res2.body.code).to.equal(ApiCodes.OK);
+            expect(res2.body.code).to.equal(ApiCode.OK);
             expect(res2.body.result.group).to.be.a('object');
             expect(res2.body.result.group).to.have.keys(groupDTOKeys);
             expect(res2.body.result.group.groupName).to.be.a('string');
@@ -208,7 +208,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 그룹번호일 경우`, async () => {
@@ -221,7 +221,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 
@@ -236,7 +236,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.row).to.be.a('number');
             expect(res.body.result.account).to.be.a('string');
 
@@ -248,7 +248,7 @@ describe(`/api/group API Test`, async () => {
 
             // 그룹이 이미 삭제되어서 404 에러
             expect(res2.body).to.have.keys(responseFailKeys);
-            expect(res2.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res2.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`토큰이 없을 경우`, async () => {
@@ -259,7 +259,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 그룹번호일 경우`, async () => {
@@ -272,7 +272,7 @@ describe(`/api/group API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 });

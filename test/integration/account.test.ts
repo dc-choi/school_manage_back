@@ -11,7 +11,7 @@ import { app } from '@/app';
 import { env } from '@/env';
 
 import logger from '@/lib/logger';
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 
 chai.use(chaiSubset);
 chai.use(chaiLike);
@@ -52,7 +52,7 @@ describe(`/api/account API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.id).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
             cache.put('id', res.body.result.id);
@@ -70,7 +70,7 @@ describe(`/api/account API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result).to.be.a('string');
         });
 
@@ -81,7 +81,7 @@ describe(`/api/account API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
     });
 });

@@ -80,7 +80,7 @@
 				let html = '';
 				html += `<option value="선택하세요.">선택하세요.</option>`;
 				data.result.groups.forEach(item => {
-					html += `<option value="${item._id}">${item.groupName}</option>`;
+					html += `<option value="${item._id}">${item.name}</option>`;
 				});
 				group.append(html);
 
@@ -107,11 +107,11 @@
                     return;
                 }
 				$('#_id').val(data.result.student._id);
-				$('#societyName').val(data.result.student.studentSocietyName);
-				$('#catholicName').val(data.result.student.studentCatholicName);
-				$('#age').val(data.result.student.studentAge);
+				$('#societyName').val(data.result.student.societyName);
+				$('#catholicName').val(data.result.student.catholicName);
+				$('#age').val(data.result.student.age);
 				$('#group').val(data.result.student.groupId);
-				$('#contact').val('0' + data.result.student.studentContact);
+				$('#contact').val('0' + data.result.student.contact);
                 $('#baptism').val(data.result.student.baptizedAt);
 			},
 			error: (error) => {

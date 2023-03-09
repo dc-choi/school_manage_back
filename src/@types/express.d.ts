@@ -13,7 +13,7 @@ declare global {
     namespace Express {
         interface Request {
             decodeToken: {
-                account_ID: string
+                name: string
                 timeStamp: number
             },
             account: {

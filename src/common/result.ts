@@ -1,6 +1,6 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
-import ApiCode from "./api.codes";
-import ApiMessages from "./api.messages";
+import ApiCode from "./api.code";
+import ApiMessage from "./api.message";
 
 // staic을 이용해서 외부에서 new를 사용하지않아도 새 객체를 만들어내도록 함.
 export class Result<T> {
@@ -26,11 +26,11 @@ export class Result<T> {
     private get json(): any {
         return this.isSuccess ? {
             code: ApiCode.OK,
-            message: ApiMessages.OK,
+            message: ApiMessage.OK,
             result: this._value
         } : {
             code: this.error?.code || ApiCode.INTERNAL_SERVER_ERROR,
-            message: this.error?.message || ApiMessages.INTERNAL_SERVER_ERROR,
+            message: this.error?.message || ApiMessage.INTERNAL_SERVER_ERROR,
         };
     }
 

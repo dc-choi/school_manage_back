@@ -11,7 +11,7 @@ import { app } from '@/app';
 import { env } from '@/env';
 
 import logger from '@/lib/logger';
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 
 chai.use(chaiSubset);
 chai.use(chaiLike);
@@ -52,7 +52,7 @@ describe(`/api/attendance API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.id).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
             cache.put('id', res.body.result.id);
@@ -70,7 +70,7 @@ describe(`/api/attendance API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.year).to.be.a('number');
             expect(res.body.result.groups).to.be.a('array');
             expect(res.body.result.account).to.be.a('string');
@@ -84,7 +84,7 @@ describe(`/api/attendance API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
     });
 
@@ -99,7 +99,7 @@ describe(`/api/attendance API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.year).to.be.a('number');
             expect(res.body.result.sunday).to.be.a('array');
             expect(res.body.result.saturday).to.be.a('array');
@@ -116,7 +116,7 @@ describe(`/api/attendance API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`잘못된 그룹번호일 경우`, async () => {
@@ -129,7 +129,7 @@ describe(`/api/attendance API Test`, async () => {
             .send();
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.BAD_REQUEST);
+            expect(res.body.code).to.equal(ApiCode.BAD_REQUEST);
         });
     });
 

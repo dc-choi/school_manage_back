@@ -1,4 +1,4 @@
-const ApiMessages = Object.freeze({
+const ApiMessage = Object.freeze({
     OK:                     'OK',
     BAD_REQUEST:            'BAD_REQUEST',
     UNAUTHORIZED:           'UNAUTHORIZED',
@@ -8,4 +8,4 @@ const ApiMessages = Object.freeze({
     INTERNAL_SERVER_ERROR:  'INTERNAL_SERVER_ERROR'
 });
 
-export default ApiMessages;
+export default ApiMessage;

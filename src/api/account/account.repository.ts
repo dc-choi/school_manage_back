@@ -3,10 +3,10 @@
 import { Account } from '@/models/account.model';
 
 export default class AccountRepository {
-    async getByAccountId(id: string): Promise<Account> {
+    async getByAccountName(name: string): Promise<Account> {
         return await Account.findOne({
             where: {
-                account_ID: id
+                name
             },
         });
     }

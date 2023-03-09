@@ -32,18 +32,18 @@ export default class StudentRepository extends BaseRepository<Student> {
             ],
             attributes: [
                 '_id',
-                'student_society_name',
-                'student_catholic_name',
-                'student_age',
-                [ Sequelize.col('group.group_name'), 'group_name' ],
-                'student_contact',
+                'society_name',
+                'catholic_name',
+                'age',
+                [ Sequelize.col('group.name'), 'group_name' ],
+                'contact',
                 'baptized_at',
             ],
             where,
             raw: true,
             offset: (this.page - 1) * this.size,
             limit: this.size,
-            order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
+            order: [ ['age', 'ASC'], ['society_name', 'ASC'] ],
         });
     }
 
@@ -51,21 +51,21 @@ export default class StudentRepository extends BaseRepository<Student> {
         return await Student.findAll({
 			attributes: [
                 '_id',
-				'student_society_name',
-				'student_catholic_name',
-                'student_age',
-                'student_contact',
-                'student_description',
-                'group__id',
+				'society_name',
+				'catholic_name',
+                'age',
+                'contact',
+                'description',
+                'group_id',
                 'baptized_at',
 			],
 			where: {
-                group__id: this._id,
+                group_id: this._id,
                 delete_at: {
                     [Op.eq]: null,
                 },
             },
-			order: [ ['student_age', 'ASC'], ['student_society_name', 'ASC'] ],
+			order: [ ['age', 'ASC'], ['society_name', 'ASC'] ],
 		});
     }
 
@@ -73,21 +73,21 @@ export default class StudentRepository extends BaseRepository<Student> {
         return await Student.findAll({
 			attributes: [
                 '_id',
-				'student_society_name',
-				'student_catholic_name',
-                'student_age',
-                'student_contact',
-                'student_description',
-                'group__id',
+				'society_name',
+				'catholic_name',
+                'age',
+                'contact',
+                'description',
+                'group_id',
                 'baptized_at',
 			],
 			where: {
-                student_age: age,
+                age,
                 delete_at: {
                     [Op.eq]: null,
                 },
             },
-			order: [ ['student_society_name', 'ASC'] ],
+			order: [ ['society_name', 'ASC'] ],
 		});
     }
 
@@ -107,12 +107,12 @@ export default class StudentRepository extends BaseRepository<Student> {
 
         try {
             student = await Student.create({
-                student_society_name: param.studentSocietyName,
-                student_catholic_name: param.studentCatholicName,
-                student_age: param.studentAge,
-                student_contact: param.studentContact,
-                student_description: param.studentDescription,
-                group__id: param.groupId,
+                society_name: param.societyName,
+                catholic_name: param.catholicName,
+                age: param.age,
+                contact: param.contact,
+                description: param.description,
+                group_id: param.groupId,
                 baptized_at: param.baptizedAt,
             }, { transaction: this.transaction });
 
@@ -133,12 +133,12 @@ export default class StudentRepository extends BaseRepository<Student> {
         try {
             [ student ] = await Student.update(
                 {
-                    student_society_name: param.studentSocietyName,
-                    student_catholic_name: param.studentCatholicName,
-                    student_age: param.studentAge,
-                    student_contact: param.studentContact,
-                    student_description: param.studentDescription,
-                    group__id: param.groupId,
+                    society_name: param.societyName,
+                    catholic_name: param.catholicName,
+                    age: param.age,
+                    contact: param.contact,
+                    description: param.description,
+                    group_id: param.groupId,
                     baptized_at: param.baptizedAt,
                 },
                 {

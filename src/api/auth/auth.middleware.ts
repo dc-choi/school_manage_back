@@ -2,11 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import context from 'express-http-context';
 
-import { env } from '@/env';
-
 import { IAccount } from '@/@types/account';
 
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
 
@@ -36,7 +34,7 @@ export default class AuthMiddleware {
                 req.decodeToken = decodeToken;
                 next();
 			} else {
-				throw new ApiError(ApiCodes.NOT_FOUND, 'UNAUTHORIZED: TOKEN NOT_FOUND');
+				throw new ApiError(ApiCode.NOT_FOUND, 'UNAUTHORIZED: TOKEN NOT_FOUND');
 			}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (e: any) {
@@ -54,37 +52,18 @@ export default class AuthMiddleware {
      */
     async verifyAccount(req: Request, res: Response, next: NextFunction) {
         try {
-            // 디코드된 토큰안의 변수를 가져옴
-            const { account_ID, timeStamp } = req.decodeToken;
-
-            // 시스템상 가입된 회원인지 확인
-            const account: IAccount = await new AccountService().getByAccountId(account_ID);
-
             // 토큰의 기한이 만료된 토큰인지 검사하는 로직
-            const regex = /[^A-z]/g; // 문자열 A~z에 대한 정규식
-            const now = Date.now();
-            const expireDate = new Date(timeStamp).getTime();
-            const str = env.jwt.expire.access.replace(regex, ""); // 정규식으로 현재 시스템의 토큰 만료기한이 시간단위인지 분단위인지 구하기
-            let result: boolean;
-
-            if (str === 'h') { // 시간단위 처리
-                const parsed = env.jwt.expire.access.split('h');
-                result = (now - expireDate) > (parseInt(parsed[0]) * 3600000);
-            } else { // 분단위 처리
-                const parsed = env.jwt.expire.access.split('m');
-                result = (now - expireDate) > (parseInt(parsed[0]) * 60000);
-            }
-
-            if (result) {
-                throw new ApiError(ApiCodes.UNAUTHORIZED, 'TOKEN is EXPIRE');
-            }
+            await new TokenService().checkTime(req.decodeToken);
+            // 시스템상 가입된 회원인지 확인
+            const { name } = req.decodeToken;
+            const account: IAccount = await new AccountService().getByAccountName(name);
 
             req.account = {
                 id: account._id,
-                name: account_ID
+                name
             };
 
-            context.set('account_ID', account_ID);
+            context.set('account_name', name);
             next();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (e: any) {

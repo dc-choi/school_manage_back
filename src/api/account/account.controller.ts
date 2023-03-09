@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import { ResponseDTO } from '@/common/dto/response.dto';
+import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 

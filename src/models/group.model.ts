@@ -3,11 +3,11 @@ import { DataTypes, Model, Optional } from 'sequelize';
 
 export interface GroupAttributes {
     _id: number;
-    group_name: string;
-    account__id: number;
+    name: string;
     create_at: Date;
     update_at?: Date;
     delete_at?: Date;
+    account_id: number;
 }
 
 export type GroupPk = "_id";
@@ -17,11 +17,11 @@ export type GroupCreationAttributes = Optional<GroupAttributes, GroupOptionalAtt
 
 export class Group extends Model<GroupAttributes, GroupCreationAttributes> implements GroupAttributes {
     _id!: number;
-    group_name!: string;
-    account__id!: number;
+    name!: string;
     create_at!: Date;
     update_at?: Date;
     delete_at?: Date;
+    account_id!: number;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Group {
         return Group.init({
@@ -29,32 +29,34 @@ export class Group extends Model<GroupAttributes, GroupCreationAttributes> imple
                 autoIncrement: true,
                 type: DataTypes.BIGINT,
                 allowNull: false,
-                primaryKey: true
+                primaryKey: true,
+                comment: "PK"
             },
-            group_name: {
+            name: {
                 type: DataTypes.STRING(50),
-                allowNull: false
-            },
-            account__id: {
-                type: DataTypes.BIGINT,
                 allowNull: false,
-                references: {
-                    model: 'account',
-                    key: '_id'
-                }
+                comment: "그룹명"
             },
             create_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
+                comment: "생성일자",
                 defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
             },
             update_at: {
                 type: DataTypes.DATE,
-                allowNull: true
+                allowNull: true,
+                comment: "수정일자"
             },
             delete_at: {
                 type: DataTypes.DATE,
-                allowNull: true
+                allowNull: true,
+                comment: "삭제일자"
+            },
+            account_id: {
+                type: DataTypes.BIGINT,
+                allowNull: false,
+                comment: "계정의 PK"
             }
         }, {
             sequelize,
@@ -67,13 +69,6 @@ export class Group extends Model<GroupAttributes, GroupCreationAttributes> imple
                     using: "BTREE",
                     fields: [
                         { name: "_id" },
-                    ]
-                },
-                {
-                    name: "fk_group_account_idx",
-                    using: "BTREE",
-                    fields: [
-                        { name: "account__id" },
                     ]
                 },
             ]

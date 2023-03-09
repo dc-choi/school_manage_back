@@ -11,7 +11,7 @@ import { app } from '@/app';
 import { env } from '@/env';
 
 import logger from '@/lib/logger';
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 
 chai.use(chaiSubset);
 chai.use(chaiLike);
@@ -52,7 +52,7 @@ describe(`/api/auth API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseSuccessKeys);
-            expect(res.body.code).to.equal(ApiCodes.OK);
+            expect(res.body.code).to.equal(ApiCode.OK);
         });
 
         it (`존재하지 않는 ID의 경우`, async () => {
@@ -65,7 +65,7 @@ describe(`/api/auth API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.NOT_FOUND);
+            expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
         });
 
         it (`password가 잘못된 경우`, async () => {
@@ -78,7 +78,7 @@ describe(`/api/auth API Test`, async () => {
             });
 
             expect(res.body).to.have.keys(responseFailKeys);
-            expect(res.body.code).to.equal(ApiCodes.UNAUTHORIZED);
+            expect(res.body.code).to.equal(ApiCode.UNAUTHORIZED);
         });
     });
 });

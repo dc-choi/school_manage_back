@@ -50,12 +50,12 @@ export function initModels() {
     const student = Student.initModel(sequelize);
     const attendance = Attendance.initModel(sequelize);
 
-    group.belongsTo(account, { as: "account", foreignKey: "account__id"});
-    account.hasMany(group, { as: "groups", foreignKey: "account__id"});
-    student.belongsTo(group, { as: "group", foreignKey: "group__id"});
-    group.hasMany(student, { as: "students", foreignKey: "group__id"});
-    attendance.belongsTo(student, { as: "student", foreignKey: "student__id"});
-    student.hasMany(attendance, { as: "attendances", foreignKey: "student__id"});
+    group.belongsTo(account, { as: "account", foreignKey: "account_id"});
+    account.hasMany(group, { as: "groups", foreignKey: "account_id"});
+    student.belongsTo(group, { as: "group", foreignKey: "group_id"});
+    group.hasMany(student, { as: "students", foreignKey: "group_id"});
+    attendance.belongsTo(student, { as: "student", foreignKey: "student_id"});
+    student.hasMany(attendance, { as: "attendances", foreignKey: "student_id"});
 }
 
 export function connect() {
