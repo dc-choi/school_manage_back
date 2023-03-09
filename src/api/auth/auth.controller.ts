@@ -7,7 +7,7 @@ import { IToken } from '@/@types/token';
 
 import ApiError from '../../common/api.error';
 import { Result } from '../../common/result';
-import { ResponseDTO } from '@/common/dto/response.dto';
+import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -58,8 +58,8 @@ export default class AuthController {
     //         logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
     //         logger.error(e);
     //         response = getErrorResponse({
-    //             code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-    //             message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
+    //             code: e.code || ApiCode.INTERNAL_SERVER_ERROR,
+    //             message: e.message || ApiMessage.INTERNAL_SERVER_ERROR
     //         });
     //     }
 
@@ -87,8 +87,8 @@ export default class AuthController {
     //         logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
     //         logger.error(e);
     //         response = getErrorResponse({
-    //             code: e.code || ApiCodes.INTERNAL_SERVER_ERROR,
-    //             message: e.message || ApiMessages.INTERNAL_SERVER_ERROR
+    //             code: e.code || ApiCode.INTERNAL_SERVER_ERROR,
+    //             message: e.message || ApiMessage.INTERNAL_SERVER_ERROR
     //         });
     //     }
 

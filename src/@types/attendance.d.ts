@@ -1,6 +1,6 @@
 ﻿export interface IAttendance {
     _id: number,
-    attendanceDate: string,
-    attendanceContent: string,
+    date: string,
+    content: string,
     studentId: number,
 }

@@ -46,7 +46,7 @@
 				html += `<tbody>`;
 				data.result.groups.forEach(e => {
 					html += `<tr scope="row">
-					<td scope="col" class="text-center">${e.groupName}</td>
+					<td scope="col" class="text-center">${e.name}</td>
 					<td scope="col" class="text-center"><button class="btn btn-primary" type="button" onclick="modifyData('${e._id}')">수정</button></td>
 				</tr>`;
 				});

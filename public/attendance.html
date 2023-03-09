@@ -67,7 +67,7 @@
 				$('#year').append(html);
 				let html2 = '';
 				data.result.groups.forEach(e => {
-					html2 += `<option value="${e._id}">${e.groupName}</option>`;
+					html2 += `<option value="${e._id}">${e.name}</option>`;
 				});
 				$('#group').append(html2);
 				getTable();
@@ -143,8 +143,8 @@
 				html += `<tbody>`;
                 data.result.students.forEach((e, studentIdx) => {
 					html += `<tr scope="row">`;
-					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 0;">${e.studentSocietyName}</td>`;
-					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 5.1%;">${e.studentCatholicName}</td>`;
+					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 0;">${e.societyName}</td>`;
+					html += `<td scope="col" class="text-center table-info" style="position:sticky; left: 5.1%;">${e.catholicName}</td>`;
 
                     let tableIndex = 1;
 					for (let i = 0; i < 12; i++) {
@@ -157,9 +157,9 @@
                                 let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
                                 data.result.attendances.filter(list => {
-                                    month = list.attendanceDate.substring(4, 6);
-                                    day = list.attendanceDate.substring(6, 8);
-                                    inputContent = list.attendanceContent;
+                                    month = list.date.substring(4, 6);
+                                    day = list.date.substring(6, 8);
+                                    inputContent = list.content;
                                     Number(month);
                                     Number(day);
                                     if (e._id === list.studentId && month - 1 == i && day == data.result.saturday[i][j]) {
@@ -178,9 +178,9 @@
                                 let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
                                 data.result.attendances.filter(list => {
-                                    month = list.attendanceDate.substring(4, 6);
-                                    day = list.attendanceDate.substring(6, 8);
-                                    inputContent = list.attendanceContent;
+                                    month = list.date.substring(4, 6);
+                                    day = list.date.substring(6, 8);
+                                    inputContent = list.content;
                                     Number(month);
                                     Number(day);
                                     if (e._id === list.studentId && month - 1 == i && day == data.result.sunday[i][j]) {

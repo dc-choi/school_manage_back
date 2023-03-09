@@ -1,12 +1,13 @@
-import { Builder } from 'builder-pattern';
-
 import AttendanceRepository from './attendance.repository';
 
 import { IGroup } from '@/@types/group';
 import { IStudent } from '@/@types/student';
 import { IAttendance } from '@/@types/attendance';
 
-import { AttendancesDTO, AttendancesDTOBuilder } from '@/common/dto/attendance.dto';
+import AttendanceDTO from '@/common/dto/attendance.dto'
+import AttendanceBuilder from '@/common/builder/attendance.builder'
+
+import { getYearDate } from '@/lib/utils'
 
 import { Attendance } from '@/models/attendance.model';
 
@@ -17,17 +18,16 @@ export default class AttendanceService {
     /**
      * 초기 화면 설정시 필요한 데이터를 내려줌
      *
-     * @param _id
+     * @param id
      * @returns
      */
-    async list(_id: number): Promise<AttendancesDTO> {
+    async list(id: number): Promise<AttendanceBuilder> {
         const year = new Date().getFullYear();
-        const groups: IGroup[] = await new GroupService().setId(_id).list();
+        const groups: IGroup[] = await new GroupService().setId(id).list();
 
-        return new AttendancesDTOBuilder()
+        return new AttendanceBuilder()
             .setDate(year)
-            .setGroups(groups)
-            .build();
+            .setGroups(groups);
     }
 
     /**
@@ -37,56 +37,25 @@ export default class AttendanceService {
      * @param year
      * @returns
      */
-    async listByGroup(groupId: number, year: number): Promise<AttendancesDTO> {
-        const month = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12 ];
-		const sunday: Array<number[]> = []; // 1년중 일요일에 해당하는 날
-        const saturday: Array<number[]> = []; // 1년중 토요일에 해당하는 날
-        const studentsCode: number[] = []; // 학생들의 pk를 담기위한 변수
-
-        // 토, 일요일에 해당하는 날을 구하는 로직
-		month.forEach(e => {
-			const tempSunday: number[] = [];
-			const tempSaturday: number[] = [];
-			const lastDay = new Date(year, e, 0).getDate();
-
-			for (let i = 1; i <= lastDay; i++) {
-				const date = new Date(year, e - 1, i);
-				if (date.getDay() === 0) {
-					tempSunday.push(i);
-				}
-                if (date.getDay() === 6) {
-					tempSaturday.push(i);
-				}
-			}
-			sunday.push(tempSunday);
-            saturday.push(tempSaturday);
-		});
+    async listByGroup(groupId: number, year: number): Promise<AttendanceBuilder> {
+        const { saturday, sunday } = await getYearDate(year);
 
         // 그룹에 해당되는 학생들의 정보 가져오기
         const students: IStudent[] = await new StudentService().setId(groupId).list();
+        const studentsCode: number[] = []; // 학생들의 pk를 담기위한 변수
         students.forEach(item => {
 			studentsCode.push(item._id);
 		});
 
         // Entity를 DTO로 변환하는 과정, 학생들의 출석정보를 가져온다.
         const attendances: Attendance[] = await new AttendanceRepository().list(studentsCode);
-        const attendancesBuilder: IAttendance[] = [];
-        attendances.forEach(item => {
-            attendancesBuilder.push(
-                Builder<IAttendance>()
-                    ._id(item._id)
-                    .attendanceContent(item.attendance_content)
-                    .attendanceDate(item.attendance_date)
-                    .studentId(item.student__id)
-                    .build()
-            );
-        });
+        const attendanceDTOs: IAttendance[] = [];
+        attendances.forEach(item => attendanceDTOs.push(new AttendanceDTO(item).attendance));
 
-        return new AttendancesDTOBuilder()
+        return new AttendanceBuilder()
             .setDate(year, sunday, saturday)
             .setStudents(students)
-            .setAttendances(attendancesBuilder)
-            .build();
+            .setAttendances(attendanceDTOs);
     }
 
     /**

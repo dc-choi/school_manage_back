@@ -11,7 +11,7 @@
 <body>
 	<div class="container">
 		<h1 id="title">주일학교 학생 명단</h1><br>
-		<input type="hidden" id="nowPage">
+		<input type="hidden" id="page">
 		<div class="row">
 			<div class="col-1"></div>
 			<div class="col-2">
@@ -41,11 +41,12 @@
 	let pageNation = $('#pageNation');
 
 	const initPage = () => {
-		let nowPage = $('#nowPage').val();
-		nowPage = Number(nowPage);
-		if (nowPage < 1) nowPage = 1;
+		let page = $('#page').val();
+		page = Number(page);
+		if (page < 1) page = 1;
 		let searchOption = $('#searchOption').val();
 		let searchWord = $('#searchWord').val();
+        console.log(page);
 
 		$.ajax({
 			type: 'GET',
@@ -54,7 +55,7 @@
 			data: {
 				searchOption,
 				searchWord,
-				nowPage,
+				page,
 			},
 			success: (data) => {
 				console.log(data);
@@ -65,7 +66,7 @@
                     return;
                 }
                 $('#title').html(`${data.result.account} 주일학교 학생 명단`);
-				$('#nowPage').val(data.result.nowPage);
+				$('#page').val(data.result.page);
 				table.empty();
 				pageNation.empty();
 				let html = `<thead class="table-primary">`;
@@ -81,13 +82,13 @@
 				html += `</thead>`;
 				html += `<tbody>`;
 				data.result.students.forEach(e => {
-                    const phone = e.studentContact.toString();
+                    const phone = e.contact.toString();
 					html += `<tr scope="row">`;
-					html += `<td scope="col" class="text-center">${e.studentSocietyName}</td>`;
-					html += `<td scope="col" class="text-center">${e.studentCatholicName}</td>`;
+					html += `<td scope="col" class="text-center">${e.societyName}</td>`;
+					html += `<td scope="col" class="text-center">${e.catholicName}</td>`;
                     if (e.baptizedAt) html += `<td scope="col" class="text-center">${e.baptizedAt}</td>`;
                     else html += `<td scope="col" class="text-center"></td>`;
-					html += `<td scope="col" class="text-center">${e.studentAge}</td>`;
+					html += `<td scope="col" class="text-center">${e.age}</td>`;
 					html += `<td scope="col" class="text-center">${e.groupName}</td>`;
 					html += `<td scope="col" class="text-center">0${phone.substring(0, 2)}-${phone.substring(2, 6)}-${phone.substring(6, 10)}</td>`;
 					html += `<td scope="col" class="text-center"><button class="btn btn-primary" type="button" onclick="modifyData('${e._id}')">수정</button></td>`;
@@ -95,15 +96,15 @@
 				});
 				html += '</tbody>';
 				let pageHTML = '';
-				pageHTML += `<button class="btn btn-primary" type="button" onclick="movePage(${data.result.nowPage - 1}, ${data.result.totalPage})">&lt;&lt;</button>`;
+				pageHTML += `<button class="btn btn-primary" type="button" onclick="movePage(${data.result.page - 1}, ${data.result.totalPage})">&lt;&lt;</button>`;
 				for (let i = 1; i <= data.result.totalPage; i++) {
-					if (data.result.nowPage === i) {
+					if (data.result.page === i) {
 						pageHTML += `<button class="btn btn-warning" type="button" onclick="movePage(${i}, ${data.result.totalPage})">${i}</button>`;
 					} else {
 						pageHTML += `<button class="btn btn-light" type="button" onclick="movePage(${i}, ${data.result.totalPage})">${i}</button>`;
 					}
 				}
-				pageHTML += `<button class="btn btn-primary" type="button" onclick="movePage(${data.result.nowPage + 1}, ${data.result.totalPage})">&gt;&gt;</button>`;
+				pageHTML += `<button class="btn btn-primary" type="button" onclick="movePage(${data.result.page + 1}, ${data.result.totalPage})">&gt;&gt;</button>`;
 				table.append(html);
 				pageNation.append(pageHTML);
 			},
@@ -115,7 +116,7 @@
 
 	const movePage = (page, totalPage) => {
 		if (page < 1 || page > totalPage) return;
-		$('#nowPage').val(page);
+		$('#page').val(page);
 		initPage();
 	};
 

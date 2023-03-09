@@ -10,12 +10,12 @@ export default class AttendanceRepository {
         return await Attendance.findAll({
 			attributes: [
 				'_id',
-				'attendance_date',
-				'attendance_content',
-				'student__id',
+				'date',
+				'content',
+				'student_id',
 			],
 			where: {
-				student__id: { [Op.in]: studentsCode },
+				student_id: { [Op.in]: studentsCode },
 			},
 			// order: [ ['a_date', 'ASC'] ],
 		});
@@ -24,8 +24,8 @@ export default class AttendanceRepository {
     async get(id: number, fullTime: string): Promise<Attendance> {
         return await Attendance.findOne({
             where: {
-                student__id: id,
-                attendance_date: fullTime,
+                student_id: id,
+                date: fullTime,
             },
         });
     }
@@ -36,9 +36,9 @@ export default class AttendanceRepository {
 
         try {
             attendance = await Attendance.create({
-                attendance_date: fullTime,
-                attendance_content: data,
-                student__id: id,
+                date: fullTime,
+                content: data,
+                student_id: id,
             }, { transaction });
 
             await transaction.commit();
@@ -59,12 +59,12 @@ export default class AttendanceRepository {
         try {
             attendance = await Attendance.update(
                 {
-                    attendance_content: data,
+                    content: data,
                 },
                 {
                     where: {
-                        attendance_date: fullTime,
-                        student__id: id,
+                        date: fullTime,
+                        student_id: id,
                     },
                     transaction
                 }
@@ -89,8 +89,8 @@ export default class AttendanceRepository {
         try {
             attendance = await Attendance.destroy({
                 where: {
-                    attendance_date: fullTime,
-                    student__id: id,
+                    date: fullTime,
+                    student_id: id,
                 },
                 transaction
             });

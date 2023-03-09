@@ -1,47 +1,26 @@
-﻿import { IStudent } from '@/@types/student';
+﻿import { Builder } from 'builder-pattern';
 
-export class StudentsDTO {
-    constructor(
-        public nowPage?: number,
-        public rowPerPage?: number,
-        public totalRow?: number,
-        public totalPage?: number,
-        public students?: IStudent[],
-    ) {}
-}
+import { IStudent } from '@/@types/student';
 
-// 생성자에 너무 많은 매개변수를 넣을 경우 Builder Patten으로 생성하도록 함.
-export class StudentsDTOBuilder {
-    private nowPage?: number;
-    private rowPerPage?: number;
-    private totalRow?: number;
-    private totalPage?: number;
-    private students?: IStudent[];
+import { prune } from '@/lib/utils';
 
-    setNowPage(nowPage: number, rowPerPage: number) {
-        this.nowPage = nowPage;
-        this.rowPerPage = rowPerPage;
-        return this;
-    }
+import { Student } from '@/models/student.model';
 
-    setTotalPage(totalRow: number, totalPage: number) {
-        this.totalRow = totalRow;
-        this.totalPage = totalPage;
-        return this;
-    }
+export default class StudentDTO {
+    public student: IStudent;
 
-    setStudents(students: IStudent[]) {
-        this.students = students;
-        return this;
-    }
+    constructor(param: Student) {
+        const build = Builder<IStudent>()
+            ._id(param._id)
+            .societyName(param.society_name)
+            .catholicName(param.catholic_name)
+            .age(param.age)
+            .contact(param.contact)
+            .description(param.description)
+            .groupId(param.group_id)
+            .baptizedAt(param.baptized_at)
+            .build();
 
-    build() {
-        return new StudentsDTO(
-            this.nowPage,
-            this.rowPerPage,
-            this.totalRow,
-            this.totalPage,
-            this.students,
-        )
+        this.student = prune(build);
     }
 }

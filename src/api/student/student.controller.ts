@@ -7,11 +7,11 @@ import StudentService from './student.service';
 
 import { IStudent } from '@/@types/student';
 
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import { StudentsDTO } from '@/common/dto/student.dto';
-import { ResponseDTO } from '@/common/dto/response.dto';
+import StudentBuilder from '@/common/builder/student.builder';
+import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -22,22 +22,22 @@ export default class StudentController {
         logger.log('req.body:', JSON.stringify(req.body));
 
         const { searchOption, searchWord } = req.query;
-        const { nowPage } = req.query;
+        const { page } = req.query;
         let response;
 
         try {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
-            let parseNowPage = Number(nowPage);
-            if (isNaN(parseNowPage) || parseNowPage === 0) {
-                parseNowPage = 1;
+            let parsePage = Number(page);
+            if (isNaN(parsePage) || parsePage === 0) {
+                parsePage = 1;
             }
 
             const where = await new StudentService().setId(req.account.id).setWhere(String(searchOption), String(searchWord))
-            const students: StudentsDTO = await new StudentService().setPage(parseNowPage).findAll(where);
+            const StudentDTO: StudentBuilder = await new StudentService().setPage(parsePage).findAll(where);
 
             const result: ResponseDTO = {
                 account: req.account.name,
-                ...students
+                ...StudentDTO
             };
             logger.log('result:', JSON.stringify(result));
 
@@ -65,7 +65,7 @@ export default class StudentController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseStudentId = Number(studentId);
             if (isNaN(parseStudentId) || parseStudentId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
             const student: IStudent = await new StudentService().setId(parseStudentId).get();
@@ -99,11 +99,11 @@ export default class StudentController {
         try {
             const param = Builder<IStudent>()
                 .groupId(groupId)
-                .studentSocietyName(societyName)
-                .studentCatholicName(catholicName)
-                .studentAge(age)
-                .studentContact(contact)
-                .studentDescription(description)
+                .societyName(societyName)
+                .catholicName(catholicName)
+                .age(age)
+                .contact(contact)
+                .description(description)
                 .baptizedAt(baptizedAt)
                 .build();
 
@@ -140,17 +140,17 @@ export default class StudentController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseStudentId = Number(studentId);
             if (isNaN(parseStudentId) || parseStudentId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
             const param = Builder<IStudent>()
                 ._id(parseStudentId)
                 .groupId(groupId)
-                .studentSocietyName(societyName)
-                .studentCatholicName(catholicName)
-                .studentAge(age)
-                .studentContact(contact)
-                .studentDescription(description)
+                .societyName(societyName)
+                .catholicName(catholicName)
+                .age(age)
+                .contact(contact)
+                .description(description)
                 .baptizedAt(baptizedAt)
                 .build();
 
@@ -186,7 +186,7 @@ export default class StudentController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseStudentId = Number(studentId);
             if (isNaN(parseStudentId) || parseStudentId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
             const row = await new StudentService().setId(parseStudentId).remove();

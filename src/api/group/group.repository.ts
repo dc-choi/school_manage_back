@@ -19,11 +19,11 @@ export default class GroupRepository extends BaseRepository<Group> {
         return await Group.findAll({
             attributes: [
                 '_id',
-				'group_name',
-                'account__id',
+				'name',
+                'account_id',
 			],
             where: {
-                account__id: this._id,
+                account_id: this._id,
 				delete_at: {
                     [Op.eq]: null,
                 },
@@ -35,16 +35,16 @@ export default class GroupRepository extends BaseRepository<Group> {
         return await Group.findAll({
             attributes: [
                 '_id',
-				'group_name',
-                'account__id',
+				'name',
+                'account_id',
 			],
             where: {
-                account__id: this._id,
+                account_id: this._id,
 				delete_at: {
                     [Op.eq]: null,
                 },
 			},
-            order: [ ['group_name', 'DESC'] ]
+            order: [ ['name', 'DESC'] ]
         });
     }
 
@@ -59,10 +59,10 @@ export default class GroupRepository extends BaseRepository<Group> {
         })
     }
 
-    async findOneByName(groupName: string): Promise<Group> {
+    async findOneByName(name: string): Promise<Group> {
         return await Group.findOne({
             where: {
-                group_name: groupName,
+                name,
                 delete_at: {
                     [Op.eq]: null,
                 },
@@ -75,8 +75,8 @@ export default class GroupRepository extends BaseRepository<Group> {
 
         try {
             group = await Group.create({
-                group_name: param.groupName,
-                account__id: param.accountId
+                name: param.name,
+                account_id: param.accountId
             }, { transaction: this.transaction });
 
             await this.transaction.commit();
@@ -96,8 +96,8 @@ export default class GroupRepository extends BaseRepository<Group> {
         try {
             [ group ] = await Group.update(
                 {
-                    group_name: param.groupName,
-                    account__id: param.accountId
+                    name: param.name,
+                    account_id: param.accountId
                 },
                 {
                     where: {

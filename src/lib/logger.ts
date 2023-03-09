@@ -71,7 +71,7 @@ const preprocess = (data) => {
     data.title = convTitle(data.title)?.toUpperCase();
     data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
 
-    const account = context.get('account_ID');
+    const account = context.get('account_name');
     data.account = account ? account : '';
 
     const file = data.file?.length > 23 ? (data.file.substring(0, 20) + '...') : data.file;
@@ -109,7 +109,7 @@ const sqlConfig = {
     stackIndex: 1,
     preprocess: (data: any) => {
         data.title = 'SQL';
-        const account = context.get('account_ID');
+        const account = context.get('account_name');
         data.account = account ? account : '';
         data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
     },
@@ -127,7 +127,7 @@ const mongoConfig = {
     stackIndex: 1,
     preprocess: (data: any) => {
         data.title = 'QUERY';
-        const account = context.get('account_ID');
+        const account = context.get('account_name');
         data.account = account ? account : '';
         data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
     },
@@ -144,7 +144,7 @@ const jsonConfig = {
     splitFormat: splitFormat,
     stackIndex: 1,
     preprocess: function(data: any) {
-        const account = context.get('account_ID');
+        const account = context.get('account_name');
         data.account = account ? account : '';
         data.tid = `${tid.id() ? tid.id() : '00000000-0000-0000-0000-000000000000'}`;
     },

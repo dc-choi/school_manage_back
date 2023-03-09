@@ -3,8 +3,8 @@ import { DataTypes, Model, Optional } from 'sequelize';
 
 export interface AccountAttributes {
     _id: number;
-    account_ID: string;
-    account_PW: string;
+    name: string;
+    password: string;
     create_at: Date;
     update_at?: Date;
     delete_at?: Date;
@@ -17,8 +17,8 @@ export type AccountCreationAttributes = Optional<AccountAttributes, AccountOptio
 
 export class Account extends Model<AccountAttributes, AccountCreationAttributes> implements AccountAttributes {
     _id!: number;
-    account_ID!: string;
-    account_PW!: string;
+    name!: string;
+    password!: string;
     create_at!: Date;
     update_at?: Date;
     delete_at?: Date;
@@ -29,29 +29,35 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 autoIncrement: true,
                 type: DataTypes.BIGINT,
                 allowNull: false,
-                primaryKey: true
+                primaryKey: true,
+                comment: "PK"
             },
-            account_ID: {
+            name: {
                 type: DataTypes.STRING(50),
-                allowNull: false
+                allowNull: false,
+                comment: "사용자가 입력하는 ID"
             },
-            account_PW: {
+            password: {
                 type: DataTypes.STRING(200),
-                allowNull: false
+                allowNull: false,
+                comment: "사용자가 입력하는 password"
             },
             create_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
+                comment: "생성일자",
                 defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
             },
             update_at: {
                 type: DataTypes.DATE,
-                allowNull: true
+                allowNull: true,
+                comment: "수정일자"
             },
             delete_at: {
                 type: DataTypes.DATE,
-                allowNull: true
-            }
+                allowNull: true,
+                comment: "삭제일자"
+            },
         }, {
             sequelize,
             tableName: 'account',

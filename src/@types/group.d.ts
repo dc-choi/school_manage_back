@@ -1,5 +1,5 @@
 ﻿export interface IGroup {
     _id: number,
-    groupName: string,
+    name: string,
     accountId: number,
 }

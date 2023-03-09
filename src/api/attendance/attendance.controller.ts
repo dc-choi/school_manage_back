@@ -3,11 +3,11 @@ import httpStatus from 'http-status';
 
 import AttendanceService from './attendance.service';
 
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import { ResponseDTO } from '@/common/dto/response.dto';
-import { AttendancesDTO } from '@/common/dto/attendance.dto';
+import ResponseDTO from '@/common/dto/response.dto';
+import AttendanceBuilder from '@/common/builder/attendance.builder';
 
 import logger from '@/lib/logger';
 
@@ -26,7 +26,7 @@ export default class AttendanceController {
         let response;
 
         try {
-            const setting: AttendancesDTO = await new AttendanceService().list(req.account.id);
+            const setting: AttendanceBuilder = await new AttendanceService().list(req.account.id);
 
             const result: ResponseDTO = {
                 account: req.account.name,
@@ -65,7 +65,7 @@ export default class AttendanceController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseGroupId = Number(groupId);
             if (isNaN(parseGroupId) || parseGroupId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
             let parseYear = Number(year);
@@ -74,7 +74,7 @@ export default class AttendanceController {
                 parseYear = new Date().getFullYear();
             }
 
-            const attendances: AttendancesDTO = await new AttendanceService().listByGroup(parseGroupId, parseYear);
+            const attendances: AttendanceBuilder = await new AttendanceService().listByGroup(parseGroupId, parseYear);
 
             const result: ResponseDTO = {
                 account: req.account.name,

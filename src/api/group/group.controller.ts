@@ -6,10 +6,10 @@ import GroupService from './group.service';
 
 import { IGroup } from '@/@types/group';
 
-import ApiCodes from '@/common/api.codes';
+import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import { ResponseDTO } from '@/common/dto/response.dto';
+import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -55,7 +55,7 @@ export default class GroupController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseGroupId = Number(groupId);
             if (isNaN(parseGroupId) || parseGroupId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
             const group: IGroup = await new GroupService().setId(parseGroupId).get();
@@ -88,7 +88,7 @@ export default class GroupController {
 
         try {
             const param: IGroup = Builder<IGroup>()
-                .groupName(name)
+                .name(name)
                 .accountId(req.account.id)
                 .build();
 
@@ -125,12 +125,12 @@ export default class GroupController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseGroupId = Number(groupId);
             if (isNaN(parseGroupId) || parseGroupId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
             const param = Builder<IGroup>()
                 ._id(parseGroupId)
-                .groupName(name)
+                .name(name)
                 .accountId(req.account.id)
                 .build();
 
@@ -166,7 +166,7 @@ export default class GroupController {
             // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
             const parseGroupId = Number(groupId);
             if (isNaN(parseGroupId) || parseGroupId === 0) {
-                throw new ApiError(ApiCodes.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
             const row = await new GroupService().setId(parseGroupId).remove();
