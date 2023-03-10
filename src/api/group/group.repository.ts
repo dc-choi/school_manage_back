@@ -90,56 +90,69 @@ export default class GroupRepository extends BaseRepository<Group> {
         return group;
     }
 
-    async update(param: IGroup): Promise<number> {
-        let group: number;
+    async update(param: IGroup): Promise<Group> {
+        let group: Group;
 
         try {
-            [ group ] = await Group.update(
-                {
-                    name: param.name,
-                    account_id: param.accountId
-                },
-                {
-                    where: {
-                        _id: param._id
-                    },
-                    transaction: this.transaction
-                }
-            );
-
+            group = await this.setId(param._id).findOne();
+            group.name = param.name;
+            group.account_id = param.accountId;
+            await group.save({
+                transaction: this.transaction,
+                fields: ['name', 'account_id']
+            });
+            // 변경된 후의 객체를 반환해야 함. 그래서 이 부분은 주석 처리하였음.
+            // await Group.update(
+            //     {
+            //         name: param.name,
+            //         account_id: param.accountId
+            //     },
+            //     {
+            //         where: {
+            //             _id: param._id
+            //         },
+            //         transaction: this.transaction
+            //     }
+            // );
             await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
             await this.transaction.rollback();
-            group = 0;
+            group = null;
         }
 
         return group;
     }
 
-    async delete(): Promise<number> {
-        let group: number;
+    async delete(): Promise<Group> {
+        let group: Group;
 
         try {
-            [ group ] = await Group.update(
-                {
-                    delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
-                },
-                {
-                    where: {
-                        _id: this._id
-                    },
-                    transaction: this.transaction
-                }
-            );
-
+            group = await this.findOne();
+            group.delete_at = new Date();
+            await group.save({
+                transaction: this.transaction,
+                fields: [ 'delete_at' ]
+            });
+            // 변경된 후의 객체를 반환해야 함. 그래서 이 부분은 주석 처리하였음.
+            // await Group.update(
+            //     {
+            //         delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
+            //     },
+            //     {
+            //         where: {
+            //             _id: this._id
+            //         },
+            //         transaction: this.transaction
+            //     }
+            // );
             await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
             await this.transaction.rollback();
-            group = 0;
+            group = null;
         }
 
         return group;

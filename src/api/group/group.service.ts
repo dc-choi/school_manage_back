@@ -47,13 +47,17 @@ export default class GroupService extends BaseService<IGroup> {
         return new GroupDTO(group).group;
     }
 
-    async modify(param: IGroup): Promise<number> {
+    async modify(param: IGroup): Promise<IGroup> {
         const transaction = await new GroupRepository().setTransaction();
-        return await transaction.update(param);
+        const group: Group = await transaction.update(param);
+
+        return new GroupDTO(group).group;
     }
 
-    async remove(): Promise<number> {
+    async remove(): Promise<IGroup> {
         const transaction = await new GroupRepository().setId(this._id).setTransaction();
-        return await transaction.delete();
+        const group: Group = await transaction.delete();
+
+        return new GroupDTO(group).group;
     }
 }
