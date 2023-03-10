@@ -41,10 +41,20 @@
     let IS_RUN = false; // save() 실행시 중복되게 하지 않기 위한 전역변수
 
 	const initPage = () => {
+        const year = new Date().getFullYear();
+        const getArrYear =  year - (year - 3);
+        let arrYear = [];
+        let html = '';
+        for (let i = 0; i < getArrYear; i++) {
+            arrYear.push(year - i);
+            html += `<option value="${arrYear[i]}">${arrYear[i]}</option>`;
+        }
+        $('#year').append(html);
+
         // https://solbel.tistory.com/1461
 		$.ajax({
 			type: 'GET',
-			url: '/api/attendance',
+			url: '/api/group',
             headers: { authorization: `Bearer ${sessionStorage.getItem('token')}` },
 			data: {},
 			success: (data) => {
@@ -57,19 +67,11 @@
                 }
                 USER = data.result.account;
                 $('#title').html(`${data.result.account} 주일학교 출석부`);
-				const getArrYear = data.result.year - (data.result.year - 3);
-				let arrYear = [];
 				let html = '';
-				for (let i = 0; i < getArrYear; i++) {
-					arrYear.push(data.result.year - i);
-					html += `<option value="${arrYear[i]}">${arrYear[i]}</option>`;
-				}
-				$('#year').append(html);
-				let html2 = '';
 				data.result.groups.forEach(e => {
-					html2 += `<option value="${e._id}">${e.name}</option>`;
+					html += `<option value="${e._id}">${e.name}</option>`;
 				});
-				$('#group').append(html2);
+				$('#group').append(html);
 				getTable();
 			},
 			error: (error) => {
@@ -117,27 +119,17 @@
 				html += `<th scope="col" class="text-center">12월</th>`;
 				html += `</tr>`;
 				html += `<tr scope="row">`;
-                if (data.result.account === '초등부') {
-                    data.result.saturday.forEach(e => {
-                        html += '<th scope="col" class="text-center">';
-                        html += `<span style="word-spacing: -1px;" >`;
-                        e.forEach(item => {
-                            html += `${item} `;
-                        });
-                        html += `</span>`
-                        html += '</th>';
+                let attendanceDate;
+                data.result.account === '초등부' ? attendanceDate = data.result.saturday : attendanceDate = data.result.sunday;
+                attendanceDate.forEach(e => {
+                    html += '<th scope="col" class="text-center">';
+                    html += `<span style="word-spacing: -1px;" >`;
+                    e.forEach(item => {
+                        html += `${item} `;
                     });
-                } else {
-                    data.result.sunday.forEach(e => {
-                        html += '<th scope="col" class="text-center">';
-                        html += `<span style="word-spacing: -1px;">`;
-                        e.forEach(item => {
-                            html += `${item} `;
-                        });
-                        html += `</span>`
-                        html += '</th>';
-                    });
-                }
+                    html += `</span>`
+                    html += '</th>';
+                });
 				html += '</tr>';
 				html += `</thead>`;
 				html += `<tbody>`;
@@ -149,48 +141,25 @@
                     let tableIndex = 1;
 					for (let i = 0; i < 12; i++) {
                         html += `<td scope="col" class="text-center">`;
-                        if (data.result.account === '초등부') {
-                            for (let j = 0; j < data.result.saturday[i].length; j++) {
-                                let month;
-                                let day;
-                                let inputContent;
-                                let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
+                        for (let j = 0; j < attendanceDate[i].length; j++) {
+                            let month;
+                            let day;
+                            let inputContent;
+                            let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
 
-                                data.result.attendances.filter(list => {
-                                    month = list.date.substring(4, 6);
-                                    day = list.date.substring(6, 8);
-                                    inputContent = list.content;
-                                    Number(month);
-                                    Number(day);
-                                    if (e._id === list.studentId && month - 1 == i && day == data.result.saturday[i][j]) {
-                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.saturday[i][j]}" value="${inputContent}" size=1 tabindex=${tableIndex}>`;
-                                        inputCase = false;
-                                    }
-                                });
-                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.saturday[i][j]}" size=1 tabindex=${tableIndex}>`;
-                                tableIndex++;
-                            }
-                        } else {
-                            for (let j = 0; j < data.result.sunday[i].length; j++) {
-                                let month;
-                                let day;
-                                let inputContent;
-                                let inputCase = true; // 출석 데이터에 없는 날에 대한 html 요소 추가
-
-                                data.result.attendances.filter(list => {
-                                    month = list.date.substring(4, 6);
-                                    day = list.date.substring(6, 8);
-                                    inputContent = list.content;
-                                    Number(month);
-                                    Number(day);
-                                    if (e._id === list.studentId && month - 1 == i && day == data.result.sunday[i][j]) {
-                                        html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + data.result.sunday[i][j]}" value="${inputContent}"" size=1 tabindex=${tableIndex}>`;
-                                        inputCase = false;
-                                    }
-                                });
-                                if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ data.result.sunday[i][j]}"" size=1 tabindex=${tableIndex}>`;
-                                tableIndex++;
-                            }
+                            data.result.attendances.filter(list => {
+                                month = list.date.substring(4, 6);
+                                day = list.date.substring(6, 8);
+                                inputContent = list.content;
+                                Number(month);
+                                Number(day);
+                                if (e._id === list.studentId && month - 1 == i && day == attendanceDate[i][j]) {
+                                    html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.' + attendanceDate[i][j]}" value="${inputContent}" size=1 tabindex=${tableIndex}>`;
+                                    inputCase = false;
+                                }
+                            });
+                            if (inputCase) html += `<input class="attendanceInput table-info" type="text" id="${e._id + '-' + (i + 1) + '.'+ attendanceDate[i][j]}" size=1 tabindex=${tableIndex}>`;
+                            tableIndex++;
                         }
 						html += '</td>';
 					}
@@ -241,32 +210,22 @@
         let emptyData = []; // 빈 출석에 대한 데이터
         let fullData = []; // 마크된 출석에 대한 데이터
 
+        let attendanceDate;
+        USER === '초등부' ? attendanceDate = saturDay : attendanceDate = sunDay;
         STUDENT_OF_GROUP.forEach(student => {
-            if (USER === '초등부') {
-                saturDay.forEach((item) => {
-                    let str = `${student._id + '-' + item.month + '.'+ item.day}`;
-                    let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
-                    loopData.str = str;
-                    loopData.data = data;
-                    if (data === '')
-                        emptyData.push(loopData);
-                    else
-                        fullData.push(loopData);
-                    loopData = {};
-                });
-            } else {
-                sunDay.forEach((item) => {
-                    let str = `${student._id + '-' + item.month + '.'+ item.day}`;
-                    let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
-                    loopData.str = str;
-                    loopData.data = data;
-                    if (data === '')
-                        emptyData.push(loopData);
-                    else
-                        fullData.push(loopData);
-                    loopData = {};
-                });
-            }
+            attendanceDate.forEach((item) => {
+                let str = `${student._id + '-' + item.month + '.'+ item.day}`;
+                let data = document.getElementById(str).value; // $('#220221-874895-3.6').val()가 이곳에서 안먹어서 바닐라 JS를 사용.
+                loopData._id = student._id;
+                loopData.month = item.month;
+                loopData.day = item.day;
+                loopData.data = data;
+                if (data === '')
+                    emptyData.push(loopData);
+                else
+                    fullData.push(loopData);
+                loopData = {};
+            });
         });
 
         return {

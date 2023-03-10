@@ -21,23 +21,23 @@ export default class AttendanceRepository {
 		});
     }
 
-    async get(id: number, fullTime: string): Promise<Attendance> {
+    async get(id: number, date: string): Promise<Attendance> {
         return await Attendance.findOne({
             where: {
                 student_id: id,
-                date: fullTime,
+                date,
             },
         });
     }
 
-    async create(id: number, fullTime: string, data: string): Promise<Attendance> {
+    async create(id: number, date: string, content: string): Promise<Attendance> {
         const transaction = await mysql.transaction();
         let attendance;
 
         try {
             attendance = await Attendance.create({
-                date: fullTime,
-                content: data,
+                date,
+                content,
                 student_id: id,
             }, { transaction });
 
@@ -52,18 +52,18 @@ export default class AttendanceRepository {
         return attendance;
     }
 
-    async update(id: number, fullTime: string, data: string): Promise<[affectedCount: number]> {
+    async update(id: number, date: string, content: string): Promise<[affectedCount: number]> {
         const transaction = await mysql.transaction();
         let attendance: [affectedCount: number];
 
         try {
             attendance = await Attendance.update(
                 {
-                    content: data,
+                    content,
                 },
                 {
                     where: {
-                        date: fullTime,
+                        date,
                         student_id: id,
                     },
                     transaction
@@ -82,14 +82,14 @@ export default class AttendanceRepository {
         return attendance;
     }
 
-    async delete(id: number, fullTime: string): Promise<number> {
+    async delete(id: number, date: string): Promise<number> {
         const transaction = await mysql.transaction();
         let attendance: number;
 
         try {
             attendance = await Attendance.destroy({
                 where: {
-                    date: fullTime,
+                    date,
                     student_id: id,
                 },
                 transaction
