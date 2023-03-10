@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 
 import StatisticsService from './statistics.service';
 
-import { ResponseDTO } from '@/@types/response';
+import { IResponse } from '@/@types/response';
 
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
@@ -35,7 +35,7 @@ export default class StatisticsController {
             // };
             logger.log('result:', JSON.stringify(excellentStudents));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 excellentStudents
             }).toJson();

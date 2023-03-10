@@ -6,7 +6,7 @@ import { Builder } from 'builder-pattern';
 import StudentService from './student.service';
 
 import { IStudent } from '@/@types/student';
-import { ResponseDTO } from '@/@types/response';
+import { IResponse } from '@/@types/response';
 
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
@@ -41,7 +41,7 @@ export default class StudentController {
             // };
             logger.log('result:', JSON.stringify(StudentDTO));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 ...StudentDTO
             }).toJson();
@@ -79,7 +79,7 @@ export default class StudentController {
             // };
             logger.log('result:', JSON.stringify(student));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 student
             }).toJson();
@@ -121,7 +121,7 @@ export default class StudentController {
             // };
             logger.log('result:', JSON.stringify(student));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 student
             }).toJson();
@@ -171,7 +171,7 @@ export default class StudentController {
             // };
             logger.log('result:', JSON.stringify(row));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
             }).toJson();
@@ -209,7 +209,7 @@ export default class StudentController {
             // };
             logger.log('result:', JSON.stringify(row));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
             }).toJson();
@@ -240,7 +240,7 @@ export default class StudentController {
             // };
             logger.log('result:', JSON.stringify(row));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
             }).toJson();

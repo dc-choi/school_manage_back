@@ -87,8 +87,8 @@
                     sessionStorage.clear();
                     location.href = `index.html`;
                 }
-                $("#account").html(`장위동 ${data.result} 주일학교 관리 프로그램`);
-                $("#teacher").html(`환영합니다. ${data.result} 선생님.`);
+                $("#account").html(`장위동 ${data.result.name} 주일학교 관리 프로그램`);
+                $("#teacher").html(`환영합니다. ${data.result.name} 선생님.`);
 			},
 			error: (error) => {
 				console.log(error.responseText);

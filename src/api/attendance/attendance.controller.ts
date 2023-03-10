@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 
 import AttendanceService from './attendance.service';
 
-import { ResponseDTO } from '@/@types/response';
+import { IResponse } from '@/@types/response';
 
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
@@ -49,7 +49,7 @@ export default class AttendanceController {
             // }
             logger.log('result:', JSON.stringify(attendances));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 ...attendances
             }).toJson();
@@ -98,7 +98,7 @@ export default class AttendanceController {
             // }
             logger.log('result:', JSON.stringify(row));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row,
                 isFull,

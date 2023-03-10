@@ -5,7 +5,7 @@ import { Builder } from 'builder-pattern';
 import GroupService from './group.service';
 
 import { IGroup } from '@/@types/group';
-import { ResponseDTO } from '@/@types/response';
+import { IResponse } from '@/@types/response';
 
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
@@ -31,7 +31,7 @@ export default class GroupController {
             // };
             logger.log('result:', JSON.stringify(groups));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 groups
             }).toJson();
@@ -69,7 +69,7 @@ export default class GroupController {
             // };
             logger.log('result:', JSON.stringify(group));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 group
             }).toJson();
@@ -106,7 +106,7 @@ export default class GroupController {
             // };
             logger.log('result:', JSON.stringify(group));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 group
             }).toJson();
@@ -151,7 +151,7 @@ export default class GroupController {
             // };
             logger.log('result:', JSON.stringify(row));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
             }).toJson();
@@ -189,7 +189,7 @@ export default class GroupController {
             // };
             logger.log('result:', JSON.stringify(row));
 
-            response = Result.ok<ResponseDTO>({
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
             }).toJson();

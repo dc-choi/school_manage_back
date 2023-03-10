@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 import AuthService from './auth.service';
 
 import { IToken } from '@/@types/token';
-import { ResponseDTO } from '@/@types/response';
+import { IResponse } from '@/@types/response';
 
 import ApiError from '../../common/api.error';
 import { Result } from '../../common/result';
@@ -30,7 +30,7 @@ export default class AuthController {
             const token: IToken = await new AuthService().authentication(id, password);
             logger.log('result:', JSON.stringify(token));
 
-            response = Result.ok<ResponseDTO>(token).toJson();
+            response = Result.ok<IResponse>(token).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
