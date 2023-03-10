@@ -127,61 +127,87 @@ export default class StudentRepository extends BaseRepository<Student> {
         return student;
     }
 
-    async update(param: IStudent): Promise<number> {
-        let student: number;
+    async update(param: IStudent): Promise<Student> {
+        let student: Student;
 
         try {
-            [ student ] = await Student.update(
-                {
-                    society_name: param.societyName,
-                    catholic_name: param.catholicName,
-                    age: param.age,
-                    contact: param.contact,
-                    description: param.description,
-                    group_id: param.groupId,
-                    baptized_at: param.baptizedAt,
-                },
-                {
-                    where: {
-                        _id: param._id
-                    },
-                    transaction: this.transaction
-                },
-            );
-
+            student = await this.setId(param._id).findOne();
+            student.society_name = param.societyName;
+            student.catholic_name = param.catholicName;
+            student.age = param.age;
+            student.contact = param.contact;
+            student.description = param.description;
+            student.group_id = param.groupId;
+            student.baptized_at = param.baptizedAt;
+            await student.save({
+                transaction: this.transaction,
+                fields: [
+                    'society_name',
+                    'catholic_name',
+                    'age',
+                    'contact',
+                    'description',
+                    'group_id',
+                    'baptized_at'
+                ]
+            });
+            // 변경된 후의 객체를 반환해야 함. 그래서 이 부분은 주석 처리하였음.
+            // await Student.update(
+            //     {
+            //         society_name: param.societyName,
+            //         catholic_name: param.catholicName,
+            //         age: param.age,
+            //         contact: param.contact,
+            //         description: param.description,
+            //         group_id: param.groupId,
+            //         baptized_at: param.baptizedAt,
+            //     },
+            //     {
+            //         where: {
+            //             _id: param._id
+            //         },
+            //         transaction: this.transaction
+            //     },
+            // );
             await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
             await this.transaction.rollback();
-            student = 0;
+            student = null;
         }
 
         return student;
     }
 
-    async delete(): Promise<number> {
-        let student: number;
+    async delete(): Promise<Student> {
+        let student: Student;
 
         try {
-            [ student ] = await Student.update(
-                {
-                    delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
-                },
-                {
-                    where: {
-                        _id: this._id
-                    },
-                    transaction: this.transaction
-                }
-            );
-
+            student = await this.findOne();
+            student.delete_at = new Date();
+            await student.save({
+                transaction: this.transaction,
+                fields: [ 'delete_at' ]
+            });
+            // 변경된 후의 객체를 반환해야 함. 그래서 이 부분은 주석 처리하였음.
+            // await Student.update(
+            //     {
+            //         delete_at: Sequelize.literal('CURRENT_TIMESTAMP')
+            //     },
+            //     {
+            //         where: {
+            //             _id: this._id
+            //         },
+            //         transaction: this.transaction
+            //     }
+            // );
             await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
             await this.transaction.rollback();
-            student = 0;
+            student = null;
         }
 
         return student;

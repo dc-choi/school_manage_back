@@ -33,6 +33,6 @@ export default abstract class BaseRepository<T> {
     abstract findAndCountAll(where: any): Promise<{rows: any; count: number}>; // pagenation
     abstract findOne(): Promise<T>;
     abstract create(param): Promise<T>;
-    abstract update(param): Promise<number>;
-    abstract delete(): Promise<number>;
+    abstract update(param): Promise<T>;
+    abstract delete(): Promise<T>;
 }

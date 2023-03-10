@@ -143,17 +143,17 @@ export default class GroupController {
                 .accountId(req.account.id)
                 .build();
 
-            const row = await new GroupService().modify(param);
+            const group = await new GroupService().modify(param);
 
             // const result: ResponseDTO = {
             //     account: req.account.name,
             //     row
             // };
-            logger.log('result:', JSON.stringify(row));
+            logger.log('result:', JSON.stringify(group));
 
             response = Result.ok<IResponse>({
                 account: req.account.name,
-                row
+                group
             }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
@@ -181,17 +181,17 @@ export default class GroupController {
                 throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
             }
 
-            const row = await new GroupService().setId(parseGroupId).remove();
+            const group = await new GroupService().setId(parseGroupId).remove();
 
             // const result: ResponseDTO = {
             //     account: req.account.name,
             //     row
             // };
-            logger.log('result:', JSON.stringify(row));
+            logger.log('result:', JSON.stringify(group));
 
             response = Result.ok<IResponse>({
                 account: req.account.name,
-                row
+                group
             }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {

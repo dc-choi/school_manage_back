@@ -23,6 +23,6 @@ export default abstract class BaseService<T> {
     abstract list(): Promise<T[]>;
     abstract get(): Promise<T>;
     abstract add(param): Promise<T>;
-    abstract modify(param): Promise<number>;
-    abstract remove(): Promise<number>;
+    abstract modify(param): Promise<T>;
+    abstract remove(): Promise<T>;
 }

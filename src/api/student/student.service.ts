@@ -117,31 +117,28 @@ export default class StudentService extends BaseService<IStudent> {
         return new StudentDTO(student).student;
     }
 
-    async modify(param: IStudent): Promise<number> {
+    async modify(param: IStudent): Promise<IStudent> {
         const transaction = await new StudentRepository().setTransaction();
-        return await transaction.update(param);
+        const student: Student = await transaction.update(param);
+        console.log('student:', student);
+
+        return new StudentDTO(student).student;
     }
 
-    async remove(): Promise<number> {
+    async remove(): Promise<IStudent> {
         const transaction = await new StudentRepository().setId(this._id).setTransaction();
-        return await transaction.delete();
+        const student: Student = await transaction.delete();
+
+        return new StudentDTO(student).student;
     }
 
     async graduate(accountName: string): Promise<number> {
         let result = 0;
 
-        switch (accountName) {
-            case '초등부':
-                result = await this.elementaryGraduation();
-                break;
-            case '중고등부':
-                result = await this.middleHighGraduation();
-                break;
-            default:
-                // 현재 초등부, 중고등부를 제외하면 관리자임. 관리자는 전부 졸업처리가 가능하도록 하기.
-                // throw new ApiError(ApiCode.UNAUTHORIZED, `UNAUTHORIZED: Invalid accountName`);
-                break;
-        }
+        if (accountName === '초등부') result = await this.elementaryGraduation();
+        if (accountName === '중고등부') result = await this.middleHighGraduation();
+        // 현재 초등부, 중고등부를 제외하면 관리자임. 관리자는 전부 졸업처리가 가능하도록 하기.
+        // throw new ApiError(ApiCode.UNAUTHORIZED, `UNAUTHORIZED: Invalid accountName`);
 
         return result;
     }
@@ -153,67 +150,25 @@ export default class StudentService extends BaseService<IStudent> {
      */
     private async elementaryGraduation(): Promise<number> {
         const groups: IGroup[] = await new GroupService().setId(this._id).listByAccount();
-        logger.log('졸업, 종업하는 초등부 학생들', groups);
         const _14Group = await new GroupService().getByName('예비 중1');
-        const _8Group = groups.filter(item => { return item.name === '1학년' });
-        const _9Group = groups.filter(item => { return item.name === '2학년' });
-        const _10Group = groups.filter(item => { return item.name === '3학년' });
-        const _11Group = groups.filter(item => { return item.name === '4학년' });
-        const _12Group = groups.filter(item => { return item.name === '5학년' });
-        const _13Group = groups.filter(item => { return item.name === '6학년' });
+        const _8Group = groups.filter(item => { return item.name === '1학년' })[0];
+        const _9Group = groups.filter(item => { return item.name === '2학년' })[0];
+        const _10Group = groups.filter(item => { return item.name === '3학년' })[0];
+        const _11Group = groups.filter(item => { return item.name === '4학년' })[0];
+        const _12Group = groups.filter(item => { return item.name === '5학년' })[0];
+        const _13Group = groups.filter(item => { return item.name === '6학년' })[0];
         let result = 0;
 
         for (const group of groups) {
             const students = await this.setId(group._id).list();
             logger.log('졸업, 종업하는 초등부 학생들', students);
-            switch (group.name) {
-                case '유치부':
-                    for (const student of students) {
-                        if (student.age >= 8) {
-                            student.groupId = _8Group[0]._id
-                            result += await this.modify(student);
-                        }
-                    }
-                    break;
-                case '1학년':
-                    for (const student of students) {
-                        student.groupId = _9Group[0]._id
-                        result += await this.modify(student);
-                    }
-                    break;
-                case '2학년':
-                    for (const student of students) {
-                        student.groupId = _10Group[0]._id;
-                        result += await this.modify(student);
-                    }
-                    break;
-                case '3학년':
-                    for (const student of students) {
-                        student.groupId = _11Group[0]._id;
-                        result += await this.modify(student);
-                    }
-                    break;
-                case '4학년':
-                    for (const student of students) {
-                        student.groupId = _12Group[0]._id;
-                        result += await this.modify(student);
-                    }
-                    break;
-                case '5학년':
-                    for (const student of students) {
-                        student.groupId = _13Group[0]._id;
-                        result += await this.modify(student);
-                    }
-                    break;
-                case '6학년':
-                    for (const student of students) {
-                        student.groupId = _14Group[0]._id;
-                        result += await this.modify(student);
-                    }
-                    break;
-                default:
-                    break;
-            }
+            if (group.name === '유치부') result += await this.modifyStudentsGroup(students, _8Group._id);
+            if (group.name === '1학년') result += await this.modifyStudentsGroup(students, _9Group._id);
+            if (group.name === '2학년') result += await this.modifyStudentsGroup(students, _10Group._id);
+            if (group.name === '3학년') result += await this.modifyStudentsGroup(students, _11Group._id);
+            if (group.name === '4학년') result += await this.modifyStudentsGroup(students, _12Group._id);
+            if (group.name === '5학년') result += await this.modifyStudentsGroup(students, _13Group._id);
+            if (group.name === '6학년') result += await this.modifyStudentsGroup(students, _14Group._id);
         }
 
         return result;
@@ -223,22 +178,26 @@ export default class StudentService extends BaseService<IStudent> {
         const adult = await new GroupService().getByName('성인');
         const _19Group = await new GroupService().getByName('고3');
         let result = 0;
-
         let students: IStudent[];
+
         students = await this.listByAge(20);
         logger.log('졸업하는 학생들', students);
-        if (students.length > 0) {
-            for (const student of students) {
-                student.groupId = adult._id;
-                result += await this.modify(student);
-            }
-        }
+        if (students.length > 0) result += await this.modifyStudentsGroup(students, adult._id);
+
         students = await this.listByAge(19);
         logger.log('고3인 학생들', students);
-        if (students.length > 0) {
-            for (const student of students) {
-                student.groupId = _19Group._id;
-                result += await this.modify(student);
+        if (students.length > 0) result += await this.modifyStudentsGroup(students, _19Group._id);
+
+        return result;
+    }
+
+    private async modifyStudentsGroup(students: IStudent[], groupId: number): Promise<number> {
+        let result = 0;
+
+        for (const student of students) {
+            if (student.age >= 8) {
+                student.groupId = groupId;
+                if (await this.modify(student)) result++;
             }
         }
 
