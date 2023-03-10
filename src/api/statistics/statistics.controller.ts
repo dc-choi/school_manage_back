@@ -4,9 +4,10 @@ import httpStatus from 'http-status';
 
 import StatisticsService from './statistics.service';
 
+import { IResponse } from '@/@types/response';
+
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -28,13 +29,16 @@ export default class StatisticsController {
             const excellentStudents = await new StatisticsService().excellentStudents(req.account.id, parseYear);
             logger.log('result:', JSON.stringify(excellentStudents));
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     excellentStudents
+            // };
+            logger.log('result:', JSON.stringify(excellentStudents));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 excellentStudents
-            }
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

@@ -4,10 +4,10 @@ import httpStatus from 'http-status';
 import AuthService from './auth.service';
 
 import { IToken } from '@/@types/token';
+import { IResponse } from '@/@types/response';
 
 import ApiError from '../../common/api.error';
 import { Result } from '../../common/result';
-import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -27,10 +27,10 @@ export default class AuthController {
         let response;
 
         try {
-            const result: IToken = await new AuthService().authentication(id, password);
-            logger.log('result:', JSON.stringify(result));
+            const token: IToken = await new AuthService().authentication(id, password);
+            logger.log('result:', JSON.stringify(token));
 
-            response = Result.ok<ResponseDTO>(result).toJson();
+            response = Result.ok<IResponse>(token).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

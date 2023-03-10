@@ -3,10 +3,11 @@ import httpStatus from 'http-status';
 
 import AttendanceService from './attendance.service';
 
+import { IResponse } from '@/@types/response';
+
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import ResponseDTO from '@/common/dto/response.dto';
 import AttendanceBuilder from '@/common/builder/attendance.builder';
 
 import logger from '@/lib/logger';
@@ -42,13 +43,16 @@ export default class AttendanceController {
 
             const attendances: AttendanceBuilder = await new AttendanceService().list(parseGroupId, parseYear);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     ...attendances
+            // }
+            logger.log('result:', JSON.stringify(attendances));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 ...attendances
-            }
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -87,14 +91,18 @@ export default class AttendanceController {
                 row = await new AttendanceService().delete(year, attendance);
             }
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     row,
+            //     isFull,
+            // }
+            logger.log('result:', JSON.stringify(row));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row,
                 isFull,
-            }
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

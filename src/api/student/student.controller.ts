@@ -6,12 +6,12 @@ import { Builder } from 'builder-pattern';
 import StudentService from './student.service';
 
 import { IStudent } from '@/@types/student';
+import { IResponse } from '@/@types/response';
 
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
 import StudentBuilder from '@/common/builder/student.builder';
-import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -35,13 +35,16 @@ export default class StudentController {
             const where = await new StudentService().setId(req.account.id).setWhere(String(searchOption), String(searchWord))
             const StudentDTO: StudentBuilder = await new StudentService().setPage(parsePage).findAll(where);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     ...StudentDTO
+            // };
+            logger.log('result:', JSON.stringify(StudentDTO));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 ...StudentDTO
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -70,13 +73,16 @@ export default class StudentController {
 
             const student: IStudent = await new StudentService().setId(parseStudentId).get();
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     student
+            // };
+            logger.log('result:', JSON.stringify(student));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 student
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -109,13 +115,16 @@ export default class StudentController {
 
             const student: IStudent = await new StudentService().add(param);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     student
+            // };
+            logger.log('result:', JSON.stringify(student));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 student
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -156,13 +165,16 @@ export default class StudentController {
 
             const row = await new StudentService().modify(param);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     row
+            // };
+            logger.log('result:', JSON.stringify(row));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -191,13 +203,16 @@ export default class StudentController {
 
             const row = await new StudentService().setId(parseStudentId).remove();
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     row
+            // };
+            logger.log('result:', JSON.stringify(row));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -219,13 +234,16 @@ export default class StudentController {
         try {
             const row = await new StudentService().setId(req.account.id).graduate(req.account.name);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     row
+            // };
+            logger.log('result:', JSON.stringify(row));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

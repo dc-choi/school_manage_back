@@ -20,7 +20,7 @@ export default class AuthService {
         // 추후에 완성하면 추가할 것
         // const refreshToken = await new TokenService().encodeRefreshToken(dbData.companyIdentificationNumber);
 
-        return new TokenDTO(account.name, accessToken).account;
+        return new TokenDTO(account.name, accessToken).token;
     }
 
     // public checkRefreshToken = async (refreshToken) => {

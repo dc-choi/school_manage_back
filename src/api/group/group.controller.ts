@@ -5,11 +5,11 @@ import { Builder } from 'builder-pattern';
 import GroupService from './group.service';
 
 import { IGroup } from '@/@types/group';
+import { IResponse } from '@/@types/response';
 
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -25,13 +25,16 @@ export default class GroupController {
             const groups: IGroup[] = await new GroupService().setId(req.account.id).list();
             logger.log('result:', JSON.stringify(groups));
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     groups
+            // };
+            logger.log('result:', JSON.stringify(groups));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 groups
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -60,13 +63,16 @@ export default class GroupController {
 
             const group: IGroup = await new GroupService().setId(parseGroupId).get();
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     group
+            // };
+            logger.log('result:', JSON.stringify(group));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 group
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -94,13 +100,16 @@ export default class GroupController {
 
             const group: IGroup = await new GroupService().add(param);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     group
+            // };
+            logger.log('result:', JSON.stringify(group));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 group
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -136,13 +145,16 @@ export default class GroupController {
 
             const row = await new GroupService().modify(param);
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     row
+            // };
+            logger.log('result:', JSON.stringify(row));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
@@ -171,13 +183,16 @@ export default class GroupController {
 
             const row = await new GroupService().setId(parseGroupId).remove();
 
-            const result: ResponseDTO = {
+            // const result: ResponseDTO = {
+            //     account: req.account.name,
+            //     row
+            // };
+            logger.log('result:', JSON.stringify(row));
+
+            response = Result.ok<IResponse>({
                 account: req.account.name,
                 row
-            };
-            logger.log('result:', JSON.stringify(result));
-
-            response = Result.ok<ResponseDTO>(result).toJson();
+            }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));

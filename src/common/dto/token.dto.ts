@@ -5,7 +5,7 @@ import { IToken } from '@/@types/token';
 import { prune } from '@/lib/utils';
 
 export default class TokenDTO {
-    public account: IToken;
+    public token: IToken;
 
     constructor(name: string, accessToken: string, refreshToken?: string) {
         const build = Builder<IToken>()
@@ -14,6 +14,6 @@ export default class TokenDTO {
             .refreshToken(refreshToken)
             .build();
 
-        this.account = prune(build);
+        this.token = prune(build);
     }
 }

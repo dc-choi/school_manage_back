@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
+import { IResponse } from '@/@types/response';
+
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import ResponseDTO from '@/common/dto/response.dto';
 
 import logger from '@/lib/logger';
 
@@ -17,10 +18,8 @@ export default class AccountController {
 
         try {
             // 파싱된 토큰에 데이터가 있으면 처리가 가능함.
-            const { name } = req.account;
-            logger.log('result:', JSON.stringify(name));
-
-            response = Result.ok<ResponseDTO>(name).toJson();
+            logger.log('result:', JSON.stringify(req.account.name));
+            response = Result.ok<IResponse>({ name: req.account.name }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
