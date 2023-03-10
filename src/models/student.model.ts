@@ -70,7 +70,8 @@ export class Student extends Model<StudentAttributes, StudentCreationAttributes>
             create_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                comment: "생성일자"
+                comment: "생성일자",
+                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
             },
             update_at: {
                 type: DataTypes.DATE,

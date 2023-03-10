@@ -5,7 +5,7 @@ export const prune = (obj: any) => {
 };
 
 /**
- * 해당 연도의 토요일, 일요일에 해당하는 로직
+ * 해당 연도의 토요일, 일요일을 반환한다.
  *
  * @param year
  * @returns
@@ -40,7 +40,7 @@ export const getYearDate = async(year: number) => {
 };
 
 /**
- * 해당 연도, 월에 토요일, 일요일에 해당하는 로직
+ * 해당 연도, 월에 대한 토요일, 일요일을 반환한다.
  *
  * @param year
  * @param month
@@ -71,4 +71,27 @@ export const getYearMonthDate = async(year: number, month: number) => {
         sunday,
         saturday
     }
-}
+};
+
+/**
+ * year, month, day의 값으로 YYYYMMDD형식의 문자열을 반환한다.
+ *
+ * @param year
+ * @param month
+ * @param day
+ * @returns
+ */
+export const getFullTime = async(year: number, month: number, day: number) => {
+    let fullTime: string;
+
+    if (month < 10 && day < 10)
+        fullTime = `${year}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`;
+    else if (month < 10)
+        fullTime = `${year}${month.toString().padStart(2, '0')}${day}`;
+    else if (day < 10)
+        fullTime = `${year}${month}${day.toString().padStart(2, '0')}`;
+    else
+        fullTime = `${year}${month}${day}`;
+
+    return fullTime;
+};
