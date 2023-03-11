@@ -29,12 +29,6 @@ export default class StatisticsController {
             const excellentStudents = await new StatisticsService().excellentStudents(req.account.id, parseYear);
             logger.log('result:', JSON.stringify(excellentStudents));
 
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     excellentStudents
-            // };
-            logger.log('result:', JSON.stringify(excellentStudents));
-
             response = Result.ok<IResponse>({
                 account: req.account.name,
                 excellentStudents

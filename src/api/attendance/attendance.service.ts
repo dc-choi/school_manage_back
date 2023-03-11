@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Op } from 'sequelize';
+import { Builder } from 'builder-pattern';
+
 import AttendanceRepository from './attendance.repository';
 
 import { IStudent } from '@/@types/student';
@@ -5,6 +9,7 @@ import { IAttendance } from '@/@types/attendance';
 
 import AttendanceDTO from '@/common/dto/attendance.dto'
 import AttendanceBuilder from '@/common/builder/attendance.builder'
+import BaseService from '@/common/base/base.service';
 
 import { getYearDate, getFullTime } from '@/lib/utils'
 
@@ -12,7 +17,11 @@ import { Attendance } from '@/models/attendance.model';
 
 import StudentService from '@/api/student/student.service';
 
-export default class AttendanceService {
+export default class AttendanceService extends BaseService<AttendanceBuilder> {
+    list(): Promise<AttendanceBuilder[]> {
+        throw new Error('Method not implemented.');
+    }
+
     /**
      * 그룹별 학생들의 출석 데이터를 가져옴
      *
@@ -20,25 +29,37 @@ export default class AttendanceService {
      * @param year
      * @returns
      */
-    async list(groupId: number, year: number): Promise<AttendanceBuilder> {
-        const { saturday, sunday } = await getYearDate(year);
+    async findAllByGroup(): Promise<AttendanceBuilder> {
+        const { saturday, sunday } = await getYearDate(this.year);
 
         // 그룹에 해당되는 학생들의 정보 가져오기
-        const students: IStudent[] = await new StudentService().setId(groupId).list();
+        const students: IStudent[] = await new StudentService().setId(this._id).list();
         const studentsCode: number[] = []; // 학생들의 pk를 담기위한 변수
         students.forEach(item => {
 			studentsCode.push(item._id);
 		});
 
         // Entity를 DTO로 변환하는 과정, 학생들의 출석정보를 가져온다.
-        const attendances: Attendance[] = await new AttendanceRepository().list(studentsCode);
+        const where = {
+            student_id: { [Op.in]: studentsCode },
+        };
+        const { rows } = await new AttendanceRepository().findAndCountAll(where);
         const attendanceDTOs: IAttendance[] = [];
-        attendances.forEach(item => attendanceDTOs.push(new AttendanceDTO(item).attendance));
+        rows.forEach((item: Attendance) => attendanceDTOs.push(new AttendanceDTO(item).attendance));
 
         return new AttendanceBuilder()
-            .setDate(year, sunday, saturday)
+            .setDate(this.year, sunday, saturday)
             .setStudents(students)
             .setAttendances(attendanceDTOs);
+    }
+
+    get(): Promise<AttendanceBuilder> {
+        throw new Error('Method not implemented.');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    add(param: any): Promise<AttendanceBuilder> {
+        throw new Error('Method not implemented.');
     }
 
     /**
@@ -48,23 +69,37 @@ export default class AttendanceService {
      * @param attendance - [ {"_id":46,"month":2,"day":19,"data":"○"}, ... ]
      * @returns createRow: 출석이 생성되거나 갱신된 갯수
      */
-    async update(year: number, attendance: Array<{ _id: number; month: number; day: number; data: string }>): Promise<number> {
+    async update(attendance: Array<{ _id: number; month: number; day: number; data: string }>): Promise<number> {
         let createRow = 0;
         let checkNull = null;
 
         for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-            const fullTime = await getFullTime(year, attendance[idx].month, attendance[idx].day);
-			const check = await new AttendanceRepository().get(attendance[idx]._id, fullTime);
+            const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
+			const check = await new AttendanceRepository().setId(attendance[idx]._id).get(fullTime);
             if (check === null) {
-                checkNull = await new AttendanceRepository().create(attendance[idx]._id, fullTime, attendance[idx].data);
+                const param = Builder<IAttendance>()
+                    .date(fullTime)
+                    .content(attendance[idx].data)
+                    .build();
+
+                checkNull = await new AttendanceRepository().setId(attendance[idx]._id).create(param);
                 if (checkNull) createRow++;
 			} else {
-                const [ affectedCount ] = await new AttendanceRepository().update(attendance[idx]._id, fullTime, attendance[idx].data);
-                createRow += affectedCount
+                const param = Builder<IAttendance>()
+                    .date(fullTime)
+                    .content(attendance[idx].data)
+                    .build();
+
+                createRow += await new AttendanceRepository().setId(attendance[idx]._id).modify(param);
 			}
 		}
 
         return createRow;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    modify(param: any): Promise<AttendanceBuilder> {
+        throw new Error('Method not implemented.');
     }
 
     /**
@@ -74,17 +109,23 @@ export default class AttendanceService {
      * @param attendance
      * @returns deleteRow: 기존에 출석이 있다가 없어진 갯수
      */
-    async delete(year: number, attendance: Array<{ _id: number; month: number; day: number; data: string }>): Promise<number> {
+    async delete(attendance: Array<{ _id: number; month: number; day: number; data: string }>): Promise<number> {
         let deleteRow = 0;
+        let checkNull = null;
 
         for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-			const fullTime = await getFullTime(year, attendance[idx].month, attendance[idx].day);
-			const check = await new AttendanceRepository().get(attendance[idx]._id, fullTime);
+			const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
+			const check = await new AttendanceRepository().setId(attendance[idx]._id).get(fullTime);
 			if (check !== null) {
-                deleteRow += await new AttendanceRepository().delete(attendance[idx]._id, fullTime);
+                checkNull = await new AttendanceRepository().setId(attendance[idx]._id).destroy(fullTime);
+                if (checkNull) deleteRow++;
 			}
 		}
 
         return deleteRow;
+    }
+
+    remove(): Promise<AttendanceBuilder> {
+        throw new Error('Method not implemented.');
     }
 }

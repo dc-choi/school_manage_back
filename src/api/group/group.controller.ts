@@ -9,9 +9,12 @@ import { IResponse } from '@/@types/response';
 
 import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
+import AttendanceBuilder from '@/common/builder/attendance.builder';
 import { Result } from '@/common/result';
 
 import logger from '@/lib/logger';
+
+import AttendanceService from '@/api/attendance/attendance.service';
 
 export default class GroupController {
     async list(req: Request, res: Response) {
@@ -23,12 +26,6 @@ export default class GroupController {
 
         try {
             const groups: IGroup[] = await new GroupService().setId(req.account.id).list();
-            logger.log('result:', JSON.stringify(groups));
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     groups
-            // };
             logger.log('result:', JSON.stringify(groups));
 
             response = Result.ok<IResponse>({
@@ -62,11 +59,6 @@ export default class GroupController {
             }
 
             const group: IGroup = await new GroupService().setId(parseGroupId).get();
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     group
-            // };
             logger.log('result:', JSON.stringify(group));
 
             response = Result.ok<IResponse>({
@@ -99,11 +91,6 @@ export default class GroupController {
                 .build();
 
             const group: IGroup = await new GroupService().add(param);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     group
-            // };
             logger.log('result:', JSON.stringify(group));
 
             response = Result.ok<IResponse>({
@@ -144,11 +131,6 @@ export default class GroupController {
                 .build();
 
             const group = await new GroupService().modify(param);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     row
-            // };
             logger.log('result:', JSON.stringify(group));
 
             response = Result.ok<IResponse>({
@@ -182,16 +164,57 @@ export default class GroupController {
             }
 
             const group = await new GroupService().setId(parseGroupId).remove();
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     row
-            // };
             logger.log('result:', JSON.stringify(group));
 
             response = Result.ok<IResponse>({
                 account: req.account.name,
                 group
+            }).toJson();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
+            logger.error(e);
+            response = Result.fail<ApiError>(e).toJson();
+        }
+
+        logger.res(httpStatus.OK, response, req);
+        res.status(httpStatus.OK).json(response);
+    }
+
+    /**
+     * 출석 데이터를 가져오는 API
+     *
+     * @param req
+     * @param res
+     */
+    async attendanceForGroup(req: Request, res: Response) {
+        logger.log('req.params:', JSON.stringify(req.params));
+        logger.log('req.query:', JSON.stringify(req.query));
+        logger.log('req.body:', JSON.stringify(req.body));
+
+        const { groupId } = req.params;
+        const { year } = req.query;
+        let response;
+
+        try {
+            // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
+            const parseGroupId = Number(groupId);
+            if (isNaN(parseGroupId) || parseGroupId === 0) {
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
+            }
+
+            let parseYear = Number(year);
+            if (isNaN(parseYear) || parseYear === 0) {
+                // year의 경우는 올해의 값으로 처리하도록 함.
+                parseYear = new Date().getFullYear();
+            }
+
+            const attendances: AttendanceBuilder = await new AttendanceService().setId(parseGroupId).setYear(parseYear).findAllByGroup();
+            logger.log('result:', JSON.stringify(attendances));
+
+            response = Result.ok<IResponse>({
+                account: req.account.name,
+                ...attendances
             }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {

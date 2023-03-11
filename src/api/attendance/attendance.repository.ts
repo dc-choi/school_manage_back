@@ -1,44 +1,72 @@
-﻿import { Op } from 'sequelize';
-
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 import logger from '@/lib/logger'
 import { mysql } from '@/lib/mysql';
 
 import { Attendance } from '@/models/attendance.model';
+import BaseRepository from '@/common/base/base.repository';
+import { IAttendance } from '@/@types/attendance';
 
-export default class AttendanceRepository {
-    async list(studentsCode: Array<number>): Promise<Attendance[]> {
-        return await Attendance.findAll({
+export default class AttendanceRepository extends BaseRepository<Attendance> {
+    async findAndCountAll(where: any): Promise<{ rows: any; count: number; }> {
+        return await Attendance.findAndCountAll({
 			attributes: [
 				'_id',
 				'date',
 				'content',
 				'student_id',
 			],
-			where: {
-				student_id: { [Op.in]: studentsCode },
-			},
+			where,
 			// order: [ ['a_date', 'ASC'] ],
 		});
     }
 
-    async get(id: number, date: string): Promise<Attendance> {
+    findAll(): Promise<Attendance[]> {
+        throw new Error('Method not implemented.');
+    }
+
+    /**
+     * 한 학생에 해당하는 출석정보를 가져옴.
+     *
+     * @returns
+     */
+    async findOne(): Promise<Attendance> {
+        return await Attendance.findOne({
+            attributes: [
+                '_id',
+				'date',
+				'content',
+				'student_id',
+            ],
+            where: {
+                student_id: this._id,
+            }
+        });
+    }
+
+    /**
+     * 한 학생이 언제 출석했는지 가져옴.
+     *
+     * @param date
+     * @returns
+     */
+    async get(date: string): Promise<Attendance> {
         return await Attendance.findOne({
             where: {
-                student_id: id,
+                student_id: this._id,
                 date,
             },
         });
     }
 
-    async create(id: number, date: string, content: string): Promise<Attendance> {
+    async create(param: IAttendance): Promise<Attendance> {
         const transaction = await mysql.transaction();
         let attendance;
 
         try {
             attendance = await Attendance.create({
-                date,
-                content,
-                student_id: id,
+                date: param.date,
+                content: param.content,
+                student_id: this._id,
             }, { transaction });
 
             await transaction.commit();
@@ -52,57 +80,73 @@ export default class AttendanceRepository {
         return attendance;
     }
 
-    async update(id: number, date: string, content: string): Promise<[affectedCount: number]> {
-        const transaction = await mysql.transaction();
-        let attendance: [affectedCount: number];
+    /**
+     * 수정만 하는 메서드
+     *
+     * @param {IAttendance} param
+     * @returns
+     */
+    async modify(param: IAttendance): Promise<number> {
+        let attendance: number;
 
         try {
-            attendance = await Attendance.update(
+            [ attendance ] = await Attendance.update(
                 {
-                    content,
+                    content: param.content,
                 },
                 {
                     where: {
-                        date,
-                        student_id: id,
+                        date: param.date,
+                        student_id: this._id,
                     },
-                    transaction
+                    transaction: this.transaction,
                 }
             );
-
-            await transaction.commit();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
-            attendance = [ 0 ];
+            await this.transaction.rollback();
+            attendance = 0;
         }
 
         return attendance;
     }
 
-    async delete(id: number, date: string): Promise<number> {
-        const transaction = await mysql.transaction();
-        let attendance: number;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async update(param: IAttendance): Promise<Attendance> {
+        throw new Error('Method not implemented.');
+    }
+
+    /**
+     * 출석정보의 물리적 삭제
+     *
+     * @param date
+     * @returns
+     */
+    async destroy(date: string): Promise<Attendance> {
+        let attendance: Attendance;
 
         try {
-            attendance = await Attendance.destroy({
+            attendance = await this.setId(this._id).get(date);
+            await Attendance.destroy({
                 where: {
                     date,
-                    student_id: id,
+                    student_id: this._id,
                 },
-                transaction
+                transaction: this.transaction
             });
 
-            await transaction.commit();
+            await this.transaction.commit();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
-            attendance = 0;
+            await this.transaction.rollback();
+            attendance = null;
         }
 
         return attendance;
+    }
+
+    delete(): Promise<Attendance> {
+        throw new Error('Method not implemented.');
     }
 }
