@@ -34,11 +34,6 @@ export default class StudentController {
 
             const where = await new StudentService().setId(req.account.id).setWhere(String(searchOption), String(searchWord))
             const StudentDTO: StudentBuilder = await new StudentService().setPage(parsePage).findAll(where);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     ...StudentDTO
-            // };
             logger.log('result:', JSON.stringify(StudentDTO));
 
             response = Result.ok<IResponse>({
@@ -72,11 +67,6 @@ export default class StudentController {
             }
 
             const student: IStudent = await new StudentService().setId(parseStudentId).get();
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     student
-            // };
             logger.log('result:', JSON.stringify(student));
 
             response = Result.ok<IResponse>({
@@ -114,11 +104,6 @@ export default class StudentController {
                 .build();
 
             const student: IStudent = await new StudentService().add(param);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     student
-            // };
             logger.log('result:', JSON.stringify(student));
 
             response = Result.ok<IResponse>({
@@ -164,11 +149,6 @@ export default class StudentController {
                 .build();
 
             const row = await new StudentService().modify(param);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     row
-            // };
             logger.log('result:', JSON.stringify(row));
 
             response = Result.ok<IResponse>({
@@ -202,11 +182,6 @@ export default class StudentController {
             }
 
             const row = await new StudentService().setId(parseStudentId).remove();
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     row
-            // };
             logger.log('result:', JSON.stringify(row));
 
             response = Result.ok<IResponse>({
@@ -233,11 +208,6 @@ export default class StudentController {
 
         try {
             const row = await new StudentService().setId(req.account.id).graduate(req.account.name);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     row
-            // };
             logger.log('result:', JSON.stringify(row));
 
             response = Result.ok<IResponse>({

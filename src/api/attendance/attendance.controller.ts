@@ -5,65 +5,12 @@ import AttendanceService from './attendance.service';
 
 import { IResponse } from '@/@types/response';
 
-import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
-import AttendanceBuilder from '@/common/builder/attendance.builder';
 
 import logger from '@/lib/logger';
 
 export default class AttendanceController {
-    /**
-     * 출석 데이터를 가져오는 API
-     *
-     * @param req
-     * @param res
-     */
-    async list(req: Request, res: Response) {
-        logger.log('req.params:', JSON.stringify(req.params));
-        logger.log('req.query:', JSON.stringify(req.query));
-        logger.log('req.body:', JSON.stringify(req.body));
-
-        const { groupId } = req.params;
-        const { year } = req.query;
-        let response;
-
-        try {
-            // 요청으로 넘어오는것들은 전부 string으로 받아오기 때문에 number로 형변환함.
-            const parseGroupId = Number(groupId);
-            if (isNaN(parseGroupId) || parseGroupId === 0) {
-                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: groupId is wrong');
-            }
-
-            let parseYear = Number(year);
-            if (isNaN(parseYear) || parseYear === 0) {
-                // year의 경우는 올해의 값으로 처리하도록 함.
-                parseYear = new Date().getFullYear();
-            }
-
-            const attendances: AttendanceBuilder = await new AttendanceService().list(parseGroupId, parseYear);
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     ...attendances
-            // }
-            logger.log('result:', JSON.stringify(attendances));
-
-            response = Result.ok<IResponse>({
-                account: req.account.name,
-                ...attendances
-            }).toJson();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            logger.err(JSON.stringify({ code: e.code, message: e.message, stack: e.stack }));
-            logger.error(e);
-            response = Result.fail<ApiError>(e).toJson();
-        }
-
-        logger.res(httpStatus.OK, response, req);
-        res.status(httpStatus.OK).json(response);
-    }
-
     /**
      * 출석 데이터를 입력하는 API
      *
@@ -86,16 +33,10 @@ export default class AttendanceController {
              */
             let row: number;
             if (isFull) {
-                row = await new AttendanceService().update(year, attendance);
+                row = await new AttendanceService().setYear(year).update(attendance);
             } else {
-                row = await new AttendanceService().delete(year, attendance);
+                row = await new AttendanceService().setYear(year).delete(attendance);
             }
-
-            // const result: ResponseDTO = {
-            //     account: req.account.name,
-            //     row,
-            //     isFull,
-            // }
             logger.log('result:', JSON.stringify(row));
 
             response = Result.ok<IResponse>({
