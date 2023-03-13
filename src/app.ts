@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import appRoot from 'app-root-path';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
+import requestIp from 'request-ip';
 
 import { env } from '@/env';
 
@@ -46,7 +47,7 @@ app.use(context.middleware);
 app.use((req, res, next) => {
     const { method, url, body, params, query, cookies } = req;
 
-    logger.log(`[${method}] ${url} body:${JSON.stringify(body)} params:${JSON.stringify(params)} query: ${JSON.stringify(query)} cookie:${JSON.stringify(cookies)}`);
+    logger.log(`ip: ${requestIp.getClientIp(req)} [${method}] ${url} body:${JSON.stringify(body)} params:${JSON.stringify(params)} query: ${JSON.stringify(query)} cookie:${JSON.stringify(cookies)}`);
     logger.req(req);
     next();
 });
