@@ -21,7 +21,7 @@ const expect = chai.expect;
 
 const responseSuccessKeys = ['code', 'message', 'result'];
 const responseFailKeys = ['code', 'message'];
-const groupDTOKeys = [ '_id', 'groupName', 'accountId' ];
+const groupDTOKeys = [ '_id', 'name', 'accountId' ];
 
 describe(`/api/group API Test`, async () => {
     before(async () => {
@@ -54,9 +54,9 @@ describe(`/api/group API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.id).to.be.a('string');
+            expect(res.body.result.name).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
-            cache.put('id', res.body.result.id);
+            cache.put('id', res.body.result.name);
             cache.put('accessToken', res.body.result.accessToken);
         });
     });
@@ -183,21 +183,10 @@ describe(`/api/group API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.row).to.be.a('number');
-            expect(res.body.result.account).to.be.a('string');
-
-            const res2 = await request(app)
-            .get(`/api/group/${groupId}`)
-            .auth(accessToken, { type: 'bearer' })
-            .set('Accept', 'application/json')
-            .send();
-
-            expect(res2.body).to.have.keys(responseSuccessKeys);
-            expect(res2.body.code).to.equal(ApiCode.OK);
-            expect(res2.body.result.group).to.be.a('object');
-            expect(res2.body.result.group).to.have.keys(groupDTOKeys);
-            expect(res2.body.result.group.groupName).to.be.a('string');
-            expect(res2.body.result.group.groupName).to.equal(name);
+            expect(res.body.result.group).to.be.a('object');
+            expect(res.body.result.group).to.have.keys(groupDTOKeys);
+            expect(res.body.result.group.name).to.be.a('string');
+            expect(res.body.result.group.name).to.equal(name);
         });
 
         it (`토큰이 없을 경우`, async () => {
@@ -237,7 +226,7 @@ describe(`/api/group API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.row).to.be.a('number');
+            expect(res.body.result.group).to.be.a('object');
             expect(res.body.result.account).to.be.a('string');
 
             const res2 = await request(app)

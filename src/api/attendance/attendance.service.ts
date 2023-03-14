@@ -76,13 +76,14 @@ export default class AttendanceService extends BaseService<AttendanceBuilder> {
         for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
             const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
 			const check = await new AttendanceRepository().setId(attendance[idx]._id).get(fullTime);
+            const transaction = await new AttendanceRepository().setId(attendance[idx]._id).setTransaction();
             if (check === null) {
                 const param = Builder<IAttendance>()
                     .date(fullTime)
                     .content(attendance[idx].data)
                     .build();
 
-                checkNull = await new AttendanceRepository().setId(attendance[idx]._id).create(param);
+                checkNull = await transaction.create(param);
                 if (checkNull) createRow++;
 			} else {
                 const param = Builder<IAttendance>()
@@ -90,7 +91,7 @@ export default class AttendanceService extends BaseService<AttendanceBuilder> {
                     .content(attendance[idx].data)
                     .build();
 
-                createRow += await new AttendanceRepository().setId(attendance[idx]._id).modify(param);
+                createRow += await transaction.modify(param);
 			}
 		}
 
@@ -117,7 +118,8 @@ export default class AttendanceService extends BaseService<AttendanceBuilder> {
 			const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
 			const check = await new AttendanceRepository().setId(attendance[idx]._id).get(fullTime);
 			if (check !== null) {
-                checkNull = await new AttendanceRepository().setId(attendance[idx]._id).destroy(fullTime);
+                const transaction = await new AttendanceRepository().setId(attendance[idx]._id).setTransaction();
+                checkNull = await transaction.destroy(fullTime);
                 if (checkNull) deleteRow++;
 			}
 		}

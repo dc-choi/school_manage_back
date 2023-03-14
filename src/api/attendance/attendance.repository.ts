@@ -1,6 +1,5 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 import logger from '@/lib/logger'
-import { mysql } from '@/lib/mysql';
 
 import { Attendance } from '@/models/attendance.model';
 import BaseRepository from '@/common/base/base.repository';
@@ -59,7 +58,6 @@ export default class AttendanceRepository extends BaseRepository<Attendance> {
     }
 
     async create(param: IAttendance): Promise<Attendance> {
-        const transaction = await mysql.transaction();
         let attendance;
 
         try {
@@ -67,13 +65,13 @@ export default class AttendanceRepository extends BaseRepository<Attendance> {
                 date: param.date,
                 content: param.content,
                 student_id: this._id,
-            }, { transaction });
+            }, { transaction: this.transaction });
 
-            await transaction.commit();
+            await this.transaction.commit();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             logger.error(e);
-            await transaction.rollback();
+            await this.transaction.rollback();
             attendance = null;
         }
 
@@ -102,6 +100,8 @@ export default class AttendanceRepository extends BaseRepository<Attendance> {
                     transaction: this.transaction,
                 }
             );
+
+            await this.transaction.commit();
         } catch (e: any) {
             logger.error(e);
             await this.transaction.rollback();
