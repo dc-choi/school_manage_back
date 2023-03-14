@@ -7,10 +7,13 @@ import AttendanceRepository from './attendance.repository';
 import { IStudent } from '@/@types/student';
 import { IAttendance } from '@/@types/attendance';
 
+import ApiCode from '@/common/api.code';
+import ApiError from '@/common/api.error';
 import AttendanceDTO from '@/common/dto/attendance.dto'
 import AttendanceBuilder from '@/common/builder/attendance.builder'
 import BaseService from '@/common/base/base.service';
 
+import logger from '@/lib/logger';
 import { getYearDate, getFullTime } from '@/lib/utils'
 
 import { Attendance } from '@/models/attendance.model';
@@ -72,30 +75,37 @@ export default class AttendanceService extends BaseService<AttendanceBuilder> {
     async update(attendance: Array<{ _id: number; month: number; day: number; data: string }>): Promise<number> {
         let createRow = 0;
         let checkNull = null;
+        const transaction = await new AttendanceRepository().setTransaction();
 
-        for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-            const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
-			const check = await new AttendanceRepository().setId(attendance[idx]._id).get(fullTime);
-            const transaction = await new AttendanceRepository().setId(attendance[idx]._id).setTransaction();
-            if (check === null) {
-                const param = Builder<IAttendance>()
-                    .date(fullTime)
-                    .content(attendance[idx].data)
-                    .build();
+        try {
+            for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
+                const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
+                const check = await transaction.setId(attendance[idx]._id).get(fullTime);
+                if (check === null) {
+                    const param = Builder<IAttendance>()
+                        .date(fullTime)
+                        .content(attendance[idx].data)
+                        .build();
 
-                checkNull = await transaction.create(param);
-                if (checkNull) createRow++;
-			} else {
-                const param = Builder<IAttendance>()
-                    .date(fullTime)
-                    .content(attendance[idx].data)
-                    .build();
+                    checkNull = await transaction.create(param);
+                    if (checkNull) createRow++;
+                } else {
+                    const param = Builder<IAttendance>()
+                        .date(fullTime)
+                        .content(attendance[idx].data)
+                        .build();
 
-                createRow += await transaction.modify(param);
-			}
-		}
-
-        return createRow;
+                    createRow += await transaction.modify(param);
+                }
+            }
+            await transaction.commit();
+            return createRow;
+        } catch(e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -114,17 +124,25 @@ export default class AttendanceService extends BaseService<AttendanceBuilder> {
         let deleteRow = 0;
         let checkNull = null;
 
-        for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
-			const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
-			const check = await new AttendanceRepository().setId(attendance[idx]._id).get(fullTime);
-			if (check !== null) {
-                const transaction = await new AttendanceRepository().setId(attendance[idx]._id).setTransaction();
-                checkNull = await transaction.destroy(fullTime);
-                if (checkNull) deleteRow++;
-			}
-		}
+        const transaction = await new AttendanceRepository().setTransaction();
 
-        return deleteRow;
+        try {
+            for (let idx = 0; idx < attendance.length; idx++) { // forEach 안 돌아가서 for문 사용
+                const fullTime = await getFullTime(this.year, attendance[idx].month, attendance[idx].day);
+                const check = await transaction.setId(attendance[idx]._id).get(fullTime);
+                if (check !== null) {
+                    checkNull = await transaction.destroy(fullTime);
+                    if (checkNull) deleteRow++;
+                }
+            }
+            await transaction.commit();
+            return deleteRow;
+        } catch(e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     remove(): Promise<AttendanceBuilder> {

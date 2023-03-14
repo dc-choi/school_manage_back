@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import GroupRepository from './group.repository';
 
 import { IGroup } from '@/@types/group';
@@ -6,6 +7,8 @@ import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import GroupDTO from '@/common/dto/group.dto';
 import BaseService from '@/common/base/base.service';
+
+import logger from '@/lib/logger';
 
 import { Group } from '@/models/group.model';
 
@@ -42,22 +45,46 @@ export default class GroupService extends BaseService<IGroup> {
 
     async add(param: IGroup): Promise<IGroup> {
         const transaction = await new GroupRepository().setTransaction();
-        const group: Group = await transaction.create(param);
 
-        return new GroupDTO(group).group;
+        try {
+            const group = await transaction.create(param);
+            await transaction.commit();
+            return new GroupDTO(group).group;
+        } catch(e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     async modify(param: IGroup): Promise<IGroup> {
         const transaction = await new GroupRepository().setTransaction();
-        const group: Group = await transaction.update(param);
 
-        return new GroupDTO(group).group;
+        try {
+            const group = await transaction.update(param);
+            await transaction.commit();
+            return new GroupDTO(group).group;
+        } catch(e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     async remove(): Promise<IGroup> {
         const transaction = await new GroupRepository().setId(this._id).setTransaction();
-        const group: Group = await transaction.delete();
 
-        return new GroupDTO(group).group;
+        try {
+            const group = await transaction.delete();
+            await transaction.commit();
+            return new GroupDTO(group).group;
+        } catch(e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 }
