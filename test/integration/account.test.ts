@@ -53,9 +53,9 @@ describe(`/api/account API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.id).to.be.a('string');
+            expect(res.body.result.name).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
-            cache.put('id', res.body.result.id);
+            cache.put('id', res.body.result.name);
             cache.put('accessToken', res.body.result.accessToken);
         });
     });
@@ -71,7 +71,8 @@ describe(`/api/account API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result).to.be.a('string');
+            expect(res.body.result).to.be.a('object');
+            expect(res.body.result.name).to.be.a('string');
         });
 
         it (`토큰이 없을 경우`, async () => {

@@ -21,17 +21,19 @@ const expect = chai.expect;
 
 const responseSuccessKeys = ['code', 'message', 'result'];
 const responseFailKeys = ['code', 'message'];
-const groupDTOKeys = [ '_id', 'groupName', 'accountId' ];
-const studentDTOKeys = [ 'nowPage', 'rowPerPage', 'totalRow', 'totalPage', 'students', 'account' ];
-const studentKeys = [ '_id', 'studentSocietyName', 'studentCatholicName', 'studentAge', 'studentContact', 'groupId' ]; // 'studentDescription', 'groupName'은 추후에 추가
-const detailStudentKeys = [ '_id', 'studentSocietyName', 'studentCatholicName', 'studentAge', 'studentContact', 'studentDescription', 'groupId' ]; // 'groupName'은 추후에 추가
+const groupDTOKeys = [ '_id', 'name', 'accountId' ];
+const studentDTOKeys = [ 'page', 'size', 'totalPage', 'students', 'account' ];
+const studentKeys = [ '_id', 'societyName', 'catholicName', 'age', 'contact', 'groupId' ]; // 'groupName'은 추후에 추가
+const detailStudentKeys = [ '_id', 'societyName', 'catholicName', 'age', 'contact', 'groupId' ]; // 'description', 'groupName'은 추후에 추가
 
-const studentJSON = {
-    societyName: faker.name.fullName(),
-    catholicName: faker.name.fullName(),
-    age: Number(faker.random.numeric(2)),
-    contact: 1000000000,
-    groupId: 0,
+const studentJSON = (groupId? :number) => {
+    return {
+        societyName: faker.name.fullName(),
+        catholicName: faker.name.fullName(),
+        age: Number(faker.random.numeric(2)),
+        contact: 1000000000,
+        groupId: groupId || 0,
+    };
 };
 
 describe(`/api/student API Test`, async () => {
@@ -65,9 +67,9 @@ describe(`/api/student API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.id).to.be.a('string');
+            expect(res.body.result.name).to.be.a('string');
             expect(res.body.result.accessToken).to.be.a('string');
-            cache.put('id', res.body.result.id);
+            cache.put('id', res.body.result.name);
             cache.put('accessToken', res.body.result.accessToken);
         });
     });
@@ -86,9 +88,8 @@ describe(`/api/student API Test`, async () => {
             expect(res.body.result).to.have.keys(studentDTOKeys);
             expect(res.body.result.students).to.be.a('array');
             expect(res.body.result.account).to.be.a('string');
-            expect(res.body.result.nowPage).to.be.a('number');
-            expect(res.body.result.rowPerPage).to.be.a('number');
-            expect(res.body.result.totalRow).to.be.a('number');
+            expect(res.body.result.page).to.be.a('number');
+            expect(res.body.result.size).to.be.a('number');
             expect(res.body.result.totalPage).to.be.a('number');
         });
 
@@ -123,21 +124,20 @@ describe(`/api/student API Test`, async () => {
         it (`정상 동작 시`, async () => {
             const groupId = cache.get('groupId');
             const accessToken = cache.get('accessToken');
-            studentJSON.groupId = groupId
             const res = await request(app)
             .post('/api/student')
             .auth(accessToken, { type: 'bearer' })
             .set('Accept', 'application/json')
-            .send(studentJSON);
+            .send(studentJSON(groupId));
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.student).to.have.keys(studentKeys);
             expect(res.body.result.student._id).to.be.a('number');
-            expect(res.body.result.student.studentSocietyName).to.be.a('string');
-            expect(res.body.result.student.studentCatholicName).to.be.a('string');
-            expect(res.body.result.student.studentAge).to.be.a('number');
-            expect(res.body.result.student.studentContact).to.be.a('number');
+            expect(res.body.result.student.societyName).to.be.a('string');
+            expect(res.body.result.student.catholicName).to.be.a('string');
+            expect(res.body.result.student.age).to.be.a('number');
+            expect(res.body.result.student.contact).to.be.a('number');
             expect(res.body.result.student.groupId).to.be.a('number');
             cache.put('studentId', res.body.result.student._id);
         });
@@ -146,7 +146,7 @@ describe(`/api/student API Test`, async () => {
             const res = await request(app)
             .post('/api/student')
             .set('Accept', 'application/json')
-            .send(studentJSON);
+            .send(studentJSON());
 
             expect(res.body).to.have.keys(responseFailKeys);
             expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
@@ -173,17 +173,17 @@ describe(`/api/student API Test`, async () => {
             .get(`/api/student/${studentId}`)
             .auth(accessToken, { type: 'bearer' })
             .set('Accept', 'application/json')
-            .send(studentJSON);
+            .send();
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
             expect(res.body.result.student).to.have.keys(detailStudentKeys);
             expect(res.body.result.student._id).to.be.a('number');
-            expect(res.body.result.student.studentSocietyName).to.be.a('string');
-            expect(res.body.result.student.studentCatholicName).to.be.a('string');
-            expect(res.body.result.student.studentAge).to.be.a('number');
-            expect(res.body.result.student.studentContact).to.be.a('number');
-            expect(res.body.result.student.studentDescription).to.be.a('null'); // 추후에 값이 입력되기 시작하면 string으로 올 수 있음.
+            expect(res.body.result.student.societyName).to.be.a('string');
+            expect(res.body.result.student.catholicName).to.be.a('string');
+            expect(res.body.result.student.age).to.be.a('number');
+            expect(res.body.result.student.contact).to.be.a('number');
+            // expect(res.body.result.student.description).to.be.a('string'); // 추후에 값이 입력되기 시작하면 string으로 올 수 있음.
             expect(res.body.result.student.groupId).to.be.a('number');
         });
 
@@ -192,7 +192,7 @@ describe(`/api/student API Test`, async () => {
             const res = await request(app)
             .get(`/api/student/${studentId}`)
             .set('Accept', 'application/json')
-            .send(studentJSON);
+            .send(studentJSON());
 
             expect(res.body).to.have.keys(responseFailKeys);
             expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
@@ -214,35 +214,25 @@ describe(`/api/student API Test`, async () => {
 
     describe(`학생 수정`, () => {
         it (`정상 동작 시`, async () => {
+            const groupId = cache.get('groupId');
             const studentId = cache.get('studentId');
             const accessToken = cache.get('accessToken');
             const res = await request(app)
             .put(`/api/student/${studentId}`)
             .auth(accessToken, { type: 'bearer' })
             .set('Accept', 'application/json')
-            .send(studentJSON);
+            .send(studentJSON(groupId));
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.row).to.be.a('number');
-            expect(res.body.result.account).to.be.a('string');
-
-            const res2 = await request(app)
-            .get(`/api/student/${studentId}`)
-            .auth(accessToken, { type: 'bearer' })
-            .set('Accept', 'application/json')
-            .send();
-
-            expect(res2.body).to.have.keys(responseSuccessKeys);
-            expect(res2.body.code).to.equal(ApiCode.OK);
-            expect(res2.body.result.student).to.have.keys(detailStudentKeys);
-            expect(res2.body.result.student._id).to.be.a('number');
-            expect(res2.body.result.student.studentSocietyName).to.be.a('string');
-            expect(res2.body.result.student.studentCatholicName).to.be.a('string');
-            expect(res2.body.result.student.studentAge).to.be.a('number');
-            expect(res2.body.result.student.studentContact).to.be.a('number');
-            expect(res2.body.result.student.studentDescription).to.be.a('null'); // 추후에 값이 입력되기 시작하면 string으로 올 수 있음.
-            expect(res2.body.result.student.groupId).to.be.a('number');
+            expect(res.body.result.student).to.have.keys(detailStudentKeys);
+            expect(res.body.result.student._id).to.be.a('number');
+            expect(res.body.result.student.societyName).to.be.a('string');
+            expect(res.body.result.student.catholicName).to.be.a('string');
+            expect(res.body.result.student.age).to.be.a('number');
+            expect(res.body.result.student.contact).to.be.a('number');
+            // expect(res.body.result.student.description).to.be.a('string'); // 추후에 값이 입력되기 시작하면 string으로 올 수 있음.
+            expect(res.body.result.student.groupId).to.be.a('number');
         });
 
         it (`토큰이 없을 경우`, async () => {
@@ -250,7 +240,7 @@ describe(`/api/student API Test`, async () => {
             const res = await request(app)
             .put(`/api/student/${studentId}`)
             .set('Accept', 'application/json')
-            .send(studentJSON);
+            .send(studentJSON());
 
             expect(res.body).to.have.keys(responseFailKeys);
             expect(res.body.code).to.equal(ApiCode.NOT_FOUND);
@@ -282,8 +272,14 @@ describe(`/api/student API Test`, async () => {
 
             expect(res.body).to.have.keys(responseSuccessKeys);
             expect(res.body.code).to.equal(ApiCode.OK);
-            expect(res.body.result.row).to.be.a('number');
-            expect(res.body.result.account).to.be.a('string');
+            expect(res.body.result.student).to.have.keys(detailStudentKeys);
+            expect(res.body.result.student._id).to.be.a('number');
+            expect(res.body.result.student.societyName).to.be.a('string');
+            expect(res.body.result.student.catholicName).to.be.a('string');
+            expect(res.body.result.student.age).to.be.a('number');
+            expect(res.body.result.student.contact).to.be.a('number');
+            // expect(res.body.result.student.description).to.be.a('string'); // 추후에 값이 입력되기 시작하면 string으로 올 수 있음.
+            expect(res.body.result.student.groupId).to.be.a('number');
 
             const res2 = await request(app)
             .get(`/api/student/${studentId}`)

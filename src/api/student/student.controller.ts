@@ -148,12 +148,12 @@ export default class StudentController {
                 .baptizedAt(baptizedAt)
                 .build();
 
-            const row = await new StudentService().modify(param);
-            logger.log('result:', JSON.stringify(row));
+            const student = await new StudentService().modify(param);
+            logger.log('result:', JSON.stringify(student));
 
             response = Result.ok<IResponse>({
                 account: req.account.name,
-                row
+                student
             }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
@@ -181,12 +181,12 @@ export default class StudentController {
                 throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: studentId is wrong');
             }
 
-            const row = await new StudentService().setId(parseStudentId).remove();
-            logger.log('result:', JSON.stringify(row));
+            const student = await new StudentService().setId(parseStudentId).remove();
+            logger.log('result:', JSON.stringify(student));
 
             response = Result.ok<IResponse>({
                 account: req.account.name,
-                row
+                student
             }).toJson();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {

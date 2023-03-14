@@ -120,7 +120,6 @@ export default class StudentService extends BaseService<IStudent> {
     async modify(param: IStudent): Promise<IStudent> {
         const transaction = await new StudentRepository().setTransaction();
         const student: Student = await transaction.update(param);
-        console.log('student:', student);
 
         return new StudentDTO(student).student;
     }

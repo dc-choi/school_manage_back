@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-boolean-cast */
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
@@ -5,6 +6,7 @@ import AttendanceService from './attendance.service';
 
 import { IResponse } from '@/@types/response';
 
+import ApiCode from '@/common/api.code';
 import ApiError from '@/common/api.error';
 import { Result } from '@/common/result';
 
@@ -26,6 +28,10 @@ export default class AttendanceController {
         let response;
 
         try {
+            if (!!!attendance || attendance.length <= 0 || typeof isFull === 'undefined') {
+                throw new ApiError(ApiCode.BAD_REQUEST, 'BAD_REQUEST: param is wrong');
+            }
+
             /**
              * 공백에 대한 출석과 입력에 대한 출석을 따로 나누는 로직도 합치는 것을 생각해봤으나,
              * 하나의 로직으로 묶어서 처리한다고 가정하고 성능 테스트를 해봤을 때에는 10번정도 요청을 보냈을 때, 1.2 ~ 2.3초정도의 성능을 보이는 것으로 확인함.
