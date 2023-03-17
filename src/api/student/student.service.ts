@@ -39,11 +39,11 @@ export default class StudentService extends BaseService<IStudent> {
         // searchWord가 비어있으면 삭제
         switch (searchOption) {
             case 'societyName':
-                !!!searchWord ? delete where.society_name : where.society_name = searchWord;
+                !!!searchWord ? delete where.society_name : where.society_name = { [Op.like]: `%${searchWord}%` };
                 delete where.catholic_name
                 break;
             case 'catholicName':
-                !!!searchWord ? delete where.catholic_name : where.catholic_name = searchWord;
+                !!!searchWord ? delete where.catholic_name : where.catholic_name = { [Op.like]: `%${searchWord}%` };
                 delete where.society_name
                 break;
             default:
