@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-extra-boolean-cast */
@@ -112,32 +111,58 @@ export default class StudentService extends BaseService<IStudent> {
 
     async add(param: IStudent): Promise<IStudent> {
         const transaction = await new StudentRepository().setTransaction();
-        const student: Student = await transaction.create(param);
 
-        return new StudentDTO(student).student;
+        try {
+            const student: Student = await transaction.create(param);
+            await transaction.commit();
+            return new StudentDTO(student).student;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     async modify(param: IStudent): Promise<IStudent> {
         const transaction = await new StudentRepository().setTransaction();
-        const student: Student = await transaction.update(param);
 
-        return new StudentDTO(student).student;
+        try {
+            const student: Student = await transaction.update(param);
+            await transaction.commit();
+            return new StudentDTO(student).student;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     async remove(): Promise<IStudent> {
         const transaction = await new StudentRepository().setId(this._id).setTransaction();
-        const student: Student = await transaction.delete();
 
-        return new StudentDTO(student).student;
+        try {
+            const student: Student = await transaction.delete();
+            await transaction.commit();
+            return new StudentDTO(student).student;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
     async graduate(accountName: string): Promise<number> {
         let result = 0;
 
+        // 현재 초등부, 중고등부를 제외하면 관리자임. 관리자는 전부 졸업처리가 가능하도록 하기.
         if (accountName === '초등부') result = await this.elementaryGraduation();
         if (accountName === '중고등부') result = await this.middleHighGraduation();
-        // 현재 초등부, 중고등부를 제외하면 관리자임. 관리자는 전부 졸업처리가 가능하도록 하기.
-        // throw new ApiError(ApiCode.UNAUTHORIZED, `UNAUTHORIZED: Invalid accountName`);
 
         return result;
     }
@@ -158,45 +183,62 @@ export default class StudentService extends BaseService<IStudent> {
         const _13Group = groups.filter(item => { return item.name === '6학년' })[0];
         let result = 0;
 
-        for (const group of groups) {
-            const students = await this.setId(group._id).list();
-            logger.log('졸업, 종업하는 초등부 학생들', students);
-            if (group.name === '유치부') result += await this.modifyStudentsGroup(students, _8Group._id);
-            if (group.name === '1학년') result += await this.modifyStudentsGroup(students, _9Group._id);
-            if (group.name === '2학년') result += await this.modifyStudentsGroup(students, _10Group._id);
-            if (group.name === '3학년') result += await this.modifyStudentsGroup(students, _11Group._id);
-            if (group.name === '4학년') result += await this.modifyStudentsGroup(students, _12Group._id);
-            if (group.name === '5학년') result += await this.modifyStudentsGroup(students, _13Group._id);
-            if (group.name === '6학년') result += await this.modifyStudentsGroup(students, _14Group._id);
+        const transaction = await new StudentRepository().setTransaction();
+        try {
+            for (const group of groups) {
+                const students = await this.setId(group._id).list();
+                logger.log('졸업, 종업하는 초등부 학생들', students);
+                if (group.name === '유치부') result += await this.modifyStudentsGroup(students, _8Group._id, transaction);
+                if (group.name === '1학년') result += await this.modifyStudentsGroup(students, _9Group._id, transaction);
+                if (group.name === '2학년') result += await this.modifyStudentsGroup(students, _10Group._id, transaction);
+                if (group.name === '3학년') result += await this.modifyStudentsGroup(students, _11Group._id, transaction);
+                if (group.name === '4학년') result += await this.modifyStudentsGroup(students, _12Group._id, transaction);
+                if (group.name === '5학년') result += await this.modifyStudentsGroup(students, _13Group._id, transaction);
+                if (group.name === '6학년') result += await this.modifyStudentsGroup(students, _14Group._id, transaction);
+            }
+            await transaction.commit();
+            return result;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
         }
-
-        return result;
     }
 
     private async middleHighGraduation(): Promise<number> {
-        const adult = await new GroupService().getByName('성인');
+        const adultGroup = await new GroupService().getByName('성인');
         const _19Group = await new GroupService().getByName('고3');
         let result = 0;
-        let students: IStudent[];
 
-        students = await this.listByAge(20);
-        logger.log('졸업하는 학생들', students);
-        if (students.length > 0) result += await this.modifyStudentsGroup(students, adult._id);
+        const adult: IStudent[] = await this.listByAge(20);
+        const candidate: IStudent[] = await this.listByAge(19);
+        logger.log('졸업하는 학생들', adult);
+        logger.log('고3인 학생들', candidate);
 
-        students = await this.listByAge(19);
-        logger.log('고3인 학생들', students);
-        if (students.length > 0) result += await this.modifyStudentsGroup(students, _19Group._id);
-
-        return result;
+        const transaction = await new StudentRepository().setTransaction();
+        try {
+            if (adult.length > 0) result += await this.modifyStudentsGroup(adult, adultGroup._id, transaction);
+            if (candidate.length > 0) result += await this.modifyStudentsGroup(candidate, _19Group._id, transaction);
+            await transaction.commit();
+            return result;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            logger.err(e);
+            logger.error(e);
+            await transaction.rollback();
+            throw new ApiError(ApiCode.INTERNAL_SERVER_ERROR, `${e}`);
+        }
     }
 
-    private async modifyStudentsGroup(students: IStudent[], groupId: number): Promise<number> {
+    private async modifyStudentsGroup(students: IStudent[], groupId: number, transaction: StudentRepository): Promise<number> {
         let result = 0;
 
         for (const student of students) {
             if (student.age >= 8) {
                 student.groupId = groupId;
-                if (await this.modify(student)) result++;
+                if (await transaction.update(student)) result++;
             }
         }
 

@@ -1,6 +1,4 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
-import logger from '@/lib/logger'
-
 import { Attendance } from '@/models/attendance.model';
 import BaseRepository from '@/common/base/base.repository';
 import { IAttendance } from '@/@types/attendance';
@@ -58,24 +56,11 @@ export default class AttendanceRepository extends BaseRepository<Attendance> {
     }
 
     async create(param: IAttendance): Promise<Attendance> {
-        let attendance;
-
-        try {
-            attendance = await Attendance.create({
-                date: param.date,
-                content: param.content,
-                student_id: this._id,
-            }, { transaction: this.transaction });
-
-            await this.transaction.commit();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            logger.error(e);
-            await this.transaction.rollback();
-            attendance = null;
-        }
-
-        return attendance;
+        return await Attendance.create({
+            date: param.date,
+            content: param.content,
+            student_id: this._id,
+        }, { transaction: this.transaction });
     }
 
     /**
@@ -85,29 +70,18 @@ export default class AttendanceRepository extends BaseRepository<Attendance> {
      * @returns
      */
     async modify(param: IAttendance): Promise<number> {
-        let attendance: number;
-
-        try {
-            [ attendance ] = await Attendance.update(
-                {
-                    content: param.content,
+        const [ attendance ] = await Attendance.update(
+            {
+                content: param.content,
+            },
+            {
+                where: {
+                    date: param.date,
+                    student_id: this._id,
                 },
-                {
-                    where: {
-                        date: param.date,
-                        student_id: this._id,
-                    },
-                    transaction: this.transaction,
-                }
-            );
-
-            await this.transaction.commit();
-        } catch (e: any) {
-            logger.error(e);
-            await this.transaction.rollback();
-            attendance = 0;
-        }
-
+                transaction: this.transaction,
+            }
+        );
         return attendance;
     }
 
@@ -123,26 +97,14 @@ export default class AttendanceRepository extends BaseRepository<Attendance> {
      * @returns
      */
     async destroy(date: string): Promise<Attendance> {
-        let attendance: Attendance;
-
-        try {
-            attendance = await this.setId(this._id).get(date);
-            await Attendance.destroy({
-                where: {
-                    date,
-                    student_id: this._id,
-                },
-                transaction: this.transaction
-            });
-
-            await this.transaction.commit();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            logger.error(e);
-            await this.transaction.rollback();
-            attendance = null;
-        }
-
+        const attendance: Attendance = await this.setId(this._id).get(date);
+        await Attendance.destroy({
+            where: {
+                date,
+                student_id: this._id,
+            },
+            transaction: this.transaction
+        });
         return attendance;
     }
 

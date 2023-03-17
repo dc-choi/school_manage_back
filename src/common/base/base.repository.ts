@@ -29,6 +29,14 @@ export default abstract class BaseRepository<T> {
         return this;
     }
 
+    async commit() {
+        await this.transaction.commit();
+    }
+
+    async rollback() {
+        await this.transaction.rollback();
+    }
+
     abstract findAll(): Promise<T[]>;
     abstract findAndCountAll(where: any): Promise<{rows: any; count: number}>; // pagenation
     abstract findOne(): Promise<T>;
