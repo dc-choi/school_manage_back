@@ -14,6 +14,8 @@ export default class StatisticsRepository {
                     then 2
                     when a.content = '○'
                     then 1
+                    when a.content = '△'
+                    then 1
                 end) as \`count\`
             FROM student s
             JOIN attendance a
