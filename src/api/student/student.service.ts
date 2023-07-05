@@ -27,6 +27,7 @@ export default class StudentService extends BaseService<IStudent> {
         const where = {
             society_name: null,
             catholic_name: null,
+            baptized_at: null,
             group_id: {
                 [Op.in]: groups.map(item => { return item._id })
             },
@@ -38,16 +39,30 @@ export default class StudentService extends BaseService<IStudent> {
         // searchWord가 비어있으면 삭제
         switch (searchOption) {
             case 'societyName':
-                !!!searchWord ? delete where.society_name : where.society_name = { [Op.like]: `%${searchWord}%` };
-                delete where.catholic_name
+                if (!!!searchWord) delete where.society_name;
+                else where.society_name = { [Op.like]: `%${searchWord}%` };
+
+                delete where.catholic_name;
+                delete where.baptized_at;
                 break;
             case 'catholicName':
-                !!!searchWord ? delete where.catholic_name : where.catholic_name = { [Op.like]: `%${searchWord}%` };
-                delete where.society_name
+                if (!!!searchWord) delete where.catholic_name;
+                else where.catholic_name = { [Op.like]: `%${searchWord}%` };
+
+                delete where.society_name;
+                delete where.baptized_at;
+                break;
+            case 'baptizedAt':
+                if (!!!searchWord) delete where.baptized_at;
+                else where.baptized_at = { [Op.like]: `%${searchWord}%` };
+
+                delete where.society_name;
+                delete where.catholic_name;
                 break;
             default:
-                delete where.society_name
-                delete where.catholic_name
+                delete where.society_name;
+                delete where.catholic_name;
+                delete where.baptized_at;
                 break;
         }
         logger.log('where:', where);
