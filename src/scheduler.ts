@@ -8,7 +8,7 @@ class Scheduler {
         // 초(옵션), 분, 시, 일, 월, 요일
         const time = '0 0 1 1 *';
         schedule.scheduleJob(time, async() => {
-            mysql.query('UPDATE student SET student_age = student_age + 1');
+            mysql.query('UPDATE student SET age = age + 1');
             logger.log("Scheduler is working!!");
         });
     }
