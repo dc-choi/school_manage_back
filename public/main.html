@@ -16,7 +16,7 @@
 		<p><a class="btn btn-primary" href="groupList.html">그룹 리스트 이동</a></p>
 		<p><a class="btn btn-primary" href="studentList.html">학생 명단 이동</a></p>
 		<p><a class="btn btn-primary" href="statistics.html">통계 이동</a></p>
-		<p><button class="btn btn-danger" type="button" id="graduation">졸업, 종업</button></p>
+<!--		<p><button class="btn btn-danger" type="button" id="graduation">졸업, 종업</button></p>-->
         <div id="spin" class="d-none spinner-border text-success" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
@@ -24,11 +24,11 @@
 	</div>
 </body>
 <script>
-    let IS_RUN = false; // graduation click시 중복되게 하지 않기 위한 전역변수
+    // let IS_RUN = false; // graduation click시 중복되게 하지 않기 위한 전역변수
 
     const showLoading = () => {
         $('#spin').removeClass("d-none");
-        $('#graduation').addClass("d-none");
+        // $('#graduation').addClass("d-none");
 
         //화면의 높이와 너비를 구합니다.
         let maskHeight = $(document).height();
@@ -49,7 +49,7 @@
     };
 
     const hideLoading = () => {
-        $('#graduation').removeClass("d-none");
+        // $('#graduation').removeClass("d-none");
         $('#spin').addClass("d-none");
         $("#mask").remove();
     };
@@ -87,7 +87,7 @@
                     sessionStorage.clear();
                     location.href = `index.html`;
                 }
-                $("#account").html(`장위동 ${data.result.name} 주일학교 관리 프로그램`);
+                $("#account").html(`${data.result.name} 주일학교 관리 프로그램`);
                 $("#teacher").html(`환영합니다. ${data.result.name} 선생님.`);
 			},
 			error: (error) => {
@@ -98,18 +98,18 @@
 
 	initPage();
 
-    $("#graduation").on("click", async() => {
-        if (IS_RUN) return;
-
-        showLoading();
-        IS_RUN = true;
-
-        if (confirm('정말 아이들을 졸업시키겠습니까?\n\n이 기능은 한번 누르면 되돌릴 수 없습니다.\n\n신중하게 선택해주세요.')) {
-            graduation();
-        }
-
-        hideLoading();
-        IS_RUN = false;
-    });
+    // $("#graduation").on("click", async() => {
+    //     if (IS_RUN) return;
+    //
+    //     showLoading();
+    //     IS_RUN = true;
+    //
+    //     if (confirm('정말 아이들을 졸업시키겠습니까?\n\n이 기능은 한번 누르면 되돌릴 수 없습니다.\n\n신중하게 선택해주세요.')) {
+    //         graduation();
+    //     }
+    //
+    //     hideLoading();
+    //     IS_RUN = false;
+    // });
 </script>
 </html>
